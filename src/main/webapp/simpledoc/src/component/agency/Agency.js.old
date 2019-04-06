@@ -1,0 +1,43 @@
+import React from 'react'
+import { connect } from 'react-redux'
+
+import { agents } from './agency_constants'
+import instanceFactory from '../instanceFactory'
+import listFactory from '../../utility/listFactory'
+import { ModuleWrapper } from '../../styles/layoutStyles'
+
+
+
+
+class Agency extends React.Component {
+
+  listData() {
+    return Object.entries(agents).map(([key, value]) => {
+      return {
+        data: this.props.object[key],
+        header: value,
+        itemclick: item => instanceFactory(key, item, this.props.object.agentTypes)
+      }})
+  }
+
+  render() {
+    return  <ModuleWrapper>
+              { listFactory(this.listData()) }
+      		  </ModuleWrapper>
+  }
+
+}
+
+
+const mapStateToProps = (state, ownProps) => {
+  let keys = Object.keys(agents)
+  let object = {}
+  keys.forEach(key =>{
+    object = Object.defineProperty(object, key, {value: state.agency.get(key)})
+  })
+
+  return {object}
+}
+
+
+export default connect(mapStateToProps)(Agency)
