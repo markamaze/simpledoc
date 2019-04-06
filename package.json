@@ -2,7 +2,7 @@
 	"name": "client",
 	"version": "0.12.0",
 	"description": "simpledoc client",
-	"main": "/src/index.js",
+	"main": "/src/main/webapp/simpledoc/src/index.js",
 	"scripts": {
 		"test": "jest",
 		"start": "webpack-dev-server --hot "
