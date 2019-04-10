@@ -5,7 +5,7 @@
 	"main": "/src/main/webapp/simpledoc/src/index.js",
 	"scripts": {
 		"test": "jest",
-		"start": "webpack-dev-server --hot "
+		"start": "webpack"
 	},
 	"author": "Mark A Maze",
 	"license": "ISC",
