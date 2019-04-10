@@ -4,3 +4,4 @@
 /simpledoc/.vscode/
 /.settings
 /.project
+/simpledoc/dist/*.bundle.js
