@@ -1,18 +1,20 @@
 What do I need to do:
 
--> resolve invalid certificate on client
-
 -> continue with designing and implementing my CI/CD pipeline
+-  > get setup where I can clone the repo and compile on system using maven
+-    * work out issues with maven lifecycles and pom file
+-  > get running locally with heroku cli
+-  > set up testing environment on backend
+-  > configure pipeline to build, test, and deploy app upon push to master
+
 
 -> once pipeline is running:
----> get storage controller successfully creating each of the agency object types
------> setup using UDT's if no trouble with it on the Heroku Postgres server
------> otherwise, continue with implementing  w/o acid compliance
----> extrapolate to include update and delete ops for each of the agency object types
----> develop and implement querrying model of all agency object types
----> setup testing of the API such that I can send request of each type for each agency object and get the expected response
----> upon successful testing of agency module api:
------> implement the Forms module to achieve same successful testing of each operation of each form object type
----> upon successful testing of forms module api:
------> rework the front end code to accept/handle refactored data structures
------> continue building the ui for user to envoke business logic
+-  > get storage controller successfully creating each of the agency object types
+-    * setup using UDT's if no trouble with it on the Heroku Postgres server
+-    * otherwise, continue with implementing  w/o acid compliance
+-  > extrapolate to include update and delete ops for each of the agency object types
+-  > develop and implement system to query model for all agency object types
+-  > setup testing of the API such that I can send request of each type for each agency object and get the expected response
+-  > implement the Forms module to achieve same successful testing of each operation of each form object type
+-  > rework the front end code to accept/handle refactored data structures
+-  > continue building the ui for user to envoke business logic
