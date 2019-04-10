@@ -1,8 +1,6 @@
 What do I need to do:
 
 -> continue with designing and implementing my CI/CD pipeline
--  > get setup where I can clone the repo and compile on system using maven
--    * work out issues with maven lifecycles and pom file
 -  > get running locally with heroku cli
 -  > set up testing environment on backend
 -  > configure pipeline to build, test, and deploy app upon push to master
@@ -18,3 +16,8 @@ What do I need to do:
 -  > implement the Forms module to achieve same successful testing of each operation of each form object type
 -  > rework the front end code to accept/handle refactored data structures
 -  > continue building the ui for user to envoke business logic
+
+
+-> backlog:
+-  > reorganize .gitignore files
+-  > rename app, change to "Radar"
