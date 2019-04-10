@@ -41,16 +41,18 @@ public class Simpledoc {
             // setup the HTTPS context and parameters
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(key_manager_factory.getKeyManagers(), trust_manager_factory.getTrustManagers(), null);
-        
-            
+
+
             //TODO: consider refacoring
             // I may want to create a context for each of the main module types
             // and load the service and resource request object directly?
             // then the server response could be send from the server directly
             httpsServer.createContext("/", exchange -> {
+              System.out.println(exchange.getRequestMethod());
+              System.out.println(exchange.getRequestURI().getPath());
             	new ClientThread((HttpsExchange)exchange, new ServiceLoader()).run(); });
 
-            
+
             httpsServer.setHttpsConfigurator(new HttpsConfigurator(sslContext) {
                 public void configure(HttpsParameters params) {
                     try {
@@ -67,10 +69,10 @@ public class Simpledoc {
 
                     } catch (Exception e) {e.printStackTrace();}
                 }
-            });           
+            });
             httpsServer.setExecutor(null);
             httpsServer.start();
-           
+
             System.out.println("server started on port " + httpsServer.getAddress().getPort());
 
         } catch (Exception e) {e.printStackTrace();}
