@@ -10,6 +10,10 @@
 	"author": "Mark A Maze",
 	"license": "ISC",
 	"dependencies": {
+		"babel-core": "^6.26.3",
+		"babel-loader": "^7.1.5",
+		"babel-plugin-transform-react-jsx": "^6.24.1",
+		"babel-preset-env": "^1.7.0",
 		"bson-objectid": "^1.2.3",
 		"clean-webpack-plugin": "^0.1.19",
 		"heroku": "^7.22.9",
@@ -21,18 +25,16 @@
 		"react-redux": "^5.0.6",
 		"react-router-dom": "^4.2.2",
 		"redux": "^3.7.2",
+		"redux-devtools-extension": "^2.13.2",
+		"redux-logger": "^3.0.6",
 		"redux-thunk": "^2.2.0",
 		"styled-components": "^3.2.6",
 		"webpack": "^4.26.0",
 		"webpack-cli": "^3.1.2"
 	},
 	"devDependencies": {
-		"babel-core": "^6.26.3",
-		"babel-loader": "^7.1.5",
-		"babel-plugin-transform-react-jsx": "^6.24.1",
-		"babel-preset-env": "^1.7.0",
-		"redux-devtools-extension": "^2.13.2",
-		"redux-logger": "^3.0.6",
+
+		
 		"webpack-dev-server": "^3.1.10"
 	}
 }
