@@ -5,7 +5,7 @@
 	"main": "/src/main/webapp/simpledoc/src/index.js",
 	"scripts": {
 		"test": "jest",
-		"start": "webpack"
+		"start": "webpack && mvn clean install"
 	},
 	"author": "Mark A Maze",
 	"license": "ISC",
@@ -34,7 +34,7 @@
 	},
 	"devDependencies": {
 
-		
+
 		"webpack-dev-server": "^3.1.10"
 	}
 }
