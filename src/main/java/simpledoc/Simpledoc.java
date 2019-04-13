@@ -21,7 +21,7 @@ public class Simpledoc {
 
         try {
             // initialize the HTTPS server
-        	InetSocketAddress address = new InetSocketAddress(8080);
+        	  InetSocketAddress address = new InetSocketAddress("0.0.0.0", 8080);
             HttpsServer httpsServer = HttpsServer.create(address, 0);
 
             // initialize the key store
