@@ -65,7 +65,7 @@
           <artifactId>maven-war-plugin</artifactId>
           <configuration>
               <attachClasses>true</attachClasses>
-              <webXml>src/main/java/target/web.xml</webXml>
+              <webXml>web.xml</webXml>
               <webResources>
                   <resource>
                       <directory>src/main/webapp/simpledoc</directory>
