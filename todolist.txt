@@ -1,9 +1,12 @@
 What do I need to do:
 
 -> continue with designing and implementing my CI/CD pipeline
--  > get running locally with heroku cli
+-  > get running on heroku
+-    > running mvn install and java -jar locally work fine
+-    > running heroku local works fine
+-    > deploying successfully, but client cant connect
+-    > not sure, but I might be exceeding resources of an unverified account
 -  > set up testing environment on backend
--  > configure pipeline to build, test, and deploy app upon push to master
 
 
 -> once pipeline is running:

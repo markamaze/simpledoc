@@ -1,7 +1,10 @@
-/target/
-/.classpath
-/.project
-/.settings
+/target
+**/.classpath
+**/.project
+**/.settings
 /node_modules
-/package-lock.json
-/.metadata/
+package-lock.json
+/.metadata
+**/bin
+**.bundle.js
+server.pass.key
