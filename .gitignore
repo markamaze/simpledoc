@@ -2,9 +2,11 @@
 **/.classpath
 **/.project
 **/.settings
-/node_modules
+**/node_modules
 package-lock.json
 /.metadata
 **/bin
 **.bundle.js
 server.pass.key
+**/*.jar
+**/.vscode
