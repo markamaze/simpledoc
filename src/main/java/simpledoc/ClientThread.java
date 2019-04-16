@@ -19,17 +19,18 @@ public class ClientThread extends Thread {
 
 	 @Override
 	 public void run() {
-	 	switch(this.exchange.getRequestURI().getPath()) {
-	 		case "/":
-	 			loadFile("index.html");
-	 			break;
-	 		case "/simpledoc.bundle.js":
-	 			loadFile("simpledoc.bundle.js");
-	 			break;
-	 		default:
-	 			handleResourceRequest();
-	 			break;
-	 	}
+		 loadFile("index.html");
+	 	// switch(this.exchange.getRequestURI().getPath()) {
+	 	// 	case "/":
+	 	// 		loadFile("index.html");
+	 	// 		break;
+	 	// 	case "/simpledoc.bundle.js":
+	 	// 		loadFile("simpledoc.bundle.js");
+	 	// 		break;
+	 	// 	default:
+	 	// 		handleResourceRequest();
+	 	// 		break;
+	 	// }
 
 	 }
 
