@@ -2,10 +2,10 @@
 	"name": "client",
 	"version": "0.12.0",
 	"description": "simpledoc client",
-	"main": "/src/main/webapp/simpledoc/src/index.js",
+	"main": "/src/main/client/src/index.js",
 	"scripts": {
 		"test": "jest",
-		"start": "webpack"
+		"start": "webpack src/main/client/src/index.js -o src/main/dist/simpledoc.bundle.js"
 	},
 	"author": "Mark A Maze",
 	"license": "ISC",
@@ -29,12 +29,10 @@
 		"redux-logger": "^3.0.6",
 		"redux-thunk": "^2.2.0",
 		"styled-components": "^3.2.6",
-		"webpack": "^4.26.0",
+		"webpack": "^4.30.0",
 		"webpack-cli": "^3.1.2"
 	},
 	"devDependencies": {
-
-
 		"webpack-dev-server": "^3.1.10"
 	}
 }

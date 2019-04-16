@@ -57,7 +57,7 @@ public class ClientThread extends Thread {
 	 private void loadFile(String directory) {
 	 	OutputStream out = null;
 	 	FileReader in = null;
-	 	String path = "/home/mark/code/portfolio/simpledoc/src/resources/dist/";
+	 	String path = "/home/mark/code/portfolio/simpledoc/src/main/dist/";
 	
 	 	try {
 	 		exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "[::1]:3333");
