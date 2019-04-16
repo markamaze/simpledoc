@@ -52,7 +52,7 @@ public class Simpledoc {
               System.out.println("hello client request");
               System.out.println(exchange.getRequestMethod());
               System.out.println(exchange.getRequestURI().getPath());
-            	 new ClientThread((HttpsExchange)exchange, new ServiceLoader()).run();
+            	 // new ClientThread((HttpsExchange)exchange, new ServiceLoader()).run();
             });
 
 
