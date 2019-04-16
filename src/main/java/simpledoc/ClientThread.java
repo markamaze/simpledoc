@@ -19,6 +19,7 @@ public class ClientThread extends Thread {
 
 	 @Override
 	 public void run() {
+		 System.out.println("ClientThread running");
 		 loadFile("index.html");
 	 	// switch(this.exchange.getRequestURI().getPath()) {
 	 	// 	case "/":
@@ -56,6 +57,7 @@ public class ClientThread extends Thread {
 	 }
 
 	 private void loadFile(String directory) {
+		 System.out.println("in loadFile");
 	 	OutputStream out = null;
 	 	FileReader in = null;
 	 	String path = "./src/main/dist/";
