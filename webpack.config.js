@@ -4,7 +4,7 @@ const path = require('path');
 const config = {
   devtool: "eval",
   mode: 'development',
-  entry: './src/main/client/simpledoc/src/index.js',
+  entry: './src/main/client/src/index.js',
   output: {
     path: path.resolve(__dirname, "./src/main/dist"),
     filename: 'simpledoc.bundle.js'
