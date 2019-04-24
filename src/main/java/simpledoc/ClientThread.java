@@ -3,14 +3,14 @@ package simpledoc;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
-import com.sun.net.httpserver.HttpsExchange;
+import com.sun.net.httpserver.HttpExchange;
 
 public class ClientThread extends Thread {
 
-	 private HttpsExchange exchange;
+	 private HttpExchange exchange;
 	 private ServiceLoader services;
 
-	 public ClientThread(HttpsExchange exchange, ServiceLoader loader) {
+	 public ClientThread(HttpExchange exchange, ServiceLoader loader) {
 	 	this.exchange = exchange;
 	 	this.services = loader;
 	 	try { this.join(); }
@@ -29,7 +29,8 @@ public class ClientThread extends Thread {
 	 			loadFile("simpledoc.bundle.js");
 	 			break;
 	 		default:
-	 			handleResourceRequest();
+	 			// handleResourceRequest();
+				System.out.println("requested resource, will be available after server running");
 	 			break;
 	 	}
 
