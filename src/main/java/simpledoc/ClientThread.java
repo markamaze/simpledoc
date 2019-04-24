@@ -20,18 +20,18 @@ public class ClientThread extends Thread {
 	 @Override
 	 public void run() {
 		 System.out.println("ClientThread running");
-		 loadFile("index.html");
-	 	// switch(this.exchange.getRequestURI().getPath()) {
-	 	// 	case "/":
-	 	// 		loadFile("index.html");
-	 	// 		break;
-	 	// 	case "/simpledoc.bundle.js":
-	 	// 		loadFile("simpledoc.bundle.js");
-	 	// 		break;
-	 	// 	default:
-	 	// 		handleResourceRequest();
-	 	// 		break;
-	 	// }
+		 // loadFile("index.html");
+	 	switch(this.exchange.getRequestURI().getPath()) {
+	 		case "/":
+	 			loadFile("index.html");
+	 			break;
+	 		case "/simpledoc.bundle.js":
+	 			loadFile("simpledoc.bundle.js");
+	 			break;
+	 		default:
+	 			handleResourceRequest();
+	 			break;
+	 	}
 
 	 }
 
@@ -60,7 +60,7 @@ public class ClientThread extends Thread {
 		 System.out.println("in loadFile");
 	 	OutputStream out = null;
 	 	FileReader in = null;
-	 	String path = "./src/main/dist/";
+	 	String path = "./src/main/webapp/";
 
 	 	try {
 	 		exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "[::1]:3333");

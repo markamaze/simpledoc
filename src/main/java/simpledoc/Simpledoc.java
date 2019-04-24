@@ -22,7 +22,7 @@ public class Simpledoc {
         try {
         	System.out.println("Hello server");
             // initialize the HTTPS server
-        	  InetSocketAddress address = new InetSocketAddress("0.0.0.0", 8080);
+        	  InetSocketAddress address = new InetSocketAddress("0.0.0.0", 8443);
             HttpsServer httpsServer = HttpsServer.create(address, 0);
 
             // initialize the key store
@@ -52,7 +52,7 @@ public class Simpledoc {
               System.out.println("hello client request");
               System.out.println(exchange.getRequestMethod());
               System.out.println(exchange.getRequestURI().getPath());
-            	 // new ClientThread((HttpsExchange)exchange, new ServiceLoader()).run();
+            	 new ClientThread((HttpsExchange)exchange, new ServiceLoader()).run();
             });
 
 
