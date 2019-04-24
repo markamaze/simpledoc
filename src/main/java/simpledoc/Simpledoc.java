@@ -31,7 +31,7 @@ public class Simpledoc {
             // initialize the key store
             char[] password = "password".toCharArray();
             KeyStore key_store = KeyStore.getInstance("JKS");
-            FileInputStream file_input = new FileInputStream("src/main/java/simpledoc/testkey.jks");
+            FileInputStream file_input = new FileInputStream("src/main/webapp/testkey.jks");
             key_store.load(file_input, password);
 
             // setup the key manager factory

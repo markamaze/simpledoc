@@ -58,7 +58,6 @@
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <classpathPrefix>lib/</classpathPrefix>
               <mainClass>simpledoc.Simpledoc</mainClass>
             </manifest>
           </archive>
@@ -66,5 +65,15 @@
   		</plugin>
 
   	</plugins>
+    <resources>
+      <resource>
+        <directory>/src/main/webapp/</directory>
+        <includes>
+          <include>index.html</include>
+          <include>simpledoc.bundle.js</include>
+          <include>testkey.jks</include>
+        </includes>
+      </resource>
+    </resources>
 	</build>
 </project>
