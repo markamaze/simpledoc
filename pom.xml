@@ -53,7 +53,7 @@
   		<plugin>
   		  <groupId>org.apache.maven.plugins</groupId>
   			<artifactId>maven-jar-plugin</artifactId>
-      	<version>3.0.0</version>
+      	<version>3.1.1</version>
         <configuration>
           <archive>
             <manifest>
@@ -67,11 +67,9 @@
   	</plugins>
     <resources>
       <resource>
-        <directory>/src/main/webapp/</directory>
+        <directory>resources/</directory>
         <includes>
-          <include>index.html</include>
-          <include>simpledoc.bundle.js</include>
-          <include>testkey.jks</include>
+          <include>**/*</include>
         </includes>
       </resource>
     </resources>
