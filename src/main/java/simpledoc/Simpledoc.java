@@ -12,10 +12,10 @@ public class Simpledoc {
 
 		//TODO: question -> should service loader be static or instantiated for each request?
 		ServiceLoader loader = new ServiceLoader();
-    System.out.println(System.getenv("PORT"));
+    Integer port = Integer.parseInt(System.getenv("PORT"));
 
 		try{
-			HttpServer server = HttpServer.create(new InetSocketAddress(3333), 0);
+			HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 	        HttpContext context = server.createContext("/");
 	        context.setHandler(exchange -> {
 	        	System.out.println("client request incoming: " + exchange.getRemoteAddress());
