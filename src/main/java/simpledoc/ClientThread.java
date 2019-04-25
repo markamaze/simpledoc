@@ -3,14 +3,14 @@ package simpledoc;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
-import com.sun.net.httpserver.HttpsExchange;
+import com.sun.net.httpserver.HttpExchange;
 
 public class ClientThread extends Thread {
 
-	 private HttpsExchange exchange;
+	 private HttpExchange exchange;
 	 private ServiceLoader services;
 
-	 public ClientThread(HttpsExchange exchange, ServiceLoader loader) {
+	 public ClientThread(HttpExchange exchange, ServiceLoader loader) {
 	 	this.exchange = exchange;
 	 	this.services = loader;
 	 	try { this.join(); }
@@ -20,18 +20,19 @@ public class ClientThread extends Thread {
 	 @Override
 	 public void run() {
 		 System.out.println("ClientThread running");
-		 loadFile("index.html");
-	 	// switch(this.exchange.getRequestURI().getPath()) {
-	 	// 	case "/":
-	 	// 		loadFile("index.html");
-	 	// 		break;
-	 	// 	case "/simpledoc.bundle.js":
-	 	// 		loadFile("simpledoc.bundle.js");
-	 	// 		break;
-	 	// 	default:
-	 	// 		handleResourceRequest();
-	 	// 		break;
-	 	// }
+		 // loadFile("index.html");
+	 	switch(this.exchange.getRequestURI().getPath()) {
+	 		case "/":
+	 			loadFile("index.html");
+	 			break;
+	 		case "/simpledoc.bundle.js":
+	 			loadFile("simpledoc.bundle.js");
+	 			break;
+	 		default:
+	 			// handleResourceRequest();
+				System.out.println("requested resource, will be available after server running");
+	 			break;
+	 	}
 
 	 }
 
@@ -60,7 +61,7 @@ public class ClientThread extends Thread {
 		 System.out.println("in loadFile");
 	 	OutputStream out = null;
 	 	FileReader in = null;
-	 	String path = "./src/main/dist/";
+	 	String path = "./src/main/webapp/";
 
 	 	try {
 	 		exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "[::1]:3333");
