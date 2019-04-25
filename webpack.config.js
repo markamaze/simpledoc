@@ -6,7 +6,7 @@ const config = {
   mode: 'development',
   entry: './src/main/client/src/index.js',
   output: {
-    path: path.resolve(__dirname, "./src/main/dist"),
+    path: path.resolve(__dirname, "./src/main/webapp"),
     filename: 'simpledoc.bundle.js'
   },
   devServer: {
