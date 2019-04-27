@@ -28,9 +28,11 @@ public class ClientThread extends Thread {
 	 		case "/simpledoc.bundle.js":
 	 			loadFile("simpledoc.bundle.js");
 	 			break;
+			case "/favicon.ico":
+				System.out.println("!loading favicon");
 	 		default:
-	 			// handleResourceRequest();
-				System.out.println("requested resource, will be available after server running");
+	 			handleResourceRequest();
+				// System.out.println("requested resource, will be available after server running");
 	 			break;
 	 	}
 
@@ -44,13 +46,14 @@ public class ClientThread extends Thread {
 	 									this.exchange.getRequestURI().getQuery(),
 	 									this.exchange.getRequestBody());
 
-	 	ResourceResponse response = this.services.load(request.module(), request.method())
-	 										.run(request);
+	 	ResourceResponse response = this.services.load(request.module(), request.method()).run(request);
 
 	 	try {
-	 		this.exchange.sendResponseHeaders(  response.responseCode(),
-	 											response.bodyLength() );
-	 		OutputStream out = this.exchange.getResponseBody();
+	 		this.exchange.sendResponseHeaders(  response.responseCode(), response.bodyLength() );
+			//throwing NullPointerException
+					//response is null
+
+			OutputStream out = this.exchange.getResponseBody();
 	 		out.write(response.writableBody());
 	 		out.close();
 	 	} catch (IOException e) { e.printStackTrace(); }
