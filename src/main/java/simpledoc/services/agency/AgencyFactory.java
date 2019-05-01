@@ -33,7 +33,7 @@ public class AgencyFactory implements ModuleObjectFactory {
 		String security_setting = (String) object_data.get("category_security");
 		Map<String, Object> data_definition = (Map<String, Object>) object_data.get("category_data_structure");
 
-		if(object_id == null) {
+		if(object_id == "new") {
 			new_agent_category = new AgentCategoryObject(UUID.randomUUID().toString(), object_type);
 		} else new_agent_category = new AgentCategoryObject(object_id, object_type);
 		
