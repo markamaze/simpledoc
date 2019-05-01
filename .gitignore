@@ -4,3 +4,5 @@ package-lock.json
 **/*.jar
 **/*.bundle.js
 .project
+.settings/
+.classpath
