@@ -95,4 +95,40 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 
 
+	private CallableStatement setAgencyCategory(Connection connection, AgentCategory category) throws SQLException {
+		CallableStatement cs = connection.prepareCall("call agency.create_category(?,?,?,?,?)");
+		cs.setString(1, category.getId());
+		cs.setString(2, category.getCategoryLabel());
+		cs.setString(3, category.getCategoryBehavior());
+		cs.setString(4, category.getCategorySecurity());
+		cs.setString(5, category.getDataDefinition().toString());
+		
+		return cs;
+	}
+	
+	
+	
+	private CallableStatement setAgencyDefinition(Connection connection, AgentDefinition definition) throws SQLException {
+		CallableStatement cs = connection.prepareCall("call agency.create_definition(?,?,?,?,?)");
+		cs.setString(1, definition.getId());
+		cs.setString(2, definition.getDefinitionLabel());
+		cs.setString(3, definition.getCategoryId());
+		cs.setString(4, definition.getDefinitionSecurity());
+		cs.setString(5, definition.getDataDefinition().toString());
+		
+		return cs;
+	}
+	
+	
+	
+	private CallableStatement setAgent(Connection connection, AgentObject agent) throws SQLException {
+		CallableStatement cs = connection.prepareCall("call agency.create_agent(?,?,?,?,?)");
+		cs.setString(1, agent.getId());
+		cs.setString(2, agent.getAgentLinkId());
+		cs.setString(3, agent.getAgentSecurity());
+		cs.setString(4, agent.getAgentDataStructure().toString());
+		cs.setString(5, agent.getAgentData().toString());
+		
+		return cs;
+	}
 }
