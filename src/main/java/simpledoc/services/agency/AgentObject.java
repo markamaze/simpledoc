@@ -1,24 +1,18 @@
 package simpledoc.services.agency;
 
-import java.sql.SQLException;
-import java.sql.SQLInput;
-import java.sql.SQLOutput;
 import java.util.Map;
 import simpledoc.services.ModuleObject;
 
-public class AgencyObject extends ModuleObject {
+public class AgentObject extends ModuleObject {
 
 	private String definition_id;
 	private String agent_link;
 	private String agent_security;
 	private Map<String, Object> agent_data;
+	private Map<String, Object> agent_data_structure;
 	
-	private String sql_type;
-	
-
-	public AgencyObject(String agent_id, String object_type) { 
-		super(agent_id, object_type); 
-		this.sql_type = "agency.AGENCY_AGENT";
+	public AgentObject(String agent_id, String object_type) { 
+		super(agent_id, object_type);
 	}
 	
 	public String getDefinitionId() { return this.definition_id; }
@@ -37,30 +31,11 @@ public class AgencyObject extends ModuleObject {
 		//parse string parameter and load into agent_data map
 	}
 	
-	
-	
-	@Override
-	public String getSQLTypeName() throws SQLException { return this.sql_type; }
-
-	@Override
-	public void readSQL(SQLInput stream, String typeName) throws SQLException {
-		this.sql_type = typeName;
-		this.setId(stream.readString());
-		this.setModuleObjectType(stream.readString());
-		this.setDefinitionId(stream.readString());
-		this.setAgentLinkId(stream.readString());
-		this.setAgentSecurity(stream.readString());
-		this.setAgentData(stream.readString());
-	}
-
-	@Override
-	public void writeSQL(SQLOutput stream) throws SQLException {
-		stream.writeString(this.getId());
-		stream.writeString(this.getModuleObjectType());
-		stream.writeString(this.getDefinitionId());
-		stream.writeString(this.getAgentLinkId());
-		stream.writeString(this.getAgentSecurity());
-		stream.writeString(this.getAgentData().toString());
+	public Map<String, Object> getAgentDataStructure() { return this.agent_data_structure; }
+	public void setAgentDataStructure(Map<String, Object> agent_data_structure) { this.agent_data_structure = agent_data_structure; }
+	public void setAgentDataStructure(String readString) {
+		// TODO Auto-generated method stub
+		//parse string parameter and load into agent_data map
 	}
 	
 }
