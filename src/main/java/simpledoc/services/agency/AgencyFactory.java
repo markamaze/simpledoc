@@ -15,7 +15,7 @@ public class AgencyFactory implements ModuleObjectFactory {
 		String type = (String) data_item.get("type");
 		if(type.equalsIgnoreCase("AGENCY_AGENT")) return buildAgent(data_item);
 		if(type.equalsIgnoreCase("AGENCY_DEFINITION")) return buildDefinition(data_item);
-		if(type.equalsIgnoreCase("AGENCY_CATEGORY")) return buildCategory(data_item);
+		if(type.equalsIgnoreCase("AGENCY.CATEGORY")) return buildCategory(data_item);
 			
 		return null;
 	}
@@ -33,7 +33,7 @@ public class AgencyFactory implements ModuleObjectFactory {
 		String security_setting = (String) object_data.get("category_security");
 		Map<String, Object> data_definition = (Map<String, Object>) object_data.get("category_data_structure");
 
-		if(object_id == "new") {
+		if(object_id.equalsIgnoreCase("new")) {
 			new_agent_category = new AgentCategoryObject(UUID.randomUUID().toString(), object_type);
 		} else new_agent_category = new AgentCategoryObject(object_id, object_type);
 		
@@ -55,8 +55,10 @@ public class AgencyFactory implements ModuleObjectFactory {
 
 		String label = object_data.get("definition_label") != null ? (String) object_data.get("definition_label") : null;
 		String category_id = object_data.get("category_id") != null ? (String) object_data.get("category_id") : null;
-		String security_setting = object_data.get("security_setting") != null ? (String) object_data.get("security_setting") : null;
-		Map<String, Object> data_definition = object_data.get("data_definition") != null ? (Map<String, Object>) object_data.get("data_definition") : null;
+		String security_setting = object_data.get("definition_security") != null ? (String) 
+object_data.get("definition_security") : null;
+		Map<String, Object> data_definition = object_data.get("definition_data_structure") != null ? (Map<String, Object>) 
+object_data.get("definition_data_structure") : null;
 
 		if(object_id == null) {
 			new_agent_definition = new AgentDefObject(UUID.randomUUID().toString(), object_type);
@@ -77,10 +79,10 @@ public class AgencyFactory implements ModuleObjectFactory {
 		String object_type = (String) data_item.get("type");
 		Map<String, Object> object_data = data_item.get("object_data") != null ? (Map<String, Object>) data_item.get("object_data") : null;
 		
-		String security_setting = (String) object_data.get("security_setting");
+		String security_setting = (String) object_data.get("agent_security");
 		String agent_link_id = (String) object_data.get("agent_link");
 		Map<String, Object> agent_data = (Map<String, Object>) object_data.get("agent_data");
-		Map<String, Object> data_definition = (Map<String, Object>) object_data.get("data_definition");
+		Map<String, Object> data_definition = (Map<String, Object>) object_data.get("agent_data_structure");
 	
 		String agent_type = object_type + "_" + 
 							(String) data_definition.get("category_label") + "_" +

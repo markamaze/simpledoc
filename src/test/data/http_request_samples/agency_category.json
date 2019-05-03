@@ -1,6 +1,6 @@
 {"data": [
     {   "id":"new",
-        "type":"AGENCY_CATEGORY",
+        "type":"AGENCY.CATEGORY",
         "object_data": {
           "category_label": "Program",
           "category_type": "STRUCTURAL",

@@ -19,7 +19,7 @@ public class AgentCategoryObject extends ModuleObject {
 
 	public AgentCategoryObject(String category_id, String object_type) { 
 		super(category_id, object_type); 
-		this.sql_type = "AGENCY.AGENCY_CATEGORY";
+		this.sql_type = "AGENCY.CATEGORY";
 	}
 
 	public void setCategoryLabel(String label) { this.category_label = label; }
@@ -36,13 +36,15 @@ public class AgentCategoryObject extends ModuleObject {
 	public Map<String, Object> getDataDefinition() {	return this.category_data_def; }
 
 	@Override
-	public String getSQLTypeName() throws SQLException { return this.sql_type; }
+	public String getSQLTypeName() throws SQLException { 
+		return this.sql_type; 
+	}
 
 	@Override
 	public void readSQL(SQLInput stream, String typeName) throws SQLException {
 		this.sql_type = typeName;
 		this.setId(stream.readString());
-		this.setModuleObjectType(stream.readString());
+//		this.setModuleObjectType(stream.readString());
 		this.setCategoryLabel(stream.readString());
 		this.setCategoryBehavior(stream.readString());
 		this.setCategorySecurity(stream.readString());
@@ -52,7 +54,7 @@ public class AgentCategoryObject extends ModuleObject {
 	@Override
 	public void writeSQL(SQLOutput stream) throws SQLException {
 		stream.writeString(this.getId());
-		stream.writeString(this.getModuleObjectType());
+//		stream.writeString(this.getModuleObjectType());
 		stream.writeString(this.getCategoryLabel());
 		stream.writeString(this.getCategoryBehavior());
 		stream.writeString(this.getCategorySecurity());
