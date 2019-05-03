@@ -3,14 +3,8 @@ package simpledoc.services.agency;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import simpledoc.services.ModuleObject;
@@ -48,9 +42,12 @@ public class AgencyStorage implements ModuleObjectStorage {
 			for(ModuleObject object : data) {
 				String type = object.getModuleObjectType();
 
-				if(type.equalsIgnoreCase("AGENCY.CATEGORY")) {					
-					cs = setAgencyCategory(connection, (AgentCategoryObject) object);
-				}
+				if(type.equalsIgnoreCase("AGENCY.CATEGORY"))			
+					cs = setAgencyCategory(connection, (AgentCategory) object);
+				else if(type.equalsIgnoreCase("AGENCY.DEFINITION"))
+					cs = setAgencyDefinition(connection, (AgentDefinition) object);
+				else if(type.equalsIgnoreCase("AGENCY.AGENT"))
+					cs = setAgent(connection, (AgentObject) object);
 				
 				int result = cs.executeUpdate();
 				if(result < 0) {
@@ -69,19 +66,6 @@ public class AgencyStorage implements ModuleObjectStorage {
 		}
 
 		return committed;
-	}
-
-
-
-	private CallableStatement setAgencyCategory(Connection connection, AgentCategoryObject object) throws SQLException {
-		CallableStatement cs = connection.prepareCall("call agency.create_category(?,?,?,?,?)");
-		cs.setString(1, object.getId());
-		cs.setString(2, object.getCategoryLabel());
-		cs.setString(3, object.getCategoryBehavior());
-		cs.setString(4, object.getCategorySecurity());
-		cs.setString(5, object.getDataDefinition().toString());
-		
-		return cs;
 	}
 
 
