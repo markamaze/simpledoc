@@ -4,7 +4,9 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.List;
@@ -38,44 +40,28 @@ public class AgencyStorage implements ModuleObjectStorage {
 	@Override
 	public boolean create(List<ModuleObject> data) {
 		Boolean committed = true;
-		String stored_procedure = "{? = call AGENCY.CREATE_AGENCY_OBJECTS(?)}";
+		CallableStatement cs = null;
 	
 		try {
 			connection.setAutoCommit(false);
 
-
-			 Map<String, Class<?>> type_map = new HashMap<>();
-
-
-			type_map.put("AGENCY.AGENCY_AGENT", AgencyObject.class);
-			type_map.put("AGENCY.AGENCY_DEFINITION", AgentDefObject.class);
-			type_map.put("AGENCY.AGENCY_CATEGORY", AgentCategoryObject.class);
-			connection.setTypeMap(type_map);
-			
-			CallableStatement ps = connection.prepareCall(stored_procedure);
-	
 			for(ModuleObject object : data) {
 				String type = object.getModuleObjectType();
 
-				if(type.equalsIgnoreCase("AGENCY_AGENT"))
-					ps.setObject(1, (AgencyObject) object, Types.OTHER);
-				else if(type.equalsIgnoreCase("AGENCY_DEFINITION"))
-					ps.setObject(1, (AgentDefObject) object, Types.OTHER);
-				else if(type.equalsIgnoreCase("AGENCY_CATEGORY"))
-					ps.setObject(1, (AgentCategoryObject) object, Types.OTHER);
-
-				ps.registerOutParameter(2, Types.BOOLEAN);
-
-				ps.addBatch();
+				if(type.equalsIgnoreCase("AGENCY.CATEGORY")) {					
+					cs = setAgencyCategory(connection, (AgentCategoryObject) object);
+				}
+				
+				int result = cs.executeUpdate();
+				if(result < 0) {
+					committed = false;
+					break;
+				}
 			};
-			int[] result = ps.executeBatch();
-
-			for(int i: result) { if (i < 0) committed = false; };
 
 			if (committed) connection.commit();
 			else connection.rollback();
 
-			// END COMMENTED OUT CODE FOR DEBUGGING
 
 		} catch (SQLException e1) {
 			committed = false;
@@ -84,6 +70,20 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 		return committed;
 	}
+
+
+
+	private CallableStatement setAgencyCategory(Connection connection, AgentCategoryObject object) throws SQLException {
+		CallableStatement cs = connection.prepareCall("call agency.create_category(?,?,?,?,?)");
+		cs.setString(1, object.getId());
+		cs.setString(2, object.getCategoryLabel());
+		cs.setString(3, object.getCategoryBehavior());
+		cs.setString(4, object.getCategorySecurity());
+		cs.setString(5, object.getDataDefinition().toString());
+		
+		return cs;
+	}
+
 
 
 
