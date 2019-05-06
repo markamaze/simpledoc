@@ -1,6 +1,7 @@
 package simpledoc.services.agency;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,10 +78,31 @@ public class AgencyService implements ServiceModule {
 		});
 		
 		
-		//TODO: add business logic to query AgencyObjects
+
+		
 		services.put("GET", request -> {
-			System.out.println("GET Agency Service Called");
-			ResourceResponse response = null;			
+			AgencyStorage storage = new AgencyStorage();
+			ResourceResponse response = new ResourceResponse();
+			
+			
+			List<Object> result_map = storage.query(request.resource(), request.query());
+				
+			if(result_map != null)
+				response.setDbSuccessFlag(true);
+			else response.setDbSuccessFlag(false);
+			
+			//can put more logic in here when needed
+			//  run result_set through factory to create java classes if needed
+			//	may need to perform additional operations for different subscriptions or services
+				
+			if(response.getDbSuccessFlag())
+				response.setOperationSuccessFlag(true);
+			else response.setOperationSuccessFlag(false);
+				
+			if(response.getOperationSuccessFlag())
+				response.setBody(result_map.stream());
+			else response.setErrorMessage("Error Message Here (eventually identify the source of the error here)");
+
 			return response;
 		});
 		
