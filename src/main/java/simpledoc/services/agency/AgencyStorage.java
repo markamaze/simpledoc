@@ -1,11 +1,14 @@
 package simpledoc.services.agency;
 
+import java.sql.Array;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 
 import simpledoc.services.ModuleObject;
 import simpledoc.services.ModuleObjectStorage;
@@ -43,11 +46,11 @@ public class AgencyStorage implements ModuleObjectStorage {
 				String type = object.getModuleObjectType();
 
 				if(type.equalsIgnoreCase("AGENCY.CATEGORY"))			
-					cs = setAgencyCategory(connection, (AgentCategory) object);
+					cs = setAgentCategoryCall(connection, (AgentCategory) object, "call agency.create_category(?,?,?,?,?)");
 				else if(type.equalsIgnoreCase("AGENCY.DEFINITION"))
-					cs = setAgencyDefinition(connection, (AgentDefinition) object);
+					cs = setAgentDefinitionCall(connection, (AgentDefinition) object, "call agency.create_definition(?,?,?,?,?)");
 				else if(type.equalsIgnoreCase("AGENCY.AGENT"))
-					cs = setAgent(connection, (AgentObject) object);
+					cs = setAgentCall(connection, (AgentObject) object, "call agency.create_agent(?,?,?,?,?)");
 				
 				int result = cs.executeUpdate();
 				if(result < 0) {
@@ -88,15 +91,51 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 
 	@Override
-	public List<ModuleObject> query(List<String> input) {
-		// TODO Auto-generated method stub
+	public List<Object> query(List<String> resource_path, List<String> query) {
+		CallableStatement cs = null;
+		ResultSet results = null;
+		String resource = "";
+		boolean is_uuid;
+		
+		
+		String last_path_item = resource_path.get(resource_path.size() -1 );
+		try { UUID.fromString(last_path_item); is_uuid = true; }
+		catch(Exception e) { is_uuid = false; }
+		if(is_uuid) resource = "single";
+		else resource = "collection";
+		
+		
+		try {
+			if(resource.equalsIgnoreCase("single"))
+				cs = setQueryCall(connection, resource_path, query, "call query_single_resource(?, ?)");
+			else if(resource.equalsIgnoreCase("collection"))
+				cs = setQueryCall(connection, resource_path, query, "call query_resource_collection(?, ?)");
+			
+
+			results = cs.executeQuery();
+
+
+		} catch (SQLException e) {e.printStackTrace();}
+
+		
 		return null;
 	}
 
 
+	
+	private CallableStatement setQueryCall(Connection connection, List<String> resource_path, List<String> query, String call) throws SQLException {
+		CallableStatement cs = connection.prepareCall(call);
+		cs.setArray(1, Array.class.cast(resource_path));
+		cs.setArray(2, Array.class.cast(query));	
+		
+		return cs;
+	}
 
-	private CallableStatement setAgencyCategory(Connection connection, AgentCategory category) throws SQLException {
-		CallableStatement cs = connection.prepareCall("call agency.create_category(?,?,?,?,?)");
+
+
+
+	private CallableStatement setAgentCategoryCall(Connection connection, AgentCategory category, String call) throws SQLException {
+		CallableStatement cs = connection.prepareCall(call);
 		cs.setString(1, category.getId());
 		cs.setString(2, category.getCategoryLabel());
 		cs.setString(3, category.getCategoryBehavior());
@@ -108,8 +147,8 @@ public class AgencyStorage implements ModuleObjectStorage {
 	
 	
 	
-	private CallableStatement setAgencyDefinition(Connection connection, AgentDefinition definition) throws SQLException {
-		CallableStatement cs = connection.prepareCall("call agency.create_definition(?,?,?,?,?)");
+	private CallableStatement setAgentDefinitionCall(Connection connection, AgentDefinition definition, String call) throws SQLException {
+		CallableStatement cs = connection.prepareCall(call);
 		cs.setString(1, definition.getId());
 		cs.setString(2, definition.getDefinitionLabel());
 		cs.setString(3, definition.getCategoryId());
@@ -121,8 +160,8 @@ public class AgencyStorage implements ModuleObjectStorage {
 	
 	
 	
-	private CallableStatement setAgent(Connection connection, AgentObject agent) throws SQLException {
-		CallableStatement cs = connection.prepareCall("call agency.create_agent(?,?,?,?,?)");
+	private CallableStatement setAgentCall(Connection connection, AgentObject agent, String call) throws SQLException {
+		CallableStatement cs = connection.prepareCall(call);
 		cs.setString(1, agent.getId());
 		cs.setString(2, agent.getAgentLinkId());
 		cs.setString(3, agent.getAgentSecurity());
