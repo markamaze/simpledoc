@@ -76,7 +76,7 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 	@Override
 	public boolean update(List<ModuleObject> input) {
-		// TODO Auto-generated method stub
+		// TODO: build after create() and query() working 
 		return false;
 	}
 
@@ -84,7 +84,7 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 	@Override
 	public boolean delete(List<ModuleObject> input) {
-		// TODO Auto-generated method stub
+		// TODO: build after create() and query() working 
 		return false;
 	}
 
@@ -113,7 +113,7 @@ public class AgencyStorage implements ModuleObjectStorage {
 			
 
 			results = cs.executeQuery();
-
+			//TODO: finish handling results
 
 		} catch (SQLException e) {e.printStackTrace();}
 

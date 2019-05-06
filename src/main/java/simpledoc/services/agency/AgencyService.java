@@ -40,6 +40,9 @@ public class AgencyService implements ServiceModule {
 				}
 			}
 			
+			//can put more logic in here when needed
+
+			
 			if(response.getOperationSuccessFlag())
 				response.setDbSuccessFlag(storage.create(data));
 			else response.setErrorMessage("Error while creating resource");
@@ -48,7 +51,6 @@ public class AgencyService implements ServiceModule {
 				response.setBody(data.stream().map( object -> object.getId()));	
 			else response.setErrorMessage("Error while writing to database");
 			
-			//can add code here to call services of other modules as needed			
 			
 			return response;
 		});
@@ -69,15 +71,6 @@ public class AgencyService implements ServiceModule {
 			return response;
 		});
 		
-		
-		//TODO: add business logic for subscribing to other ServiceModules
-		services.put("subscribe", request -> {
-			System.out.println("subscribe Agency Service Called");
-			ResourceResponse response = null;
-			return response;
-		});
-		
-		
 
 		
 		services.put("GET", request -> {
@@ -92,8 +85,6 @@ public class AgencyService implements ServiceModule {
 			else response.setDbSuccessFlag(false);
 			
 			//can put more logic in here when needed
-			//  run result_set through factory to create java classes if needed
-			//	may need to perform additional operations for different subscriptions or services
 				
 			if(response.getDbSuccessFlag())
 				response.setOperationSuccessFlag(true);
@@ -105,6 +96,16 @@ public class AgencyService implements ServiceModule {
 
 			return response;
 		});
+		
+		
+		
+		//TODO: add business logic for subscribing to other ServiceModules
+		services.put("subscribe", request -> {
+			System.out.println("subscribe Agency Service Called");
+			ResourceResponse response = null;
+			return response;
+		});
+		
 		
 		
 		//TODO: add business logic to unsubscribe from other ServiceModules
