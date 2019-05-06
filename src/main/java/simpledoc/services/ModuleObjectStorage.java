@@ -9,5 +9,5 @@ public interface ModuleObjectStorage {
 	public abstract boolean create(List<ModuleObject> input) throws SQLException;	
 	public abstract boolean update(List<ModuleObject> input);
 	public abstract boolean delete(List<ModuleObject> input);
-	public abstract List<ModuleObject> query(List<String> input);
+	public abstract List<Object> query(List<String> resource_path, List<String> query);
 }
