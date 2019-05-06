@@ -30,9 +30,9 @@ public class ClientThread extends Thread {
 	 			break;
 			case "/favicon.ico":
 				System.out.println("!loading favicon");
+				break;
 	 		default:
 	 			handleResourceRequest();
-				// System.out.println("requested resource, will be available after server running");
 	 			break;
 	 	}
 
@@ -49,13 +49,10 @@ public class ClientThread extends Thread {
 	 	ResourceResponse response = this.services.load(request.module(), request.method()).run(request);
 
 	 	try {
-	 		this.exchange.sendResponseHeaders(  response.responseCode(), response.bodyLength() );
-			//throwing NullPointerException
-					//response is null
-
-			OutputStream out = this.exchange.getResponseBody();
-	 		out.write(response.writableBody());
-	 		out.close();
+	 		this.exchange.sendResponseHeaders(response.responseCode(), response.bodyLength())
+				.getResponseBody()
+	 			.write(response.writableBody())
+	 			.close();
 	 	} catch (IOException e) { e.printStackTrace(); }
 
 	 }
