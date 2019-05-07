@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.json.JSONObject;
-
+import org.json.JSONStringer;
 
 public class ParseObject {
 
@@ -26,4 +26,7 @@ public class ParseObject {
 		return json_obj.toMap();
 	}
 	
+	public static String writeJSONString(Object parse_object) {
+		return JSONStringer.valueToString(parse_object);
+	}
 }
