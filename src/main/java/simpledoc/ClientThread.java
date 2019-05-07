@@ -39,7 +39,7 @@ public class ClientThread extends Thread {
 	 }
 
 	 private void handleResourceRequest() {
-
+		 OutputStream out = null;
 	 	ResourceRequest request = new ResourceRequest(
 	 									this.exchange.getRequestMethod(),
 	 									this.exchange.getRequestURI().getPath(),
@@ -49,10 +49,10 @@ public class ClientThread extends Thread {
 	 	ResourceResponse response = this.services.load(request.module(), request.method()).run(request);
 
 	 	try {
-	 		this.exchange.sendResponseHeaders(response.responseCode(), response.bodyLength())
-				.getResponseBody()
-	 			.write(response.writableBody())
-	 			.close();
+	 		this.exchange.sendResponseHeaders(response.responseCode(), response.bodyLength());
+			out = this.exchange.getResponseBody();
+	 		out.write(response.writableBody());
+	 		out.close();
 	 	} catch (IOException e) { e.printStackTrace(); }
 
 	 }
