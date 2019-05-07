@@ -1,31 +1,27 @@
 package simpledoc;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONStringer;
 
 
-//NOTE: uses external package for processing json,
-//			but keep all in/out parameters as Strings or Collections of Strings
 
 public class ResourceRequest {
+
 	private String method;
 	private List<String> url;
-	private List<String> query;
-	private List<Map<String, Object>> body_data;
+	private Map<String, String> query;
+	private Map<String, Object> body_map;
 
-	public ResourceRequest(String requestMethod, String url, String query, InputStream body) {
-		this.method = requestMethod;
-		List<String> temp_url = Arrays.asList(url.split("/"));
-		this.url = temp_url.subList(1, temp_url.size());
-//		this.query = Arrays.asList(query.split("?"));
-		this.body_data = this.method.equalsIgnoreCase("GET") ? null : parseBody(body, "data");
+
+
+	public ResourceRequest(String method, String url, String query, InputStream body) {
+		setMethod(method);
+		setURL(url);
+		setQuery(query);
+		setBody(body);
 	}
 
 
@@ -38,13 +34,33 @@ public class ResourceRequest {
 		else this.body_map = ParseObject.readJSONMap(body);
 	}
 
-	public String method() { return this.method; }
 
+
+	public String method() { return this.method; }
 	public String module() { return this.url.get(0); }
+	private void setMethod(String method) { this.method = method; }
+
+
 
 	public List<String> resource() { return this.url; }
+	private void setURL(String url) {
+		List<String> temp_url = Arrays.asList(url.split("/"));
+		this.url = temp_url.subList(1, temp_url.size());
+	}
 
-	public List<String> query() { return this.query; }
 
-	public List<Map<String, Object>> bodyData() { return this.body_data; }
+
+	public Map<String, String> query() { return this.query; }
+	private void setQuery(String query) {
+		Map<String, String> temp_query = new HashMap<>();
+
+		if (query == null) this.query = null;
+		else {
+			Arrays.asList(query.split("?")).forEach( query_item -> {
+				String[] split_item = query_item.split("=");
+				temp_query.put(split_item[0], split_item[1]);
+				});
+			this.query = temp_query;
+		}
+	}
 }
