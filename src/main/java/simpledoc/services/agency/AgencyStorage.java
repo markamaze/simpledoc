@@ -1,11 +1,11 @@
 package simpledoc.services.agency;
 
-import java.sql.Array;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -126,11 +126,12 @@ public class AgencyStorage implements ModuleObjectStorage {
 	
 	private CallableStatement setQueryCall(Connection connection, List<String> resource_path, Map<String, String> query, String call) throws SQLException {
 		CallableStatement cs = connection.prepareCall(call);
-		
+		List<String> query_pairs = Collections.emptyList();
+		query.forEach((key, value) -> query_pairs.add(key + "=" + value));
 		cs.setArray(1, connection.createArrayOf("text", resource_path.toArray()));
 		
 //		need to figure out how to send key/value pairs of the query map
-//		cs.setArray(2, connection.createArrayOf("text", query.toArray()));	
+		cs.setArray(2, connection.createArrayOf("text", query_pairs.toArray()));	
 		
 		
 		return cs;
