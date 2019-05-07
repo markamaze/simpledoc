@@ -11,9 +11,9 @@ public class ResourceResponse {
 	public boolean getDbSuccessFlag() { return this.db_success_flag; }
 
 
-	public void setBody(Stream<Object> map) {
+	public void setResponseBody(Stream<Object> map) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public int responseCode() {

@@ -1,7 +1,6 @@
 package simpledoc.services.agency;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,15 +25,12 @@ public class AgencyService implements ServiceModule {
 			ResourceResponse response = new ResourceResponse();
 			List<ModuleObject> data = new ArrayList<>();
 
-			request.bodyData().forEach(item -> {
-				ModuleObject new_obj = factory.build(item);
-				if(new_obj == null) {
-					response.setOperationSuccessFlag(false);
-					break;
-				} else {
-					data.add(new_obj);
-					response.setOperationSuccessFlag(true);
-				}
+			request.getBodyElementList("data").forEach(item -> {
+				if(item instanceof HashMap) {
+					@SuppressWarnings("unchecked")
+					Map<String, Object> item_map = (Map<String, Object>) item;
+					data.add(factory.build(item_map));
+				} else response.setOperationSuccessFlag(false);
 			});
 
 			//can put more logic in here when needed
@@ -45,7 +41,7 @@ public class AgencyService implements ServiceModule {
 			else response.setErrorMessage("Error while creating resource");
 
 			if(response.getDbSuccessFlag())
-				response.setBody(data.stream().map( object -> object.getId()));
+				response.setResponseBody(data.stream().map( object -> object.getId()));
 			else response.setErrorMessage("Error while writing to database");
 
 
@@ -88,7 +84,7 @@ public class AgencyService implements ServiceModule {
 			else response.setOperationSuccessFlag(false);
 
 			if(response.getOperationSuccessFlag())
-				response.setBody(result_map.stream());
+				response.setResponseBody(result_map.stream());
 			else response.setErrorMessage("Error Message Here (eventually identify the source of the error here)");
 
 			return response;
