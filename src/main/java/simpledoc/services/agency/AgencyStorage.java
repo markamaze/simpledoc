@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -91,7 +92,7 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 
 	@Override
-	public List<Object> query(List<String> resource_path, List<String> query) {
+	public List<Object> query(List<String> resource_path, Map<String, String> query) {
 		CallableStatement cs = null;
 		ResultSet results = null;
 		String resource = "";
@@ -123,11 +124,14 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 
 	
-	private CallableStatement setQueryCall(Connection connection, List<String> resource_path, List<String> query, String call) throws SQLException {
+	private CallableStatement setQueryCall(Connection connection, List<String> resource_path, Map<String, String> query, String call) throws SQLException {
 		CallableStatement cs = connection.prepareCall(call);
 		
 		cs.setArray(1, connection.createArrayOf("text", resource_path.toArray()));
-		cs.setArray(2, connection.createArrayOf("text", query.toArray()));	
+		
+//		need to figure out how to send key/value pairs of the query map
+//		cs.setArray(2, connection.createArrayOf("text", query.toArray()));	
+		
 		
 		return cs;
 	}
