@@ -28,25 +28,14 @@ public class ResourceRequest {
 		this.body_data = this.method.equalsIgnoreCase("GET") ? null : parseBody(body, "data");
 	}
 
-	//NOTE: this should be able to extract any 1st level property of a request body
-	//			so far I only have "data" in 1st level and so that is all this handles.
-	private List<Map<String, Object>> parseBody(InputStream body, String body_part) {
-		String body_string = "";
-		List<Map<String, Object>> data_item_list = new ArrayList<Map<String, Object>>();
 
-		int i;
-		try {
-			while((i = body.read()) != -1) {
-				char c = (char) i;
-				body_string += c;
-			}
-		} catch(IOException e) { e.printStackTrace(); }
 
-		
-		new JSONArray(JSONStringer.valueToString( new JSONObject(body_string).get(body_part)))
-			.forEach(item -> {data_item_list.add(new JSONObject(item.toString()).toMap());});
-
-		return data_item_list;
+	@SuppressWarnings("unchecked")
+	public List<Object> getBodyElementList(String key) { return (List<Object>) this.body_map.get(key); }
+	//if needed, can add a getBodyElementMap() method if the value of a body element is a an object
+	private void setBody(InputStream body) {
+		if(this.method.equalsIgnoreCase("GET")) this.body_map = null;
+		else this.body_map = ParseObject.readJSONMap(body);
 	}
 
 	public String method() { return this.method; }
