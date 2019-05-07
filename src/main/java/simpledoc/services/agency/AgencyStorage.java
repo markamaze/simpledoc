@@ -125,8 +125,9 @@ public class AgencyStorage implements ModuleObjectStorage {
 	
 	private CallableStatement setQueryCall(Connection connection, List<String> resource_path, List<String> query, String call) throws SQLException {
 		CallableStatement cs = connection.prepareCall(call);
-		cs.setArray(1, Array.class.cast(resource_path));
-		cs.setArray(2, Array.class.cast(query));	
+		
+		cs.setArray(1, connection.createArrayOf("text", resource_path.toArray()));
+		cs.setArray(2, connection.createArrayOf("text", query.toArray()));	
 		
 		return cs;
 	}
