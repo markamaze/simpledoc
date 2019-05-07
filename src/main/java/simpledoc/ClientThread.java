@@ -20,7 +20,7 @@ public class ClientThread extends Thread {
 	 @Override
 	 public void run() {
 		 System.out.println("ClientThread running");
-		 // loadFile("index.html");
+		 System.out.println(this.exchange.getRequestMethod() + this.exchange.getRequestURI());
 	 	switch(this.exchange.getRequestURI().getPath()) {
 	 		case "/":
 	 			loadFile("index.html");
@@ -39,19 +39,23 @@ public class ClientThread extends Thread {
 	 }
 
 	 private void handleResourceRequest() {
-		 OutputStream out = null;
-	 	ResourceRequest request = new ResourceRequest(
+        OutputStream out = null;
+		ResourceRequest request = new ResourceRequest(
 	 									this.exchange.getRequestMethod(),
 	 									this.exchange.getRequestURI().getPath(),
 	 									this.exchange.getRequestURI().getQuery(),
 	 									this.exchange.getRequestBody());
 
-	 	ResourceResponse response = this.services.load(request.module(), request.method()).run(request);
+		ResourceResponse response = this.services.load(request.module(), request.method()).run(request);
 
 	 	try {
-	 		this.exchange.sendResponseHeaders(response.responseCode(), response.bodyLength());
+	 		String body = response.body();
+	 		int code = response.responseCode();
+	 		
+	 		this.exchange.sendResponseHeaders(code, body.length());
 			out = this.exchange.getResponseBody();
-	 		out.write(response.writableBody());
+	 		out.write(body.getBytes());
+	 		out.flush();
 	 		out.close();
 	 	} catch (IOException e) { e.printStackTrace(); }
 
@@ -64,8 +68,8 @@ public class ClientThread extends Thread {
 	 	String path = "./src/main/webapp/";
 
 	 	try {
-	 		exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "[::1]:3333");
-	 		exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "POST");
+//	 		exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "[::1]:3333");
+//	 		exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "POST");
 	 		exchange.sendResponseHeaders(200, 0);
 	 		out = exchange.getResponseBody();
 
