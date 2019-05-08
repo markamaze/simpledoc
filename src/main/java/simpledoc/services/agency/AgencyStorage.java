@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -95,6 +96,7 @@ public class AgencyStorage implements ModuleObjectStorage {
 	public List<Object> query(List<String> resource_path, Map<String, String> query) {
 		CallableStatement cs = null;
 		ResultSet results = null;
+		List<Object> result_list = new ArrayList<Object>();
 		String resource = "";
 		boolean is_uuid;
 		
@@ -108,18 +110,19 @@ public class AgencyStorage implements ModuleObjectStorage {
 		
 		try {
 			if(resource.equalsIgnoreCase("single"))
-				cs = setQueryCall(connection, resource_path, query, "call query_single_resource(?, ?)");
+				cs = setQueryCall(connection, resource_path, query, "select agency.query_from_resource(?,?)");
 			else if(resource.equalsIgnoreCase("collection"))
-				cs = setQueryCall(connection, resource_path, query, "call query_resource_collection(?, ?)");
+				cs = setQueryCall(connection, resource_path, query, "select agency.query_from_collection(?,?)");
 			
-
 			results = cs.executeQuery();
-			//TODO: finish handling results
-
+			
+			while(results.next()) {
+				result_list.add(results.getArray(1).toString());
+			}
 		} catch (SQLException e) {e.printStackTrace();}
 
 		
-		return null;
+		return result_list;
 	}
 
 
