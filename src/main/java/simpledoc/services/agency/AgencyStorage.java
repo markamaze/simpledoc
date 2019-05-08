@@ -130,12 +130,12 @@ public class AgencyStorage implements ModuleObjectStorage {
 	private CallableStatement setQueryCall(Connection connection, List<String> resource_path, Map<String, String> query, String call) throws SQLException {
 		CallableStatement cs = connection.prepareCall(call);
 		List<String> query_pairs = Collections.emptyList();
-		query.forEach((key, value) -> query_pairs.add(key + "=" + value));
+		
 		cs.setArray(1, connection.createArrayOf("text", resource_path.toArray()));
-		
-//		need to figure out how to send key/value pairs of the query map
-		cs.setArray(2, connection.createArrayOf("text", query_pairs.toArray()));	
-		
+		if(query!=null) {
+			query.forEach((key, value) -> query_pairs.add(key + "=" + value));
+			cs.setArray(2, connection.createArrayOf("text", query_pairs.toArray())); }	
+		else cs.setArray(2, connection.createArrayOf("text", null));
 		
 		return cs;
 	}
