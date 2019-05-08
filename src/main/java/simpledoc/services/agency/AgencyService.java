@@ -7,6 +7,7 @@ import java.util.Map;
 
 import simpledoc.services.ModuleObject;
 import simpledoc.services.ServiceModule;
+import simpledoc.ParseObject;
 import simpledoc.ResourceResponse;
 import simpledoc.ServiceFunction;
 
@@ -18,31 +19,34 @@ public class AgencyService implements ServiceModule {
 	public Map<String, ServiceFunction> provideServices() {
 		Map<String, ServiceFunction> services = new HashMap<String, ServiceFunction>();
 
-		//create new Agent Objects
 		services.put("POST", request -> {
 			AgencyFactory factory = new AgencyFactory();
 			AgencyStorage storage = new AgencyStorage();
 			ResourceResponse response = new ResourceResponse();
 			List<ModuleObject> data = new ArrayList<>();
-
+			
 			request.getBodyElementList("data").forEach(item -> {
 				if(item instanceof HashMap) {
 					@SuppressWarnings("unchecked")
 					Map<String, Object> item_map = (Map<String, Object>) item;
 					data.add(factory.build(item_map));
-				} else response.setOperationSuccessFlag(false);
+					response.setRequestOpFlag(true);
+				} else response.setRequestOpFlag(false);
 			});
 
 			//can put more logic in here when needed
 
 
-			if(response.getOperationSuccessFlag())
-				response.setDbSuccessFlag(storage.create(data));
-			else response.setErrorMessage("Error while creating resource");
+			if(response.getRequestOpFlag())
+				response.setStorageOpFlag(storage.create(data));
+			else response.setStorageOpFlag(false);
 
-			if(response.getDbSuccessFlag())
-				response.setResponseBody(data.stream().map( object -> object.getId()));
-			else response.setErrorMessage("Error while writing to database");
+			if(response.getStorageOpFlag()) {
+				Object data_array = data.stream().map( object -> object.getId()).toArray();
+				response.setResponseBody(ParseObject.writeJSONString(data_array));
+				response.setRequestOpFlag(true);
+			}
+			else response.setResponseOpFlag(false);
 
 
 			return response;
@@ -70,22 +74,9 @@ public class AgencyService implements ServiceModule {
 			AgencyStorage storage = new AgencyStorage();
 			ResourceResponse response = new ResourceResponse();
 
-
 			List<Object> result_map = storage.query(request.resource(), request.query());
+			response.setResponseBody(result_map);
 
-			if(result_map != null)
-				response.setDbSuccessFlag(true);
-			else response.setDbSuccessFlag(false);
-
-			//can put more logic in here when needed
-
-			if(response.getDbSuccessFlag())
-				response.setOperationSuccessFlag(true);
-			else response.setOperationSuccessFlag(false);
-
-			if(response.getOperationSuccessFlag())
-				response.setResponseBody(result_map.stream());
-			else response.setErrorMessage("Error Message Here (eventually identify the source of the error here)");
 
 			return response;
 		});
