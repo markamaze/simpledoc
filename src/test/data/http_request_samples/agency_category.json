@@ -1,0 +1,14 @@
+{"data": [
+    {   "id":"new",
+        "type":"AGENCY.CATEGORY",
+        "object_data": {
+          "category_label": "Program",
+          "category_type": "STRUCTURAL",
+          "category_security": "4444",
+          "category_data_structure": {
+            "program_name": "string"
+          }
+        }
+    }
+  ]
+}
