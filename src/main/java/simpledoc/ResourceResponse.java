@@ -31,7 +31,8 @@ public class ResourceResponse {
 	
 	public String body() { return this.response_body; }
 	public void setResponseBody(Object body) {
-		this.response_body = ParseObject.writeJSONString(body);
+		String data_string = ParseObject.writeJSONString(body);
+		this.response_body = "{data:" + data_string + "}";
 	}
 
 	
