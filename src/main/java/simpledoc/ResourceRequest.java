@@ -54,7 +54,7 @@ public class ResourceRequest {
 	private void setQuery(String query) {
 		Map<String, String> temp_query = new HashMap<>();
 
-		if (query == null) this.query = null;
+		if (query == null) this.query = temp_query;
 		else {
 			Arrays.asList(query.split("?")).forEach( query_item -> {
 				String[] split_item = query_item.split("=");
