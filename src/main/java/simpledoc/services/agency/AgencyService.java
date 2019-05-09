@@ -74,7 +74,7 @@ public class AgencyService implements ServiceModule {
 			AgencyStorage storage = new AgencyStorage();
 			ResourceResponse response = new ResourceResponse();
 
-			List<Object> result_map = storage.query(request.resource(), request.query());
+			List<String[]> result_map = storage.query(request.resource(), request.query());
 			response.setResponseBody(result_map);
 
 

@@ -1,5 +1,6 @@
 package simpledoc.services.agency;
 
+import java.sql.Array;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -93,10 +94,10 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 
 	@Override
-	public List<Object> query(List<String> resource_path, Map<String, String> query) {
+	public List<String[]> query(List<String> resource_path, Map<String, String> query) {
 		CallableStatement cs = null;
 		ResultSet results = null;
-		List<Object> result_list = new ArrayList<Object>();
+		List<String[]> result_list = new ArrayList<String[]>();
 		String resource = "";
 		boolean is_uuid;
 		
@@ -117,7 +118,9 @@ public class AgencyStorage implements ModuleObjectStorage {
 			results = cs.executeQuery();
 			
 			while(results.next()) {
-				result_list.add(results.getArray(1).toString());
+				Array result = results.getArray(1);
+				String[] result_set = result.toString().substring(1).split(",");
+				result_list.add(result_set);
 			}
 		} catch (SQLException e) {e.printStackTrace();}
 
@@ -145,7 +148,7 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 	private CallableStatement setAgentCategoryCall(Connection connection, AgentCategory category, String call) throws SQLException {
 		CallableStatement cs = connection.prepareCall(call);
-		cs.setString(1, category.getId());
+		cs.setObject(1, category.getId());
 		cs.setString(2, category.getCategoryLabel());
 		cs.setString(3, category.getCategoryBehavior());
 		cs.setString(4, category.getCategorySecurity());
@@ -158,9 +161,9 @@ public class AgencyStorage implements ModuleObjectStorage {
 	
 	private CallableStatement setAgentDefinitionCall(Connection connection, AgentDefinition definition, String call) throws SQLException {
 		CallableStatement cs = connection.prepareCall(call);
-		cs.setString(1, definition.getId());
+		cs.setObject(1, definition.getId());
 		cs.setString(2, definition.getDefinitionLabel());
-		cs.setString(3, definition.getCategoryId());
+		cs.setObject(3, definition.getCategoryId());
 		cs.setString(4, definition.getDefinitionSecurity());
 		cs.setString(5, definition.getDataDefinition().toString());
 		
@@ -171,8 +174,9 @@ public class AgencyStorage implements ModuleObjectStorage {
 	
 	private CallableStatement setAgentCall(Connection connection, AgentObject agent, String call) throws SQLException {
 		CallableStatement cs = connection.prepareCall(call);
-		cs.setString(1, agent.getId());
-		cs.setString(2, agent.getAgentLinkId());
+		//missing definition_id
+		cs.setObject(1, agent.getId());
+		cs.setObject(2, agent.getAgentLinkId());
 		cs.setString(3, agent.getAgentSecurity());
 		cs.setString(4, agent.getAgentDataStructure().toString());
 		cs.setString(5, agent.getAgentData().toString());
