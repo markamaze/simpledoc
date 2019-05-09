@@ -1,21 +1,23 @@
 package simpledoc.services.agency;
 
 import java.util.Map;
+import java.util.UUID;
+
 import simpledoc.services.ModuleObject;
 
 public class AgentDefinition extends ModuleObject {
 
-	private String category_id;
+	private UUID category_id;
 	private String definition_label;
 	private String definition_security;
 	private Map<String, Object> definition_data_def;
 
-	public AgentDefinition(String definition_id, String object_type) {
+	public AgentDefinition(UUID definition_id, String object_type) {
 		super(definition_id, object_type);
 	}
 
-	public void setCategoryId(String category_id) { this.category_id = category_id; }
-	public String getCategoryId() { return this.category_id; }
+	public void setCategoryId(UUID category_id) { this.category_id = category_id; }
+	public UUID getCategoryId() { return this.category_id; }
 
 	public void setDefinitionLabel(String label) { this.definition_label = label; }
 	public String getDefinitionLabel() { return this.definition_label; }

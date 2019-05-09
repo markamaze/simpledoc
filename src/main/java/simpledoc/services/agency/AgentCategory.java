@@ -1,6 +1,7 @@
 package simpledoc.services.agency;
 
 import java.util.Map;
+import java.util.UUID;
 
 import simpledoc.services.ModuleObject;
 
@@ -12,7 +13,7 @@ public class AgentCategory extends ModuleObject {
 	private String category_security;
 	private Map<String, Object> category_data_def;
 	
-	public AgentCategory(String category_id, String object_type) { 
+	public AgentCategory(UUID category_id, String object_type) { 
 		super(category_id, object_type);
 	}
 
