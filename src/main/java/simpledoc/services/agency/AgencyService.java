@@ -64,8 +64,17 @@ public class AgencyService implements ServiceModule {
 
 		//TODO: add business logic for deleting AgencyObjects
 		services.put("DELETE", request -> {
-			System.out.println("DELETE Agency Service Called");
-			ResourceResponse response = null;
+			AgencyStorage storage = new AgencyStorage();
+			ResourceResponse response = new ResourceResponse();
+			Boolean delete_success = null;
+			List<Object> delete_ids = request.getBodyElementList("data");
+
+
+			delete_success = storage.delete(delete_ids);
+			response.setRequestOpFlag(true);
+			response.setStorageOpFlag(delete_success);
+			response.setResponseBody("Successfully Deleted: " + delete_ids.toString());
+			response.setResponseOpFlag(true);
 			return response;
 		});
 
