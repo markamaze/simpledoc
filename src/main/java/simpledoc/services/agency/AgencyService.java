@@ -1,5 +1,6 @@
 package simpledoc.services.agency;
 
+import simpledoc.utilities.ValidationHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.Map;
 
 import simpledoc.services.ModuleObject;
 import simpledoc.services.ServiceModule;
-import simpledoc.ParseObject;
+import simpledoc.utilities.ParseObject;
 import simpledoc.ResourceResponse;
 import simpledoc.ServiceFunction;
 
@@ -24,7 +25,7 @@ public class AgencyService implements ServiceModule {
 			AgencyStorage storage = new AgencyStorage();
 			ResourceResponse response = new ResourceResponse();
 			List<ModuleObject> data = new ArrayList<>();
-			
+
 			request.getBodyElementList("data").forEach(item -> {
 				if(item instanceof HashMap) {
 					@SuppressWarnings("unchecked")
