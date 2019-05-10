@@ -1,5 +1,6 @@
 package simpledoc;
 
+import simpledoc.utilities.ParseObject;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
