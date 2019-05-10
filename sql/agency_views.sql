@@ -1,3 +1,0 @@
- 
-CREATE OR REPLACE VIEW agency.name AS
-SELECT ...
