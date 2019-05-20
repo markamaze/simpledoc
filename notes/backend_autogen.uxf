@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>5</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>635</x>
+      <y>900</y>
+      <w>195</w>
+      <h>135</h>
+    </coordinates>
+    <panel_attributes>simpledoc.services.agency::AgencyService
+--
+--
++moduleTitle(): String
++provideServices(): Map&lt;String, ServiceFunction&gt;
+--
+import simpledoc.exceptions.ServiceErrorException;
+import simpledoc.exceptions.StorageErrorException;
+import simpledoc.exceptions.UnsupportedServiceRequest;
+import java.util.Set;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import simpledoc.services.ModuleObject;
+import simpledoc.services.ServiceModule;
+import simpledoc.ResourceResponse;
+import simpledoc.ServiceFunction;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>50</x>
+      <y>645</y>
+      <w>275</w>
+      <h>185</h>
+    </coordinates>
+    <panel_attributes>simpledoc.services.agency::AgentCategory
+--
+-category_label: String
+-category_behavior: String
+-category_security: String
+-category_data_structure: Map&lt;String, Object&gt;
+--
+~AgentCategory(UUID category_id, String type, Map&lt;String, Object&gt; object_data): ctor
++validateData(Map&lt;String, Object&gt; data): ValidationObject
+-setCategoryLabel(String label): void
++getCategoryLabel(): String
+-setCategoryBehavior(String type): void
++getCategoryBehavior(): String
+-setCategorySecurity(String security_setting): void
++getCategorySecurity(): String
+-setCategoryDataDef(Map&lt;String, Object&gt; data_definition): void
++getDataDefinition(): Map&lt;String, Object&gt;
+--
+import java.util.HashMap;
+import simpledoc.exceptions.ServiceErrorException;
+import simpledoc.utilities.ValidationObject;
+import java.util.Map;
+import java.util.UUID;
+import simpledoc.services.ModuleObject;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>345</x>
+      <y>645</y>
+      <w>275</w>
+      <h>185</h>
+    </coordinates>
+    <panel_attributes>simpledoc.services.agency::AgentDefinition
+--
+-category_id: UUID
+-definition_label: String
+-definition_security: String
+-definition_data_structure: Map&lt;String, Object&gt;
+--
++AgentDefinition(UUID definition_id, String type, Map&lt;String, Object&gt; object_data): ctor
++validateData(Map&lt;String, Object&gt; data): ValidationObject
+-setCategoryId(UUID category_id): void
++getCategoryId(): UUID
+-setDefinitionLabel(String label): void
++getDefinitionLabel(): String
+-setDefinitionSecurity(String security_setting): void
++getDefinitionSecurity(): String
+-setDataDefinition(Map&lt;String, Object&gt; data_structure): void
++getDataDefinition(): Map&lt;String, Object&gt;
+--
+import java.util.Map;
+import java.util.HashMap;
+import simpledoc.utilities.ValidationObject;
+import java.util.UUID;
+import simpledoc.exceptions.ServiceErrorException;
+import simpledoc.services.ModuleObject;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>640</x>
+      <y>645</y>
+      <w>270</w>
+      <h>200</h>
+    </coordinates>
+    <panel_attributes>simpledoc.services.agency::AgentObject
+--
+-definition_id: UUID
+-agent_link_id: UUID
+-agent_security: String
+-agent_data: Map&lt;String, Object&gt;
+-agent_data_structure: Map&lt;String, Object&gt;
+--
++AgentObject(UUID agent_id, String object_type, ValidationObject object_data): ctor
++validateData(Map&lt;String, Object&gt; data): ValidationObject
++getDefinitionId(): UUID
+-setDefinitionId(UUID uuid): void
++getAgentLinkId(): UUID
+-setAgentLinkId(UUID link_id): void
++getAgentSecurity(): String
+-setAgentSecurity(String security_setting): void
++getAgentData(): Map&lt;String, Object&gt;
+-setAgentData(Map&lt;String, Object&gt; agent_data): void
++getAgentDataStructure(): Map&lt;String, Object&gt;
+-setAgentDataStructure(Map&lt;String, Object&gt; agent_data_structure): void
+--
+import java.util.HashMap;
+import simpledoc.utilities.ValidationObject;
+import java.util.Map;
+import java.util.UUID;
+import simpledoc.services.ModuleObject;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>55</x>
+      <y>900</y>
+      <w>260</w>
+      <h>230</h>
+    </coordinates>
+    <panel_attributes>simpledoc.services.agency::AgencyStorage
+--
+-connection: Connection
+-url = "jdbc:postgresql://ec2-54-243-197-120.compute-1.amazonaws.com:5432/da16p9r5cqnbfj": String
+-username = "pqtafaszpcncjx": String
+-password = "fdfa9f7f87e9bba343a3c303b7c6dae39006a5adbc4345e535fb0b3f16340904": String
+--
++AgencyStorage(): ctor
++create(Set&lt;ModuleObject&gt; data): boolean
+-setCreateStatement(Connection conn, ModuleObject object): CallableStatement
++update(Set&lt;ModuleObject&gt; input): boolean
++delete(Set&lt;UUID&gt; delete_set): boolean
++query(List&lt;String&gt; resource_path, Map&lt;String, String&gt; query): Set&lt;String[]&gt;
+-setQueryCall(List&lt;String&gt; resource_path): String
+--
+import java.sql.SQLException;
+import simpledoc.exceptions.StorageErrorException;
+import java.util.UUID;
+import java.util.Collections;
+import java.util.Set;
+import java.sql.Array;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.util.Map;
+import java.util.List;
+import java.util.Properties;
+import simpledoc.services.ModuleObject;
+import simpledoc.services.ModuleObjectStorage;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>850</x>
+      <y>900</y>
+      <w>180</w>
+      <h>135</h>
+    </coordinates>
+    <panel_attributes>simpledoc.services.agency::AgencyFactory
+--
+--
++build(Object data_item): ModuleObject
+--
+import simpledoc.utilities.ValidationObject;
+import java.util.Map;
+import java.util.UUID;
+import simpledoc.services.ModuleObject;
+import simpledoc.services.ModuleObjectFactory;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>340</x>
+      <y>900</y>
+      <w>275</w>
+      <h>230</h>
+    </coordinates>
+    <panel_attributes>simpledoc.services.agency::AgencyValidator
+--
+--
++validateModuleObjectType(String type): ValidationObject
++validateModuleObjectData(Object object_data, String object_type): ValidationObject
++validateSupportedRequest(ResourceRequest request): ValidationObject
++validateSupportedResponse(ResourceResponse response): ValidationObject
+--
+import simpledoc.ResourceRequest;
+import simpledoc.ResourceResponse;
+import java.util.Set;
+import java.util.Map;
+import java.util.List;
+import simpledoc.services.ModuleValidation;
+import simpledoc.utilities.ValidationObject;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>630</x>
+      <y>530</y>
+      <w>145</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+simpledoc.services::ModuleObjectFactory
+--
+--
++build(Object data_item): ModuleObject
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>620</x>
+      <y>460</y>
+      <w>165</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+simpledoc.services::ServiceModule
+--
+--
++provideServices(): Map&lt;String, ServiceFunction&gt;
++moduleTitle(): String
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>220</x>
+      <y>385</y>
+      <w>145</w>
+      <h>85</h>
+    </coordinates>
+    <panel_attributes>/simpledoc.services::ModuleObject/
+--
+-object_id: UUID
+-object_type: String
+--
++ModuleObject(UUID uuid, String type): ctor
++getId(): UUID
+-setId(UUID id_string): void
++getModuleObjectType(): String
+-setModuleObjectType(String type): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>580</x>
+      <y>380</y>
+      <w>245</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+simpledoc.services::ModuleObjectStorage
+--
+--
++create(Set&lt;ModuleObject&gt; input): boolean
++update(Set&lt;ModuleObject&gt; input): boolean
++delete(Set&lt;UUID&gt; input): boolean
++query(List&lt;String&gt; resource_path, Map&lt;String, String&gt; query): Set&lt;String[]&gt;
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>150</x>
+      <y>485</y>
+      <w>275</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>/simpledoc.services::ModuleValidation/
+--
+--
++validateSetAs(Set&lt;?&gt; object, Class&lt;?&gt; set_of): ValidationObject
++validateObjectAs(Object object, Class&lt;?&gt; class_of): ValidationObject
++validateModuleObjectType(String type): ValidationObject
++validateModuleObjectData(Object object_data, String object_type): ValidationObject
++validateSupportedRequest(ResourceRequest request): ValidationObject
++validateSupportedResponse(ResourceResponse response): ValidationObject
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>670</x>
+      <y>140</y>
+      <w>235</w>
+      <h>85</h>
+    </coordinates>
+    <panel_attributes>simpledoc::ServiceLoader
+--
+-services: Map&lt;String, Map&lt;String, ServiceFunction&gt;&gt;
+--
++ServiceLoader(): ctor
++load(String module, String method): ServiceFunction
+---if service_module is not found: throws UnsupportedServiceRequest
+---if service of found module not found: throws UnsupportedServiceRequest
+
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>100</x>
+      <y>35</y>
+      <w>280</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>simpledoc::ResourceRequest
+--
+-method: String
+-url: List&lt;String&gt;
+-query: Map&lt;String, String&gt;
+-body_map: Map&lt;String, Object&gt;
+--
++ResourceRequest(String method, String url, String query, InputStream body): ctor
+
++getBodyElementSet(String key): Set&lt;Object&gt;
+-setBody(InputStream body): void
+--- uses ParseObject.readJSONMap on request body
+--- should validate the body for structure {data:[]} when setting body
+
++method(): String
+-setMethod(String method): void
+
++module(): String
++resource(): List&lt;String&gt;
+-setURL(String url): void
+
++query(): Map&lt;String, String&gt;
+-setQuery(String query): void
+--
+style=autoresize
+
+
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>735</x>
+      <y>90</y>
+      <w>150</w>
+      <h>35</h>
+    </coordinates>
+    <panel_attributes>simpledoc::Simpledoc
+--
+--
++main(String[] args): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1255</x>
+      <y>845</y>
+      <w>210</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>simpledoc.utilities::ParseObject
+--
+--
++readJSONMap(InputStream json_stream): Map&lt;String, Object&gt;
++writeJSONString(Object parse_object): String
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1060</x>
+      <y>845</y>
+      <w>190</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>simpledoc.utilities::ValidationObject
+--
+-isValid: boolean
+-string_value: String
+-uuid_value: UUID
+-map_value: Map&lt;String, Object&gt;
+--
++ValidationObject(Object value, Class&lt;?&gt; value_type): ctor
++isValid(): boolean
++getStringValue(): String
++getUUIDValue(): UUID
++getMapValue(): Map&lt;String, ?&gt;
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>670</x>
+      <y>230</y>
+      <w>220</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>simpledoc::ClientThread
+--
+-exchange: HttpExchange
+-services: ServiceLoader
+--
++ClientThread(HttpExchange exchange, ServiceLoader loader): ctor
++run(): void
+-handleResourceRequest(): void
+-loadFile(String directory): void
+--
+catch thrown exceptions for:
+        UnsupportedServiceRequest
+        ServiceErrorException
+        StorageErrorException
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>390</x>
+      <y>35</y>
+      <w>210</w>
+      <h>155</h>
+    </coordinates>
+    <panel_attributes>simpledoc::ResourceResponse
+--
+-response_body: String
+-request: ResourceRequest
+--
++ResourceResponse(ResourceRequest request): ctor
++ResourceResponse(String body, int response_code): ctor
+
++responseTo(): ResourceRequest
+
++body(): String
+
++setResponse(Set&lt;?&gt; body, int status_code): ResourceResponse
++setResponse(String body, int status_code): ResourceResponse
+--- uses ParseObject.writeJSONString to write body to response
+--- sets given response inside structure {data: (received object) }
+
++responseCode(): int
+--
+
+style=autoresize</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>715</x>
+      <y>30</y>
+      <w>175</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+simpledoc::ServiceFunction
+--
+--
++run(ResourceRequest request): ResourceResponse
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1060</x>
+      <y>990</y>
+      <w>150</w>
+      <h>35</h>
+    </coordinates>
+    <panel_attributes>simpledoc.exceptions::ServiceErrorException
+--
+--
++ServiceErrorException(String message): ctor
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1215</x>
+      <y>990</y>
+      <w>170</w>
+      <h>35</h>
+    </coordinates>
+    <panel_attributes>simpledoc.exceptions::UnsupportedServiceRequest
+--
+--
++UnsupportedServiceRequest(String message): ctor
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1060</x>
+      <y>1030</y>
+      <w>155</w>
+      <h>35</h>
+    </coordinates>
+    <panel_attributes>simpledoc.exceptions::StorageErrorException
+--
+--
++StorageErrorException(String message): ctor
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>75</x>
+      <y>0</y>
+      <w>850</w>
+      <h>340</h>
+    </coordinates>
+    <panel_attributes>simpledoc
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>1055</x>
+      <y>975</y>
+      <w>335</w>
+      <h>95</h>
+    </coordinates>
+    <panel_attributes>simpledoc.exceptions
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>45</x>
+      <y>360</y>
+      <w>880</w>
+      <h>240</h>
+    </coordinates>
+    <panel_attributes>simpledoc.services
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>40</x>
+      <y>625</y>
+      <w>1010</w>
+      <h>520</h>
+    </coordinates>
+    <panel_attributes>simpledoc.services.agency
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>1055</x>
+      <y>830</y>
+      <w>415</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>simpledoc.utilities
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
