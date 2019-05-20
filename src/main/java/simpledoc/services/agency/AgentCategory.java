@@ -1,7 +1,9 @@
 package simpledoc.services.agency;
 
 
-import simpledoc.utilities.ValidationHandler;
+import java.util.HashMap;
+import simpledoc.exceptions.ServiceErrorException;
+import simpledoc.utilities.ValidationObject;
 import java.util.Map;
 import java.util.UUID;
 
@@ -15,18 +17,48 @@ public class AgentCategory extends ModuleObject {
 	private Map<String, Object> category_data_structure;
 
 
-	public AgentCategory(UUID category_id, String type, Map<String, Object> object_data){
+	AgentCategory(UUID category_id, String type, Map<String, Object> object_data) throws ServiceErrorException {
 		super(category_id, type);
 
-		String label = ValidationHandler.getValidStringFor("category_label", object_data);
-		String behavior = ValidationHandler.getValidStringFor("category_behavior", object_data);
-		String security = ValidationHandler.getValidStringFor("category_behavior", object_data);
-		Map<String, Object> data_structure = ValidationHandler.getValidMapFor("category_data_structure", object_data);
+		ValidationObject valid_data = validateData(object_data);
+		if(!valid_data.isValid())
+			throw new ServiceErrorException("object data not valid for object type AgentCategory");
+
+		String label = (String) object_data.get("category_label");
+		String behavior = (String) object_data.get("category_behavior");
+		String security = (String) object_data.get("category_security");
+		Map<String, Object> data_structure = (Map<String, Object>) object_data.get("category_data_structure");
 
 		this.setCategoryLabel(label);
 		this.setCategoryBehavior(behavior);
 		this.setCategorySecurity(security);
 		this.setCategoryDataDef(data_structure);
+	}
+
+	public static ValidationObject validateData(Map<String, Object> data) {
+		AgencyValidator validator = new AgencyValidator();
+		Map<String, ValidationObject> validated_data = null;
+		try{
+			ValidationObject label = validator.validateObjectAs(data.get("category_label"), String.class);
+			ValidationObject behavior = validator.validateObjectAs(data.get("category_behavior"), UUID.class);
+			ValidationObject security = validator.validateObjectAs(data.get("category_security"), String.class);
+			ValidationObject data_structure = validator.validateObjectAs(data.get("category_data_structure"), Map.class);
+
+			if( label.isValid()
+					&& behavior.isValid()
+					&& security.isValid()
+					&& data_structure.isValid()) {
+						validated_data = new HashMap<>();
+						validated_data.put("category_label", label);
+						validated_data.put("category_behavior", behavior);
+						validated_data.put("category_security", security);
+						validated_data.put("data_structure", data_structure);
+					}
+		} catch (Exception e) { e.printStackTrace(); }
+
+
+		return new ValidationObject(validated_data, Map.class);
+
 	}
 
 	private void setCategoryLabel(String label) { this.category_label = label; }

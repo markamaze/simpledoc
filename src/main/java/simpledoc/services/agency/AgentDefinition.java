@@ -1,9 +1,10 @@
 package simpledoc.services.agency;
 
-import simpledoc.utilities.ValidationHandler;
 import java.util.Map;
+import java.util.HashMap;
+import simpledoc.utilities.ValidationObject;
 import java.util.UUID;
-
+import simpledoc.exceptions.ServiceErrorException;
 import simpledoc.services.ModuleObject;
 
 public class AgentDefinition extends ModuleObject {
@@ -13,18 +14,47 @@ public class AgentDefinition extends ModuleObject {
 	private String definition_security;
 	private Map<String, Object> definition_data_structure;
 
-	public AgentDefinition(UUID definition_id, String type, Map<String, Object> object_data) {
+	public AgentDefinition(UUID definition_id, String type, Map<String, Object> object_data) throws ServiceErrorException {
 		super(definition_id, type);
 
-		String label = ValidationHandler.getValidStringFor("definition_label", object_data);
-		UUID cat_id = ValidationHandler.getValidUUIDFor("category_id", object_data);
-		String security = ValidationHandler.getValidStringFor("definition_security", object_data);
-		Map<String, Object> data_structure = ValidationHandler.getValidMapFor("definition_data_structure", object_data);
+		ValidationObject valid_data = validateData(object_data);
+		if(!valid_data.isValid())
+			throw new ServiceErrorException("object data not valid for object type AgentDefinition");
+
+		String label = (String) object_data.get("definition_label");
+		UUID cat_id = (UUID) object_data.get("category_id");
+		String security = (String) object_data.get("definition_security");
+		Map<String, Object> data_structure = (Map<String, Object>) object_data.get("definition_data_structure");
 
 		this.setDefinitionLabel(label);
 		this.setCategoryId(cat_id);
 		this.setDefinitionSecurity(security);
 		this.setDataDefinition(data_structure);
+	}
+
+	public static ValidationObject validateData(Map<String, Object> data){
+		AgencyValidator validator = new AgencyValidator();
+		Map<String, ValidationObject> validated_data = null;
+		try{
+			ValidationObject label = validator.validateObjectAs(data.get("definition_label"), String.class);
+			ValidationObject category_id = validator.validateObjectAs(data.get("category_id"), UUID.class);
+			ValidationObject security = validator.validateObjectAs(data.get("definition_security"), String.class);
+			ValidationObject data_structure = validator.validateObjectAs(data.get("definition_data_structure"), Map.class);
+
+			if( label.isValid()
+					&& category_id.isValid()
+					&& security.isValid()
+					&& data_structure.isValid()) {
+						validated_data = new HashMap<>();
+						validated_data.put("definition_label", label);
+						validated_data.put("category_id", category_id);
+						validated_data.put("definition_security", security);
+						validated_data.put("data_structure", data_structure);
+					}
+		} catch (Exception e) { e.printStackTrace(); }
+
+
+		return new ValidationObject(validated_data, Map.class);
 	}
 
 	private void setCategoryId(UUID category_id) { this.category_id = category_id; }

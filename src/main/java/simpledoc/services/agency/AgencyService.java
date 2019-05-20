@@ -1,14 +1,15 @@
 package simpledoc.services.agency;
 
-import simpledoc.utilities.ValidationHandler;
-import java.util.ArrayList;
+import simpledoc.exceptions.ServiceErrorException;
+import simpledoc.exceptions.StorageErrorException;
+import simpledoc.exceptions.UnsupportedServiceRequest;
+import java.util.Set;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
+import java.util.UUID;
 import simpledoc.services.ModuleObject;
 import simpledoc.services.ServiceModule;
-import simpledoc.utilities.ParseObject;
 import simpledoc.ResourceResponse;
 import simpledoc.ServiceFunction;
 
@@ -21,74 +22,147 @@ public class AgencyService implements ServiceModule {
 		Map<String, ServiceFunction> services = new HashMap<String, ServiceFunction>();
 
 		services.put("POST", request -> {
+			AgencyValidator validator = new AgencyValidator();
 			AgencyFactory factory = new AgencyFactory();
 			AgencyStorage storage = new AgencyStorage();
-			ResourceResponse response = new ResourceResponse();
-			List<ModuleObject> data = new ArrayList<>();
+			ResourceResponse response = new ResourceResponse(request);
 
-			request.getBodyElementList("data").forEach(item -> {
-				if(item instanceof HashMap) {
-					@SuppressWarnings("unchecked")
-					Map<String, Object> item_map = (Map<String, Object>) item;
-					data.add(factory.build(item_map));
-					response.setRequestOpFlag(true);
-				} else response.setRequestOpFlag(false);
-			});
-
-			//can put more logic in here when needed
+			Set<Object> request_data = request.getBodyElementSet("data");
+			Set<UUID> result_data = Collections.emptySet();
+			Set<ModuleObject> working_data = Collections.emptySet();
 
 
-			if(response.getRequestOpFlag())
-				response.setStorageOpFlag(storage.create(data));
-			else response.setStorageOpFlag(false);
 
-			if(response.getStorageOpFlag()) {
-				Object data_array = data.stream().map( object -> object.getId()).toArray();
-				response.setResponseBody(ParseObject.writeJSONString(data_array));
-				response.setRequestOpFlag(true);
-			}
-			else response.setResponseOpFlag(false);
+			// step 1: validate the request -> cross-check method, URL, and body_data contents
+			if(!validator.validateSupportedRequest(request).isValid())
+				throw new UnsupportedServiceRequest("invalid request URL");
 
 
-			return response;
+			// step *: build and validate working data set
+			request_data.stream().forEach( item -> working_data.add(factory.build(item)) );
+			if(!validator.validateSetAs(working_data, ModuleObject.class).isValid())
+				throw new ServiceErrorException("trouble creating new objects with given data");
+
+
+			// step *: perform database operation
+			if(!storage.create(working_data))
+				throw new StorageErrorException("unable to store new object data");
+
+
+			// step n-1: build response data & validate
+			working_data.stream().forEach(item -> result_data.add(item.getId()) );
+			if(!validator.validateSetAs(result_data, UUID.class).isValid())
+				throw new ServiceErrorException("unable to validate response data");
+
+
+
+			// step n: set response data and code in response and return
+			return response.setResponse(result_data, 200);
 		});
 
 
-		//TODO: add business logic for updating AgencyObjects
+
 		services.put("PUT", request -> {
-			System.out.println("PUT Agency Service Called");
-			ResourceResponse response = null;
-			return response;
+			AgencyFactory factory = new AgencyFactory();
+			AgencyStorage storage = new AgencyStorage();
+			AgencyValidator validator = new AgencyValidator();
+			ResourceResponse response = new ResourceResponse(request);
+
+
+			Set<Object> request_data = request.getBodyElementSet("data");
+			String result_data = "";
+			Set<ModuleObject> working_data = Collections.emptySet();
+
+
+			// step 1: validate the request -> cross-check method, URL, and body_data contents
+			if(!validator.validateSupportedRequest(request).isValid())
+				throw new UnsupportedServiceRequest("invalid request URL");
+
+
+			// step *: build and validate working data set
+			request_data.stream().forEach( item -> working_data.add(factory.build(item)));
+			if(!validator.validateSetAs(working_data, ModuleObject.class).isValid())
+				throw new ServiceErrorException("trouble creating new objects with given data");
+
+
+			// step *: perform database operation
+			if(!storage.update(working_data))
+				throw new StorageErrorException("unable to update objects in database");
+
+
+			// step n-1: build response data & validate
+			result_data = "Successfully updated objects.";
+
+
+			// step n: set response data and code in response and return
+			return response.setResponse(result_data, 200);
+
 		});
 
 
-		//TODO: add business logic for deleting AgencyObjects
+
 		services.put("DELETE", request -> {
 			AgencyStorage storage = new AgencyStorage();
-			ResourceResponse response = new ResourceResponse();
-			Boolean delete_success = null;
-			List<Object> delete_ids = request.getBodyElementList("data");
+			AgencyValidator validator = new AgencyValidator();
+			ResourceResponse response = new ResourceResponse(request);
+
+			Set<Object> request_data = request.getBodyElementSet("data");
+			Set<UUID> working_data = Collections.emptySet();
+			String result_data = "";
+
+			// step 1: validate the request -> cross-check method, URL, and body_data contents
+			if(!validator.validateSupportedRequest(request).isValid())
+				throw new UnsupportedServiceRequest("invalid request URL");
 
 
-			delete_success = storage.delete(delete_ids);
-			response.setRequestOpFlag(true);
-			response.setStorageOpFlag(delete_success);
-			response.setResponseBody("Successfully Deleted: " + delete_ids.toString());
-			response.setResponseOpFlag(true);
-			return response;
+			// step *: build and validate working data set
+			request_data.stream().forEach( item -> working_data.add( UUID.fromString(item.toString()) ));
+			if(!validator.validateSetAs(working_data, UUID.class).isValid())
+				throw new UnsupportedServiceRequest("invalid request data");
+
+
+			// step *: perform database operation
+			if(!storage.delete(working_data))
+				throw new StorageErrorException("could not remove objects with given id");
+
+
+			// step n-1: build response data & validate
+			result_data = "Objects with given id's successfully removed from storage";
+
+
+			// step n: set response data and code in response and return
+			return response.setResponse(result_data, 200);
+
 		});
 
 
 
 		services.put("GET", request -> {
+			AgencyFactory factory = new AgencyFactory();
 			AgencyStorage storage = new AgencyStorage();
-			ResourceResponse response = new ResourceResponse();
+			AgencyValidator validator = new AgencyValidator();
+			ResourceResponse response = new ResourceResponse(request);
 
-			List<String[]> result_map = storage.query(request.resource(), request.query());
-			response.setResponseBody(result_map);
+			Set<String[]> working_data = Collections.emptySet();
+			Set<ModuleObject> result_data = Collections.emptySet();
+
+			// step 1: validate the request -> cross-check method, URL, and query contents
+			if(!validator.validateSupportedRequest(request).isValid())
+				throw new UnsupportedServiceRequest("invalid request ");
 
 
-			return response;
+			// step *: perform database operation
+			working_data = storage.query(request.resource(), request.query());
+
+
+			// step n-1: build response data & validate
+			working_data.stream().forEach( item -> result_data.add(factory.build(item)));
+				if(!validator.validateSetAs(result_data, ModuleObject.class).isValid())
+					throw new ServiceErrorException("error with response results");
+
+			// step n: set response data and code in response and return
+			return response.setResponse(result_data, 200);
+
 		});
 
 

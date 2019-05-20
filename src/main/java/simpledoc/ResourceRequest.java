@@ -1,5 +1,7 @@
 package simpledoc;
 
+import java.util.Map.Entry;
+import java.util.Set;
 import simpledoc.utilities.ParseObject;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -14,7 +16,7 @@ public class ResourceRequest {
 	private String method;
 	private List<String> url;
 	private Map<String, String> query;
-	private Map<String, Object> body_map;
+	private Map<String, Entry<Class<?>, ?>> body_map;
 
 
 
@@ -28,21 +30,24 @@ public class ResourceRequest {
 
 
 	@SuppressWarnings("unchecked")
-	public List<Object> getBodyElementList(String key) { return (List<Object>) this.body_map.get(key); }
+	public Set<Object> getBodyElementSet(String key) { return (Set<Object>) this.body_map.get(key); }
 	//if needed, can add a getBodyElementMap() method if the value of a body element is a an object
 	private void setBody(InputStream body) {
 		if(this.method.equalsIgnoreCase("GET")) this.body_map = null;
-		else this.body_map = ParseObject.readJSONMap(body);
+		// else this.body_map = ParseObject.readJSONMap(body);
+
+
+
+
 	}
 
 
 
 	public String method() { return this.method; }
+	private void setMethod(String method) {	this.method = method;	}
+
+
 	public String module() { return this.url.get(0); }
-	private void setMethod(String method) { this.method = method; }
-
-
-
 	public List<String> resource() { return this.url; }
 	private void setURL(String url) {
 		List<String> temp_url = Arrays.asList(url.split("/"));

@@ -1,14 +1,17 @@
 package simpledoc.services.agency;
 
+import java.sql.SQLException;
+import simpledoc.exceptions.StorageErrorException;
+import java.util.UUID;
+import java.util.Collections;
+import java.util.Set;
 import java.sql.Array;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
 import java.util.Properties;
 
 import simpledoc.services.ModuleObject;
@@ -36,7 +39,7 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 
 	@Override
-	public boolean create(List<ModuleObject> data) {
+	public boolean create(Set<ModuleObject> data) throws StorageErrorException {
 		Boolean committed = true;
 
 		try {
@@ -52,12 +55,14 @@ public class AgencyStorage implements ModuleObjectStorage {
 			};
 
 			if (committed) connection.commit();
-			else connection.rollback();
-
+			else {
+				connection.rollback();
+				throw new StorageErrorException("error with commiting data to database");
+			}
 
 		} catch (SQLException e) {
 			committed = false;
-			e.printStackTrace();
+			throw new StorageErrorException("error storing new objects in database");
 		}
 
 		return committed;
@@ -102,7 +107,7 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 
 	@Override
-	public boolean update(List<ModuleObject> input) {
+	public boolean update(Set<ModuleObject> input) throws StorageErrorException {
 		// TODO: build after create() and query() working
 		return false;
 	}
@@ -110,7 +115,7 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 
 	@Override
-	public boolean delete(List<Object> delete_set) {
+	public boolean delete(Set<UUID> delete_set) throws StorageErrorException {
 		// TODO: build after create() and query() working
 		return false;
 	}
@@ -118,8 +123,8 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 
 	@Override
-	public List<String[]> query(List<String> resource_path, Map<String, String> query) {
-		List<String[]> returnable_result = new ArrayList<String[]>();
+	public Set<String[]> query(List<String> resource_path, Map<String, String> query) throws StorageErrorException {
+		Set<String[]> returnable_result = Collections.emptySet();
 
 		try{
 			String call = setQueryCall(resource_path);
@@ -134,7 +139,8 @@ public class AgencyStorage implements ModuleObjectStorage {
 				String[] result_set = result.toString().substring(1).split(",");
 				returnable_result.add(result_set);
 			}
-		} catch(SQLException e){ e.printStackTrace(); }
+		} catch(SQLException e){ throw new StorageErrorException("error with database query"); }
+
 
 
 		return returnable_result;
@@ -144,6 +150,33 @@ public class AgencyStorage implements ModuleObjectStorage {
 		String resource_switch = "";
 
 		//somehow, set switch using resource_path
+		/*
+				supported structures -->
+
+				GET / Agency / {ModuleObject implementation} / {uuid}
+							--> may limit data returned with query params
+
+				GET / Agency / {ModuleObject implementation} /
+							--> may limit objects returned with query params
+
+				GET / Agency / {uuid} / {ModuleObject implementation}
+							--> gets all objects related to specific resource
+							--> may limit returned objects with query params
+
+				POST / Agency /
+							--> no query
+							--> body includes: type & object_data
+
+				PUT / Agency /
+							--> body includes: id, type, object_data
+							--> query param opts: replace entire or up
+							--> must include object for updating with id in body
+
+				DELETE / Agency /
+							--> no body, just delete object with given id
+							--> use query to determine what happens to dependent objects
+							----> what to do when deleting object is a dependent of another
+		*/
 
 		switch(resource_switch){
 			case "category_resource":

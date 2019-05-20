@@ -1,25 +1,37 @@
 package simpledoc.services.agency;
 
-import simpledoc.utilities.ValidationHandler;
+import simpledoc.utilities.ValidationObject;
 import java.util.Map;
 import java.util.UUID;
-
 import simpledoc.services.ModuleObject;
 import simpledoc.services.ModuleObjectFactory;
 
 
 public class AgencyFactory implements ModuleObjectFactory {
 
+	public ModuleObject build(Object data_item) {
+		AgencyValidator validator = new AgencyValidator();
+		ValidationObject id = validator.validateObject(data_item.get("id"), UUID.class);
+		ValidationObject type = validator.validateModuleObjectType(data_item.get("type").toString());
 
-	public ModuleObject build(Map<String, Object> data_item) {
-		UUID id = ValidationHandler.getValidUUIDFor("id", data_item);
-		String type = ValidationHandler.getValidStringFor("type", data_item);
-		Map<String, Object> object_data = ValidationHandler.getValidMapFor("object_data", data_item);
+		if(id.isValid() && type.isValid()){
 
-		if(type.equalsIgnoreCase("AGENCY.AGENT")) return new AgentObject(id, type, object_data);
-		else if(type.equalsIgnoreCase("AGENCY.DEFINITION")) return new AgentDefinition(id, type, object_data);
-		else if(type.equalsIgnoreCase("AGENCY.CATEGORY")) return new AgentCategory(id, type, object_data);
-		else return null;
+			//this should just make sure that the object_data contains the proper keyset of the given type
+			ValidationObject object_data = validator.validateModuleObjectData(data_item.get("object_data"), type.getStringValue());
+
+			if(object_data.isValid()) {
+				switch(type.getStringValue()){
+					case "AGENCY.AGENT":
+						return new AgentObject(id.getUUIDValue(), type.getStringValue(), object_data.getMapValue());
+					case "AGENCY.DEFINITION":
+						return new AgentDefinition(id.getUUIDValue(), type.getStringValue(), object_data.getMapValue());
+					case "AGENCY.CATEGORY":
+						return new AgentCategory(id.getUUIDValue(), type.getStringValue(), object_data.getMapValue());
+				}
+			}
+		}
+
+		return null;
 	}
 
 }

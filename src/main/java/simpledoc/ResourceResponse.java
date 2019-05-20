@@ -1,39 +1,41 @@
 package simpledoc;
 
+import java.util.Set;
 import simpledoc.utilities.ParseObject;
 
-//can add handling of setting response headers in here when ready
+
+
 public class ResourceResponse {
 
+	private String response_body;
+	private ResourceRequest request;
 
-	private String response_body = "";
-	private boolean request_success = false;
-	private boolean storage_op_success = false;
-	private boolean response_success = false;
+	public ResourceResponse(ResourceRequest request){
+		this.request = request;
 
+	}
+	public ResourceResponse(String body, int response_code){
+		// create a response with just the body and response code injected directly
+		// typically this should be used for setting errors
+	}
 
-	public boolean getStorageOpFlag() { return this.storage_op_success; }
-	public void setStorageOpFlag(boolean flag) {
-		this.storage_op_success = flag;
-		if(!flag) setResponseBody("Error in storage operation"); }
-
-
-	public boolean getRequestOpFlag() { return this.request_success; }
-	public void setRequestOpFlag(boolean flag) {
-		this.request_success  = flag;
-		if(!flag) setResponseBody("Error in processing received request"); }
-
-
-	public boolean getResponseOpFlag() { return this.response_success; }
-	public void setResponseOpFlag(boolean flag) {
-		this.response_success = flag;
-		if(!flag) setResponseBody("Error in building response"); }
+	public ResourceRequest responseTo() { return this.request; }
 
 
 	public String body() { return this.response_body; }
-	public void setResponseBody(Object body) {
+
+
+	public ResourceResponse setResponse(Set<?> body, int status_code){
 		String data_string = ParseObject.writeJSONString(body);
 		this.response_body = "{data:" + data_string + "}";
+
+		return this;
+	}
+
+	public ResourceResponse setResponse(String body, int status_code){
+
+
+		return this;
 	}
 
 
@@ -54,4 +56,5 @@ public class ResourceResponse {
 
 		return 200;
 	}
+
 }
