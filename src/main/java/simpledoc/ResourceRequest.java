@@ -1,8 +1,10 @@
 package simpledoc;
 
-import java.util.Map.Entry;
+import java.util.Collections;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.io.IOException;
 import java.util.Set;
-import simpledoc.utilities.ParseObject;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,34 +15,50 @@ import java.util.Map;
 
 public class ResourceRequest {
 
+	private String body;
 	private String method;
 	private List<String> url;
 	private Map<String, String> query;
-	private Map<String, Entry<Class<?>, ?>> body_map;
 
 
 
 	public ResourceRequest(String method, String url, String query, InputStream body) {
+		storeBodyAsString(body);
 		setMethod(method);
 		setURL(url);
 		setQuery(query);
-		setBody(body);
 	}
 
 
-
-	@SuppressWarnings("unchecked")
-	public Set<Object> getBodyElementSet(String key) { return (Set<Object>) this.body_map.get(key); }
-	//if needed, can add a getBodyElementMap() method if the value of a body element is a an object
-	private void setBody(InputStream body) {
-		if(this.method.equalsIgnoreCase("GET")) this.body_map = null;
-		// else this.body_map = ParseObject.readJSONMap(body);
-
-
-
-
+	private void storeBodyAsString(InputStream body) {
+		String json_string = "";
+		try {
+			int i;
+			while((i = body.read()) != -1) {
+				char c = (char) i;
+				json_string += c;
+			}
+		} catch(IOException e) { e.printStackTrace(); }
+		this.body = json_string;
 	}
 
+
+	public Set<RequestData> getDataSet() {
+		Set<RequestData> data_set = Collections.emptySet();
+		JSONObject json_body = new JSONObject(body);
+		JSONArray data_array = json_body.optJSONArray("data");
+
+		data_array.forEach( item -> {
+			JSONObject json_item = new JSONObject(item);
+			String id = json_item.optString("id");
+			String type = json_item.optString("type");
+			Map<String, Object> data = json_item.optJSONObject("object_data").toMap();
+
+			data_set.add(new RequestData(id, type, data));
+		});
+
+		return data_set;
+	}
 
 
 	public String method() { return this.method; }
