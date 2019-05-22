@@ -1,17 +1,20 @@
 package simpledoc.services.agency;
 
-import simpledoc.exceptions.ServiceErrorException;
-import simpledoc.exceptions.StorageErrorException;
-import simpledoc.exceptions.UnsupportedServiceRequest;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import simpledoc.services.ModuleObject;
-import simpledoc.services.ServiceModule;
+import simpledoc.utilities.ValidationObject;
+import simpledoc.RequestData;
 import simpledoc.ResourceResponse;
 import simpledoc.ServiceFunction;
+import simpledoc.exceptions.ServiceErrorException;
+import simpledoc.exceptions.StorageErrorException;
+import simpledoc.exceptions.UnsupportedServiceRequest;
+import simpledoc.services.ModuleObject;
+import simpledoc.services.ServiceModule;
 
 
 public class AgencyService implements ServiceModule {
@@ -22,41 +25,34 @@ public class AgencyService implements ServiceModule {
 		Map<String, ServiceFunction> services = new HashMap<String, ServiceFunction>();
 
 		services.put("POST", request -> {
-			AgencyValidator validator = new AgencyValidator();
-			AgencyFactory factory = new AgencyFactory();
+			//all services will use these
+			AgencyValidator validator = new AgencyValidator(); //always validate request prior to servicing
 			AgencyStorage storage = new AgencyStorage();
+			Set<String> result_data = Collections.emptySet(); //result data should always be a set of strings
 			ResourceResponse response = new ResourceResponse(request);
-
-			Set<Object> request_data = request.getBodyElementSet("data");
-			Set<UUID> result_data = Collections.emptySet();
-			Set<ModuleObject> working_data = Collections.emptySet();
-
+			//specific to this service
+			Set<ModuleObject> working_data = Collections.emptySet(); //working_data used in whatever form required to perform the service
+			AgencyFactory factory = new AgencyFactory();
 
 
-			// step 1: validate the request -> cross-check method, URL, and body_data contents
-			if(!validator.validateSupportedRequest(request).isValid())
-				throw new UnsupportedServiceRequest("invalid request URL");
+			//if the data/method/URL signature in the request is not valid,
+			//	this will throw UnsupportedServiceRequest exception
+			validator.validateRequest(request.getDataSet(), request.method(), request.resource());
+
+			//if there is an error with building set of moduleobjects,
+			//	this will throw ServiceErrorException
+			request.getDataSet().stream().forEach( item -> working_data.add(factory.build(item)));
+
+			//if there is an error with storage operation,
+			//	this will throw StorageErrorException
+			storage.create(working_data);
+
+			//if no errors thrown before here, everything should be good to build the result_data
+			working_data.stream().forEach( item -> {
+				result_data.add(item.getId().toString());
+			});
 
 
-			// step *: build and validate working data set
-			request_data.stream().forEach( item -> working_data.add(factory.build(item)) );
-			if(!validator.validateSetAs(working_data, ModuleObject.class).isValid())
-				throw new ServiceErrorException("trouble creating new objects with given data");
-
-
-			// step *: perform database operation
-			if(!storage.create(working_data))
-				throw new StorageErrorException("unable to store new object data");
-
-
-			// step n-1: build response data & validate
-			working_data.stream().forEach(item -> result_data.add(item.getId()) );
-			if(!validator.validateSetAs(result_data, UUID.class).isValid())
-				throw new ServiceErrorException("unable to validate response data");
-
-
-
-			// step n: set response data and code in response and return
 			return response.setResponse(result_data, 200);
 		});
 

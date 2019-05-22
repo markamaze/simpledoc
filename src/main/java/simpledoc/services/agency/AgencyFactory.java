@@ -1,37 +1,35 @@
 package simpledoc.services.agency;
 
-import simpledoc.utilities.ValidationObject;
 import java.util.Map;
 import java.util.UUID;
+import simpledoc.RequestData;
+import simpledoc.exceptions.ServiceErrorException;
 import simpledoc.services.ModuleObject;
 import simpledoc.services.ModuleObjectFactory;
 
 
 public class AgencyFactory implements ModuleObjectFactory {
 
-	public ModuleObject build(Object data_item) {
-		AgencyValidator validator = new AgencyValidator();
-		ValidationObject id = validator.validateObject(data_item.get("id"), UUID.class);
-		ValidationObject type = validator.validateModuleObjectType(data_item.get("type").toString());
+	//might be good to setup such that it is only capable of accepting validated data
+	// currently I just only call it with data I know has been validated
+	//for now just catch illegal arguments and throw ServiceErrorException
+	public ModuleObject build(RequestData data_item) throws ServiceErrorException{
+		UUID id;
+		try {	id = UUID.fromString(data_item.getIdString()); }
+		catch(IllegalArgumentException err) {throw new ServiceErrorException("invalid UUID sent to factory");}
+		Map<String, Object> data = data_item.getObjectData();
+		String type = data_item.getType();
 
-		if(id.isValid() && type.isValid()){
-
-			//this should just make sure that the object_data contains the proper keyset of the given type
-			ValidationObject object_data = validator.validateModuleObjectData(data_item.get("object_data"), type.getStringValue());
-
-			if(object_data.isValid()) {
-				switch(type.getStringValue()){
-					case "AGENCY.AGENT":
-						return new AgentObject(id.getUUIDValue(), type.getStringValue(), object_data.getMapValue());
-					case "AGENCY.DEFINITION":
-						return new AgentDefinition(id.getUUIDValue(), type.getStringValue(), object_data.getMapValue());
-					case "AGENCY.CATEGORY":
-						return new AgentCategory(id.getUUIDValue(), type.getStringValue(), object_data.getMapValue());
-				}
-			}
+		switch(type){
+			case "AGENCY.AGENT":
+				return new AgentObject(id, type, data);
+			case "AGENCY.DEFINITION":
+				return new AgentDefinition(id, type, data);
+			case "AGENCY.CATEGORY":
+				return new AgentCategory(id, type, data);
+			default:
+				throw new ServiceErrorException("invalid Agency Object Type sent to factory");
 		}
-
-		return null;
 	}
 
 }

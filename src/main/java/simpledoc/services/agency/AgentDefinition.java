@@ -1,8 +1,8 @@
 package simpledoc.services.agency;
 
+import java.util.Set;
+import java.util.Collections;
 import java.util.Map;
-import java.util.HashMap;
-import simpledoc.utilities.ValidationObject;
 import java.util.UUID;
 import simpledoc.exceptions.ServiceErrorException;
 import simpledoc.services.ModuleObject;
@@ -12,19 +12,18 @@ public class AgentDefinition extends ModuleObject {
 	private UUID category_id;
 	private String definition_label;
 	private String definition_security;
-	private Map<String, Object> definition_data_structure;
+	private Map<String, String> definition_data_structure;
 
-	public AgentDefinition(UUID definition_id, String type, Map<String, Object> object_data) throws ServiceErrorException {
+
+	AgentDefinition(UUID definition_id, String type, Map<String, Object> object_data) throws ServiceErrorException {
 		super(definition_id, type);
 
-		ValidationObject valid_data = validateData(object_data);
-		if(!valid_data.isValid())
-			throw new ServiceErrorException("object data not valid for object type AgentDefinition");
-
-		String label = (String) object_data.get("definition_label");
-		UUID cat_id = (UUID) object_data.get("category_id");
-		String security = (String) object_data.get("definition_security");
-		Map<String, Object> data_structure = (Map<String, Object>) object_data.get("definition_data_structure");
+		//need to validate each value of object_data prior to setting it
+		//		if any validation errors, throw ServiceErrorException
+		String label = null; /*set a limit on length of string*/
+		UUID cat_id = null; /*assure it is a valid uuid*/
+		String security = null; /*should be a four digit integer, each digit from 1-4 */
+		Map<String, String> data_structure = null; /*limit length of key, value should represent the value type of key*/
 
 		this.setDefinitionLabel(label);
 		this.setCategoryId(cat_id);
@@ -32,41 +31,30 @@ public class AgentDefinition extends ModuleObject {
 		this.setDataDefinition(data_structure);
 	}
 
-	public static ValidationObject validateData(Map<String, Object> data){
-		AgencyValidator validator = new AgencyValidator();
-		Map<String, ValidationObject> validated_data = null;
-		try{
-			ValidationObject label = validator.validateObjectAs(data.get("definition_label"), String.class);
-			ValidationObject category_id = validator.validateObjectAs(data.get("category_id"), UUID.class);
-			ValidationObject security = validator.validateObjectAs(data.get("definition_security"), String.class);
-			ValidationObject data_structure = validator.validateObjectAs(data.get("definition_data_structure"), Map.class);
-
-			if( label.isValid()
-					&& category_id.isValid()
-					&& security.isValid()
-					&& data_structure.isValid()) {
-						validated_data = new HashMap<>();
-						validated_data.put("definition_label", label);
-						validated_data.put("category_id", category_id);
-						validated_data.put("definition_security", security);
-						validated_data.put("data_structure", data_structure);
-					}
-		} catch (Exception e) { e.printStackTrace(); }
-
-
-		return new ValidationObject(validated_data, Map.class);
-	}
 
 	private void setCategoryId(UUID category_id) { this.category_id = category_id; }
 	public UUID getCategoryId() { return this.category_id; }
 
+
 	private void setDefinitionLabel(String label) { this.definition_label = label; }
 	public String getDefinitionLabel() { return this.definition_label; }
+
 
 	private void setDefinitionSecurity(String security_setting) { this.definition_security = security_setting; }
 	public String getDefinitionSecurity() { return this.definition_security; }
 
-	private void setDataDefinition(Map<String, Object> data_structure) { this.definition_data_structure = data_structure; }
-	public Map<String, Object> getDataDefinition() { return this.definition_data_structure; }
 
+	private void setDataDefinition(Map<String, String> data_structure) { this.definition_data_structure = data_structure; }
+	public Map<String, String> getDataDefinition() { return this.definition_data_structure; }
+
+	public static Set<String> getKeySet(){
+		Set<String> key_set = Collections.emptySet();
+
+		key_set.add("definition_label");
+		key_set.add("category_id");
+		key_set.add("definition_security");
+		key_set.add("definition_data_structure");
+
+		return key_set;
+	}
 }
