@@ -20,12 +20,10 @@ public class AgentCategory extends ModuleObject {
 	AgentCategory(UUID category_id, String type, Map<String, Object> object_data) throws ServiceErrorException {
 		super(category_id, type);
 
-		//need to validate each value of object_data prior to setting it
-		//		if any validation errors, throw ServiceErrorException
-		String label = null; /*set a limit on length of string*/
-		String behavior = null; /*shoule be either "STRUCTURAL" or "ACTOR" */
-		String security = null; /*should be a four digit integer, each digit from 1-4*/
-		Map<String, String> data_structure = null; /*limit length of key, value should represent the value type of key*/
+		String label = AgencyValidator.validLabel(object_data.get("category_label"));
+		String behavior = AgencyValidator.validBehavior(object_data.get("category_behavior"));
+		String security = AgencyValidator.validSecurity(object_data.get("category_security"));
+		Map<String, String> data_structure = AgencyValidator.validDataStruct(object_data.get(category_data_structure));
 
 		this.setCategoryLabel(label);
 		this.setCategoryBehavior(behavior);

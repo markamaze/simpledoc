@@ -16,15 +16,15 @@ public class AgentObject extends ModuleObject {
 	private Map<String, String> agent_data_structure;
 
 
-	AgentObject(UUID agent_id, String object_type, Map<String, Object> object_data) {
+	AgentObject(UUID agent_id, String object_type, Map<String, Object> object_data) throws ServiceErrorException{
 		super(agent_id, object_type);
 
 		//need to validate each value of object_data prior to setting it
 		//		if any validation errors, throw ServiceErrorException
-		UUID definition_id = null; /*assure it is a valid uuid*/
-		UUID agent_link_id = null; /*assure it is a valid uuid*/
-		String agent_security = null; /*should be a four digit integer, each digit from 1-4 */
-		Map<String, String> agent_data_structure = null; /*limit length of key, value should represent the value type of key*/
+		UUID definition_id = AgencyValidator.validUUIDString(object_data.get("definition_id"));
+		UUID agent_link_id = AgencyValidator.validUUIDString(object_data.get("agent_link_id"));
+		String agent_security = AgencyValidator.validSecurity(object_data.get("agent_security"));
+		Map<String, String> agent_data_structure = AgencyValidator.validDataStruct(object_data.get("agent_data_structure"));
 		Map<String, Object> agent_data = null; /*not sure what to do with this, may remove from AgentObject
 																							and collect all agent data another way*/
 

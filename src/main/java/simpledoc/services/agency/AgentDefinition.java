@@ -18,12 +18,10 @@ public class AgentDefinition extends ModuleObject {
 	AgentDefinition(UUID definition_id, String type, Map<String, Object> object_data) throws ServiceErrorException {
 		super(definition_id, type);
 
-		//need to validate each value of object_data prior to setting it
-		//		if any validation errors, throw ServiceErrorException
-		String label = null; /*set a limit on length of string*/
-		UUID cat_id = null; /*assure it is a valid uuid*/
-		String security = null; /*should be a four digit integer, each digit from 1-4 */
-		Map<String, String> data_structure = null; /*limit length of key, value should represent the value type of key*/
+		String label = AgencyValidator.validLabel(object_data.get("definition_label"));
+		UUID cat_id = AgencyValidator.validUUIDString(object_data.get("category_id"));
+		String security = AgencyValidator.validSecurity(object_data.get("definition_security"));
+		Map<String, String> data_structure = AgencyValidator.validDataStruct(object_data.get("definition_data_structure"));
 
 		this.setDefinitionLabel(label);
 		this.setCategoryId(cat_id);
