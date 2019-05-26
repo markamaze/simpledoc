@@ -1,5 +1,6 @@
 package simpledoc.services.agency;
 
+import simpledoc.RequestData;
 import java.util.Set;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,7 +35,9 @@ public class AgencyService implements ServiceModule {
 
 			//if there is an error with building set of moduleobjects,
 			//	this will throw ServiceErrorException
-			request.getDataSet().stream().forEach( item -> working_data.add(factory.build(item)));
+			for( RequestData item : request.getDataSet()){
+				working_data.add(factory.build(item));
+			}
 
 			//if there is an error with storage operation,
 			//	this will throw StorageErrorException
