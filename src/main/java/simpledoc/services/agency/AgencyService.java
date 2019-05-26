@@ -1,18 +1,11 @@
 package simpledoc.services.agency;
 
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-import simpledoc.utilities.ValidationObject;
-import simpledoc.RequestData;
 import simpledoc.ResourceResponse;
 import simpledoc.ServiceFunction;
-import simpledoc.exceptions.ServiceErrorException;
-import simpledoc.exceptions.StorageErrorException;
-import simpledoc.exceptions.UnsupportedServiceRequest;
 import simpledoc.services.ModuleObject;
 import simpledoc.services.ServiceModule;
 
