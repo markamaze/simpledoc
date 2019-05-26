@@ -1,7 +1,7 @@
 package simpledoc;
 
+import org.json.JSONStringer;
 import java.util.Set;
-import simpledoc.utilities.ParseObject;
 
 
 
@@ -26,7 +26,7 @@ public class ResourceResponse {
 
 
 	public ResourceResponse setResponse(Set<?> body, int status_code){
-		String data_string = ParseObject.writeJSONString(body);
+		String data_string = JSONStringer.valueToString(body);
 		this.response_body = "{data:" + data_string + "}";
 
 		return this;
