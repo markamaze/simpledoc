@@ -84,8 +84,11 @@ public class AgencyValidator extends ModuleValidation {
 
 
   public static String validBehavior(Object behavior_object) throws ServiceErrorException{
-
-    return "";
+    switch(behavior_object.toString()){
+      case "STRUCTURAL": return "STRUCTURAL";
+      case "ACTOR": return "ACTOR";
+      default: throw new ServiceErrorException("unknown agent category behavior");
+    }
   }
 
   public static Map<String, String> validDataStruct(Object data_struct) throws ServiceErrorException{
