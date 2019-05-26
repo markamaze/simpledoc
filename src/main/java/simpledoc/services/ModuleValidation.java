@@ -15,18 +15,30 @@ public abstract class ModuleValidation {
 
 
     public static UUID validUUIDString(Object id_string) throws ServiceErrorException{
-
-      return null;
+      UUID uuid = null;
+      try{
+        uuid = UUID.fromString(id_string.toString());
+      } catch (IllegalArgumentException err) { throw new ServiceErrorException("invalid id given"); }
+      return uuid;
     }
 
     public static String validLabel(Object label_object) throws ServiceErrorException{
+      String label = label_object.toString();
 
-      return "";
+      if(label.length() > 30) throw new ServiceErrorException("invalid label, too many characters");
+
+      return label;
     }
 
     public static String validSecurity(Object security_object) throws ServiceErrorException{
+      char[] security = security_object.toString().toCharArray();
 
-      return "";
+      if(security.length != 4) throw new ServiceErrorException("invalid security value, must be 4 digits");
+      for(char i: security ){
+        Integer asint = Integer.valueOf(i);
+        if(asint < 1 || asint > 4) throw new ServiceErrorException("invalid security digit, out of bounds");
+      }
+      return security.toString();
     }
 
 }
