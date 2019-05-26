@@ -1,5 +1,6 @@
 package simpledoc.services.agency;
 
+import simpledoc.exceptions.ServiceErrorException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -82,4 +83,13 @@ public class AgencyValidator extends ModuleValidation {
   }
 
 
+  public static String validBehavior(Object behavior_object) throws ServiceErrorException{
+
+    return "";
+  }
+
+  public static Map<String, String> validDataStruct(Object data_struct) throws ServiceErrorException{
+
+    return null;
+  }
 }
