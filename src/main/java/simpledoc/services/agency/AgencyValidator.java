@@ -1,5 +1,6 @@
 package simpledoc.services.agency;
 
+import java.util.Collections;
 import simpledoc.exceptions.ServiceErrorException;
 import java.util.List;
 import java.util.Map;
@@ -91,8 +92,32 @@ public class AgencyValidator extends ModuleValidation {
     }
   }
 
+  @SuppressWarnings("unchecked")
   public static Map<String, String> validDataStruct(Object data_struct) throws ServiceErrorException{
+    //should check that each label is valid
+    //the value of each label should be something like: string-30, date-mm/dd/yy, int-9, (data type)-(format or length)
+    //should use RegExp's for this eventually, but for now just stick to some basics
+    Map<String, String> validated_structure = Collections.emptyMap();
+    Map<String, Object> data_map = null;
 
-    return null;
+    if(data_struct instanceof Map) data_map = (Map<String, Object>) data_struct;
+    else throw new ServiceErrorException("invalid data structure");
+
+    for(String key: data_map.keySet()) { AgencyValidator.validLabel(key); }
+
+    for(Object value: data_map.values()){
+      switch(value.toString()){
+        case "string-30": break;
+        case "date-mm/dd/yy": break;
+        case "string-any": break;
+        default: throw new ServiceErrorException("unsupported value in data structure");
+      }
+    }
+    data_map.forEach((key, value) -> {
+      validated_structure.put(key, value.toString());
+    });
+
+
+    return validated_structure;
   }
 }
