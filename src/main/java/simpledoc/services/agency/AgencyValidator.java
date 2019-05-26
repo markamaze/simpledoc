@@ -18,18 +18,33 @@ public class AgencyValidator extends ModuleValidation {
   public boolean validateRequest (Set<RequestData> request_data, String method, List<String> resource)
           throws UnsupportedServiceRequest {
 
-    //TODO: finish validateRequest to include validation with method & resource
+    //this portion will validate the resource against the method
+    if(method.equalsIgnoreCase("POST") ||
+        method.equalsIgnoreCase("PUT") ||
+        method.equalsIgnoreCase("DELETE")){
+          if(resource.size() != 1) /*for these methods, all data will be in the request body*/
+            throw new UnsupportedServiceRequest("unsupported url for given method");
+        }
+    else if(method.equalsIgnoreCase("GET")) {
+      // any elements beyond the first, should be either a uuid or a type of agency object (category, agent, definition)
+      // there should be no more than one uuid in the url
+      // if a uuid is in the resource path, it should be either the second (after "/Agency") or the last (or both)
+      //    /Agency/UUID -> gets a single resource by id
+      //    /Agency/(agency object) -> gets all resources of the agency object type specified
+      //    /Agency/UUID/agent -> gets all agents associated with the given resource id
+      //    /Agency/UUID/category -> gets category objects of the given resource id
+      //    /Agency/UUID/definition -> gets definition objects of the given resource id
 
 
-    //in addition to below verification,
-    //  make sure the resource/method/data make sense
+      //for now, just validate any get requests
 
-    //  for example, a POST or PUT method with any resorce other than "/Agency" wouldn't be supported for now
-    //              a GET or DELETE method with a request body wouldn't be supported
-    //              giving a valid id on a POST request wouldn't make sense
-    //              not giving a valid id on a PUT request wouldn't make sense
-    //
+    }
+    else throw new UnsupportedServiceRequest("unsupported request method");
 
+
+
+
+    //this portion will validate the contents of the data portion of the http request body
     for(RequestData item: request_data) {
       String string_id = item.getIdString();
       String type = item.getType();
