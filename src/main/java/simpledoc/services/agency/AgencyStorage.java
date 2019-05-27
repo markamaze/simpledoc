@@ -115,7 +115,7 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 
 	@Override
-	public boolean delete(Set<UUID> delete_set) throws StorageErrorException {
+	public boolean delete(Map<String, UUID> delete_set) throws StorageErrorException {
 		// TODO: build after create() and query() working
 		return false;
 	}

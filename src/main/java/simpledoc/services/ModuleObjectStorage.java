@@ -11,6 +11,6 @@ public interface ModuleObjectStorage {
 
 	public abstract boolean create(Set<ModuleObject> input) throws StorageErrorException;
 	public abstract boolean update(Set<ModuleObject> input) throws StorageErrorException;
-	public abstract boolean delete(Set<UUID> input) throws StorageErrorException;
+	public abstract boolean delete(Map<String, UUID> input) throws StorageErrorException;
 	public abstract Set<String[]> query(List<String> resource_path, Map<String, String> query) throws StorageErrorException;
 }
