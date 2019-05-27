@@ -1,8 +1,13 @@
 package simpledoc;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.io.IOException;
+import java.util.Set;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -10,38 +15,57 @@ import java.util.Map;
 
 public class ResourceRequest {
 
+	private String body;
 	private String method;
 	private List<String> url;
 	private Map<String, String> query;
-	private Map<String, Object> body_map;
 
 
 
 	public ResourceRequest(String method, String url, String query, InputStream body) {
+		storeBodyAsString(body);
 		setMethod(method);
 		setURL(url);
 		setQuery(query);
-		setBody(body);
 	}
 
 
-
-	@SuppressWarnings("unchecked")
-	public List<Object> getBodyElementList(String key) { return (List<Object>) this.body_map.get(key); }
-	//if needed, can add a getBodyElementMap() method if the value of a body element is a an object
-	private void setBody(InputStream body) {
-		if(this.method.equalsIgnoreCase("GET")) this.body_map = null;
-		else this.body_map = ParseObject.readJSONMap(body);
+	private void storeBodyAsString(InputStream body) {
+		String json_string = "";
+		try {
+			int i;
+			while((i = body.read()) != -1) {
+				char c = (char) i;
+				json_string += c;
+			}
+		} catch(IOException e) { e.printStackTrace(); }
+		this.body = json_string;
 	}
 
+
+	public Set<RequestData> getDataSet() {
+		Set<RequestData> data_set = new HashSet<RequestData>();
+		JSONObject json_body = new JSONObject(body);
+		JSONArray data_array = json_body.optJSONArray("data");
+
+		data_array.forEach( item -> {
+			JSONObject json_item = item instanceof JSONObject ? (JSONObject) item : null;
+			String id = json_item.optString("id");
+			String type = json_item.optString("type");
+			Map<String, Object> data = json_item.optJSONObject("object_data").toMap();
+
+			data_set.add(new RequestData(id, type, data));
+		});
+
+		return data_set;
+	}
 
 
 	public String method() { return this.method; }
+	private void setMethod(String method) {	this.method = method;	}
+
+
 	public String module() { return this.url.get(0); }
-	private void setMethod(String method) { this.method = method; }
-
-
-
 	public List<String> resource() { return this.url; }
 	private void setURL(String url) {
 		List<String> temp_url = Arrays.asList(url.split("/"));
@@ -54,7 +78,7 @@ public class ResourceRequest {
 	private void setQuery(String query) {
 		Map<String, String> temp_query = new HashMap<>();
 
-		if (query == null) this.query = null;
+		if (query == null) this.query = temp_query;
 		else {
 			Arrays.asList(query.split("?")).forEach( query_item -> {
 				String[] split_item = query_item.split("=");

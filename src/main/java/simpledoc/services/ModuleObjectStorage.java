@@ -1,14 +1,16 @@
 package simpledoc.services;
 
-import java.sql.SQLException;
+import simpledoc.exceptions.StorageErrorException;
+import java.util.UUID;
+import java.util.Set;
 import java.util.List;
 import java.util.Map;
 
 
 public interface ModuleObjectStorage {
 
-	public abstract boolean create(List<ModuleObject> input) throws SQLException;	
-	public abstract boolean update(List<ModuleObject> input);
-	public abstract boolean delete(List<ModuleObject> input);
-	public abstract List<String[]> query(List<String> resource_path, Map<String, String> query);
+	public abstract boolean create(Set<ModuleObject> input) throws StorageErrorException;
+	public abstract boolean update(Set<ModuleObject> input) throws StorageErrorException;
+	public abstract boolean delete(Map<String, UUID> input) throws StorageErrorException;
+	public abstract Set<String[]> query(List<String> resource_path, Map<String, String> query) throws StorageErrorException;
 }

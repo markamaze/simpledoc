@@ -1,5 +1,8 @@
 package simpledoc;
 
+import simpledoc.exceptions.StorageErrorException;
+import simpledoc.exceptions.UnsupportedServiceRequest;
+import simpledoc.exceptions.ServiceErrorException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -39,19 +42,34 @@ public class ClientThread extends Thread {
 	 }
 
 	 private void handleResourceRequest() {
-        OutputStream out = null;
-		ResourceRequest request = new ResourceRequest(
+    OutputStream out = null;
+		ResourceResponse response;
+		ResourceRequest request;
+		ServiceFunction service;
+
+		try{
+		 	request = new ResourceRequest(
 	 									this.exchange.getRequestMethod(),
 	 									this.exchange.getRequestURI().getPath(),
 	 									this.exchange.getRequestURI().getQuery(),
 	 									this.exchange.getRequestBody());
 
-		ResourceResponse response = this.services.load(request.module(), request.method()).run(request);
+			service = this.services.load(request.module(), request.method());
+
+			response = service.run(request);
+
+		} catch (UnsupportedServiceRequest err) {
+			response = new ResourceResponse(err.getMessage(), 501);
+		} catch (ServiceErrorException err) {
+			response = new ResourceResponse(err.getMessage(), 502);
+		} catch (StorageErrorException err) {
+			response = new ResourceResponse(err.getMessage(), 503);
+		}
 
 	 	try {
 	 		String body = response.body();
 	 		int code = response.responseCode();
-	 		
+
 	 		this.exchange.sendResponseHeaders(code, body.length());
 			out = this.exchange.getResponseBody();
 	 		out.write(body.getBytes());
