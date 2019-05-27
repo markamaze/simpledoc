@@ -35,10 +35,10 @@ public abstract class ModuleValidation {
 
       if(security.length != 4) throw new ServiceErrorException("invalid security value, must be 4 digits");
       for(char i: security ){
-        Integer asint = Integer.valueOf(i);
+        Integer asint = Integer.parseInt(Character.toString(i));
         if(asint < 1 || asint > 4) throw new ServiceErrorException("invalid security digit, out of bounds");
       }
-      return security.toString();
+      return security_object.toString();
     }
 
 }
