@@ -1,7 +1,7 @@
 package simpledoc.services.agency;
 
 
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import simpledoc.exceptions.ServiceErrorException;
 import java.util.Map;
@@ -23,7 +23,7 @@ public class AgentCategory extends ModuleObject {
 		String label = AgencyValidator.validLabel(object_data.get("category_label"));
 		String behavior = AgencyValidator.validBehavior(object_data.get("category_behavior"));
 		String security = AgencyValidator.validSecurity(object_data.get("category_security"));
-		Map<String, String> data_structure = AgencyValidator.validDataStruct(object_data.get(category_data_structure));
+		Map<String, String> data_structure = AgencyValidator.validDataStruct(object_data.get("category_data_structure"));
 
 		this.setCategoryLabel(label);
 		this.setCategoryBehavior(behavior);
@@ -49,7 +49,7 @@ public class AgentCategory extends ModuleObject {
 
 
 	public static Set<String> getKeySet(){
-		Set<String> key_set = Collections.emptySet();
+		Set<String> key_set = new HashSet<String>();
 
 		key_set.add("category_label");
 		key_set.add("category_behavior");

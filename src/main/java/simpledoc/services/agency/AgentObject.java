@@ -1,7 +1,8 @@
 package simpledoc.services.agency;
 
 import java.util.Set;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 import simpledoc.exceptions.ServiceErrorException;
@@ -25,7 +26,7 @@ public class AgentObject extends ModuleObject {
 		UUID agent_link_id = AgencyValidator.validUUIDString(object_data.get("agent_link_id"));
 		String agent_security = AgencyValidator.validSecurity(object_data.get("agent_security"));
 		Map<String, String> agent_data_structure = AgencyValidator.validDataStruct(object_data.get("agent_data_structure"));
-		Map<String, Object> agent_data = null; /*not sure what to do with this, may remove from AgentObject
+		Map<String, Object> agent_data = new HashMap<>(); /*not sure what to do with this, may remove from AgentObject
 																							and collect all agent data another way*/
 
 
@@ -58,7 +59,7 @@ public class AgentObject extends ModuleObject {
 
 
 	public static Set<String> getKeySet(){
-		Set<String> key_set = Collections.emptySet();
+		Set<String> key_set = new HashSet<String>();
 
 		key_set.add("definition_id");
 		key_set.add("agent_link_id");

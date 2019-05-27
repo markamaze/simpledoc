@@ -1,7 +1,7 @@
 package simpledoc.services.agency;
 
 import java.util.Set;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 import simpledoc.exceptions.ServiceErrorException;
@@ -46,7 +46,7 @@ public class AgentDefinition extends ModuleObject {
 	public Map<String, String> getDataDefinition() { return this.definition_data_structure; }
 
 	public static Set<String> getKeySet(){
-		Set<String> key_set = Collections.emptySet();
+		Set<String> key_set = new HashSet<String>();
 
 		key_set.add("definition_label");
 		key_set.add("category_id");
