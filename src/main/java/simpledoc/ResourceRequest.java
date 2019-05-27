@@ -8,6 +8,7 @@ import java.util.Set;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -44,12 +45,12 @@ public class ResourceRequest {
 
 
 	public Set<RequestData> getDataSet() {
-		Set<RequestData> data_set = Collections.emptySet();
+		Set<RequestData> data_set = new HashSet<RequestData>();
 		JSONObject json_body = new JSONObject(body);
 		JSONArray data_array = json_body.optJSONArray("data");
 
 		data_array.forEach( item -> {
-			JSONObject json_item = new JSONObject(item);
+			JSONObject json_item = item instanceof JSONObject ? (JSONObject) item : null;
 			String id = json_item.optString("id");
 			String type = json_item.optString("type");
 			Map<String, Object> data = json_item.optJSONObject("object_data").toMap();
