@@ -9,7 +9,6 @@ import simpledoc.services.agency.AgencyService;
 
 
 
-//TODO: this feels like it should be refactored
 public class ServiceLoader {
 	private Map<String, Map<String, ServiceFunction>> services;
 

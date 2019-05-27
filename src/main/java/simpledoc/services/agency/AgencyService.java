@@ -82,7 +82,7 @@ public class AgencyService implements ServiceModule {
 			Map<String, UUID> working_data = new HashMap<String, UUID>();
 
 
-			//BUG: when validating request, need to differentiate between what the data should contain.
+			//TODO BUG: when validating request, need to differentiate between what the data should contain.
 			//		For example: a DELETE request will only contain id and type, no object_data
 			//								a PUT request may not contain all elements of the object_data structure
 			//								a GET request should have a null dataSet as there is no request body
@@ -108,28 +108,29 @@ public class AgencyService implements ServiceModule {
 			AgencyStorage storage = new AgencyStorage();
 			ResourceResponse response = new ResourceResponse();
 
-			AgencyFactory factory = new AgencyFactory();
+//			AgencyFactory factory = new AgencyFactory();
 
 			Set<String[]> working_data = null;
-			Set<ModuleObject> result_data = new HashSet<ModuleObject>();
+//			Set<ModuleObject> result_data = new HashSet<ModuleObject>();
 
 
 
-			validator.validateRequest(request.getDataSet(), request.method(), request.resource());
+			validator.validateRequest(null, request.method(), request.resource());
 
 
 			working_data = storage.query(request.resource(), request.query());
 
 
-			//not sure if I should build agency objects from results from storage
+			//TODO: not sure if I should build agency objects from results from storage
 			// on one hand, it provides validation prior to sending response
 			// on the other, the data was valid when sent to the database and should be unchanged?
-			for(String[] item: working_data){
-				result_data.add(factory.build(item));
-			}
+//			for(String[] item: working_data){
+//				result_data.add(factory.build(item));
+//			}
 
 
-			return response.setResponse(result_data, 200);
+
+			return response.setResponse(working_data, 200);
 
 		});
 

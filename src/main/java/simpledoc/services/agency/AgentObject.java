@@ -20,13 +20,11 @@ public class AgentObject extends ModuleObject {
 	AgentObject(UUID agent_id, String object_type, Map<String, Object> object_data) throws ServiceErrorException{
 		super(agent_id, object_type);
 
-		//need to validate each value of object_data prior to setting it
-		//		if any validation errors, throw ServiceErrorException
 		UUID definition_id = AgencyValidator.validUUIDString(object_data.get("definition_id"));
 		UUID agent_link_id = AgencyValidator.validUUIDString(object_data.get("agent_link_id"));
 		String agent_security = AgencyValidator.validSecurity(object_data.get("agent_security"));
 		Map<String, String> agent_data_structure = AgencyValidator.validDataStruct(object_data.get("agent_data_structure"));
-		Map<String, Object> agent_data = new HashMap<>(); /*not sure what to do with this, may remove from AgentObject
+		Map<String, Object> agent_data = new HashMap<>(); /*TODO not sure what to do with this, may remove from AgentObject
 																							and collect all agent data another way*/
 
 

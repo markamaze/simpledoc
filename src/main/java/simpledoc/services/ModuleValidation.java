@@ -16,7 +16,7 @@ public abstract class ModuleValidation {
 
 
     public static UUID validUUIDString(Object id_string) throws ServiceErrorException{
-      //BUG: returning without throwing exception when what seems to be an invalid uuid sent in some occasions
+      //TODO BUG: returning without throwing exception when what seems to be an invalid uuid sent in some occasions
     	// got what's happening, UUID.fromString is just filling in leading zeros when missing a few digits
       UUID uuid = null;
       try{

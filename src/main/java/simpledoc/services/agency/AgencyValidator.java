@@ -27,6 +27,7 @@ public class AgencyValidator extends ModuleValidation {
             throw new UnsupportedServiceRequest("unsupported url for given method");
         }
     else if(method.equalsIgnoreCase("GET")) {
+      //TODO: work out validating GET request url's
       // any elements beyond the first, should be either a uuid or a type of agency object (category, agent, definition)
       // there should be no more than one uuid in the url
       // if a uuid is in the resource path, it should be either the second (after "/Agency") or the last (or both)
@@ -46,6 +47,7 @@ public class AgencyValidator extends ModuleValidation {
 
 
     //this portion will validate the contents of the data portion of the http request body
+    if( request_data != null)
     for(RequestData item: request_data) {
       String string_id = item.getIdString();
       String type = item.getType();
@@ -86,7 +88,7 @@ public class AgencyValidator extends ModuleValidation {
 
     switch(type) {
       case "AGENCY.CATEGORY":
-        if(keys.containsAll(AgentCategory.getKeySet()) 
+        if(keys.containsAll(AgentCategory.getKeySet())
         		&& keys.size() == AgentCategory.getKeySet().size()) return true;
         else return false;
       case "AGENCY.DEFINITION":

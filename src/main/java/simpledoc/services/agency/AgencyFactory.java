@@ -10,12 +10,9 @@ import simpledoc.services.ModuleObjectFactory;
 
 public class AgencyFactory implements ModuleObjectFactory {
 
-	//might be good to setup such that it is only capable of accepting validated data
-	// currently I just only call it with data I know has been validated
-	//for now just catch illegal arguments and throw ServiceErrorException
 	public ModuleObject build(RequestData data_item) throws ServiceErrorException{
 		UUID id;
-		try {	
+		try {
 			if(data_item.getIdString().equalsIgnoreCase("new_object")) id = UUID.randomUUID();
 			else id = UUID.fromString(data_item.getIdString()); }
 		catch(IllegalArgumentException err) {throw new ServiceErrorException("invalid UUID sent to factory");}

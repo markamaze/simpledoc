@@ -3,7 +3,7 @@ package simpledoc.services.agency;
 import java.sql.SQLException;
 import simpledoc.exceptions.StorageErrorException;
 import java.util.UUID;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.sql.Array;
 import java.sql.CallableStatement;
@@ -20,7 +20,7 @@ import simpledoc.services.ModuleObjectStorage;
 
 
 public class AgencyStorage implements ModuleObjectStorage {
-
+	//TODO: remove credientials, use environment variables
 	private static Connection connection;
 	private static String url = "jdbc:postgresql://ec2-54-243-197-120.compute-1.amazonaws.com:5432/da16p9r5cqnbfj";
 	private static String username = "pqtafaszpcncjx";
@@ -124,7 +124,7 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 	@Override
 	public Set<String[]> query(List<String> resource_path, Map<String, String> query) throws StorageErrorException {
-		Set<String[]> returnable_result = Collections.emptySet();
+		Set<String[]> returnable_result = new HashSet<String[]>();
 
 		try{
 			String call = setQueryCall(resource_path);
@@ -149,7 +149,7 @@ public class AgencyStorage implements ModuleObjectStorage {
 		String call = "";
 		String resource_switch = "";
 
-		//somehow, set switch using resource_path
+		//TODO: somehow, set switch using resource_path
 		/*
 				supported structures -->
 
