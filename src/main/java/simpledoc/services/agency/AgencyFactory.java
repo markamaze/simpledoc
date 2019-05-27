@@ -15,7 +15,9 @@ public class AgencyFactory implements ModuleObjectFactory {
 	//for now just catch illegal arguments and throw ServiceErrorException
 	public ModuleObject build(RequestData data_item) throws ServiceErrorException{
 		UUID id;
-		try {	id = UUID.fromString(data_item.getIdString()); }
+		try {	
+			if(data_item.getIdString().equalsIgnoreCase("new_object")) id = UUID.randomUUID();
+			else id = UUID.fromString(data_item.getIdString()); }
 		catch(IllegalArgumentException err) {throw new ServiceErrorException("invalid UUID sent to factory");}
 		Map<String, Object> data = data_item.getObjectData();
 		String type = data_item.getType();
