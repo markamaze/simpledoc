@@ -86,13 +86,16 @@ public class AgencyValidator extends ModuleValidation {
 
     switch(type) {
       case "AGENCY.CATEGORY":
-        if(keys.containsAll(AgentCategory.getKeySet())) return true;
+        if(keys.containsAll(AgentCategory.getKeySet()) 
+        		&& keys.size() == AgentCategory.getKeySet().size()) return true;
         else return false;
       case "AGENCY.DEFINITION":
-        if(keys.containsAll(AgentDefinition.getKeySet())) return true;
+        if(keys.containsAll(AgentDefinition.getKeySet())
+        		&& keys.size() == AgentDefinition.getKeySet().size()) return true;
         else return false;
       case "AGENCY.AGENT":
-        if(keys.containsAll(AgentObject.getKeySet())) return true;
+        if(keys.containsAll(AgentObject.getKeySet())
+        		&& keys.size() == AgentObject.getKeySet().size()) return true;
         else return false;
       default: return false;
 
