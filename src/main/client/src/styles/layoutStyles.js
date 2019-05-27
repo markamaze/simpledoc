@@ -21,7 +21,7 @@ export const appStyle = {
 export const LayoutStyle = styled.div`
   display: grid;
   min-width: 100%;
-  background-color: ${colors.darkgray};
+  background-color: ${colors.secondary};
   grid-template-columns: 10em auto;
   grid-template-rows: 5% 90% 5%;
   box-sizing: border-box;
