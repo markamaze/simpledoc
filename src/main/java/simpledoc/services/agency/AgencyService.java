@@ -2,8 +2,8 @@ package simpledoc.services.agency;
 
 import simpledoc.RequestData;
 import java.util.Set;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import simpledoc.ResourceResponse;
 import simpledoc.ServiceFunction;
@@ -22,10 +22,10 @@ public class AgencyService implements ServiceModule {
 			//all services will use these
 			AgencyValidator validator = new AgencyValidator(); //always validate request prior to servicing
 			AgencyStorage storage = new AgencyStorage();
-			Set<String> result_data = Collections.emptySet(); //result data should always be a set of strings
-			ResourceResponse response = new ResourceResponse(request);
+			Set<String> result_data = new HashSet<String>(); //result data should always be a set of strings
+			ResourceResponse response = new ResourceResponse();
 			//specific to this service
-			Set<ModuleObject> working_data = Collections.emptySet(); //working_data used in whatever form required to perform the service
+			Set<ModuleObject> working_data = new HashSet<ModuleObject>(); //working_data used in whatever form required to perform the service
 			AgencyFactory factory = new AgencyFactory();
 
 
