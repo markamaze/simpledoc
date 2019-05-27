@@ -8,18 +8,12 @@ import java.util.Set;
 public class ResourceResponse {
 
 	private String response_body;
-	private ResourceRequest request;
+	private int response_code;
 
-	public ResourceResponse(ResourceRequest request){
-		this.request = request;
-
-	}
+	public ResourceResponse(){}
 	public ResourceResponse(String body, int response_code){
-		// create a response with just the body and response code injected directly
-		// typically this should be used for setting errors
+		setResponse(body, response_code);
 	}
-
-	public ResourceRequest responseTo() { return this.request; }
 
 
 	public String body() { return this.response_body; }
@@ -28,33 +22,20 @@ public class ResourceResponse {
 	public ResourceResponse setResponse(Set<?> body, int status_code){
 		String data_string = JSONStringer.valueToString(body);
 		this.response_body = "{data:" + data_string + "}";
-
+		this.response_code = status_code;
 		return this;
 	}
 
 	public ResourceResponse setResponse(String body, int status_code){
+		if(status_code == 200) this.response_body = "{data:" + body + "}";
+		else this.response_body = "{error:" + body + "}";
 
+		this.response_code = status_code;
 
 		return this;
 	}
 
 
-	public int responseCode() {
-		/* possible states:
-		 * 		request handled successfully
-		 * 		problem with request
-		 * 		problem with storage
-		 * 		problem forming response
-		 *
-		 *	build a switch statement to handle
-		 *	parsing the flags to determine which
-		 *	code to return
-		 *
-		 *	for now, just return 200 by default
-		 * */
-
-
-		return 200;
-	}
+	public int responseCode() { return this.response_code; }
 
 }
