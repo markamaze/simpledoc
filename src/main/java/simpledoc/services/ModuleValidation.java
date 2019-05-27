@@ -3,6 +3,7 @@ package simpledoc.services;
 import java.util.UUID;
 import simpledoc.exceptions.ServiceErrorException;
 import simpledoc.exceptions.UnsupportedServiceRequest;
+
 import java.util.List;
 import simpledoc.RequestData;
 import java.util.Set;
@@ -15,6 +16,8 @@ public abstract class ModuleValidation {
 
 
     public static UUID validUUIDString(Object id_string) throws ServiceErrorException{
+      //BUG: returning without throwing exception when what seems to be an invalid uuid sent in some occasions
+    	// got what's happening, UUID.fromString is just filling in leading zeros when missing a few digits
       UUID uuid = null;
       try{
         uuid = UUID.fromString(id_string.toString());
