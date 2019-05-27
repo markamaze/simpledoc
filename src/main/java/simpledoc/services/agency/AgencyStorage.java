@@ -27,13 +27,13 @@ public class AgencyStorage implements ModuleObjectStorage {
 	private static String password = "fdfa9f7f87e9bba343a3c303b7c6dae39006a5adbc4345e535fb0b3f16340904";
 
 
-	public AgencyStorage() {
+	public AgencyStorage() throws StorageErrorException {
 		try {
 			Properties props = new Properties();
 			props.setProperty("user", username);
 			props.setProperty("password", password);
 			connection = DriverManager.getConnection(url, props);
-		} catch (SQLException err) { err.printStackTrace();	}	}
+		} catch (SQLException err) { throw new StorageErrorException("error connecting to database"); }}
 
 
 
