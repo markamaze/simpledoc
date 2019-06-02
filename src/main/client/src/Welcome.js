@@ -17,7 +17,7 @@ export default class Welcome extends React.Component {
   }
   render() {
     return  <div style={this.style}>
-              Welcome
+              Welcome Page
             </div>
   }
 }

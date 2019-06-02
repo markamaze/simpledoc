@@ -1,4 +1,9 @@
 const colors = {
+  primary: "#9cafd1",
+
+
+
+
   one: "#262216",
   two: "#49412c",
   three: "#97743a",
@@ -8,7 +13,6 @@ const colors = {
   white: "#fff",
   gray: "#6c757d",
   darkgray: "#343a40",
-  primary: "#110C22",
   secondary: "#0E280B",
   success: "#28a745",
   info: "#17a2b8",

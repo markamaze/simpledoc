@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { LayoutFooter } from '../styles/layoutStyles'
+import { FooterWrapper } from './layout_styles'
 
 export default class Footer extends React.Component {
   render() {
-    return  <LayoutFooter>
+    return  <FooterWrapper>
               developed by MARK A MAZE
-            </LayoutFooter>
+            </FooterWrapper>
   }
 }

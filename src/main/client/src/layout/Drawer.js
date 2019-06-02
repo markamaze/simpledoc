@@ -1,40 +1,41 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import TabbedViewport from '../utility/TabbedViewport'
-import { LayoutDrawer } from '../styles/layoutStyles'
+// import TabbedViewport from '../utility/TabbedViewport'
+import { DrawerWrapper } from './layout_styles'
 
 
 
 
-class Drawer extends React.Component {
-  //need to adapt data for items prop of TabbedViewport
-  //  currently it uses props.items.instanceid as a label
-  //  and props.items.instance as the component to render
-  //format data sent in items prop of TabbedViewport as such:
-  //  items = [{label, component}, {label, component}, ...]
+export default class Drawer extends React.Component {
+
   render() {
-    let tabbedviewportitems = () => {
-      return this.props.instances.size > 0 ?
-          this.props.instances.toSeq().map(instance => {
-            return {  label: instance.instanceId,
-                      component: instance.instance }})
-          : [{ label: "empty", component: <div>empty set</div>}]
-      }
+		return <DrawerWrapper >Hello Drawer</DrawerWrapper>
+	}
 
-    return  <LayoutDrawer >
-              <TabbedViewport header="Active Instances"
-                              items={tabbedviewportitems()} >
-              </TabbedViewport>
-            </LayoutDrawer>
-  }
+
+  // render() {
+  //   let tabbedviewportitems = () => {
+  //     return this.props.instances.size > 0 ?
+  //         this.props.instances.toSeq().map(instance => {
+  //           return {  label: instance.instanceId,
+  //                     component: instance.instance }})
+  //         : [{ label: "empty", component: <div>empty set</div>}]
+  //     }
+  //
+  //   return  <DrawerWrapper >
+  //             <TabbedViewport header="Active Instances"
+  //                             items={tabbedviewportitems()} >
+  //             </TabbedViewport>
+  //           </DrawerWrapper>
+  // }
 }
 
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    instances: state.appState.get("openInstances")
-  }
-}
+// const mapStateToProps = (state, ownProps) => {
+//   return {
+//     instances: state.appState.get("openInstances")
+//   }
+// }
 
-export default connect(mapStateToProps)(Drawer)
+// export default connect(mapStateToProps)(Drawer)

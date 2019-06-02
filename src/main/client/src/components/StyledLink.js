@@ -4,6 +4,8 @@ import { NavLink } from 'react-router-dom'
 export default class StyledLink extends React.Component {
   constructor(props) {
     super(props)
+
+    //this should be in utility_styles
     this.style = {
       textDecoration: 'none',
       color: "#f8f9fa",

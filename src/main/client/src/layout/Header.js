@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { LayoutHeader } from '../styles/layoutStyles'
+import { HeaderWrapper } from './layout_styles'
 
 export default class Header extends React.Component {
   render() {
-    return  <LayoutHeader>
-              <div>ALSO on Simpledoc</div>
-            </LayoutHeader>
+    return  <HeaderWrapper>
+              <div>Simpledoc: AI Clerk</div>
+            </HeaderWrapper>
   }
 }
