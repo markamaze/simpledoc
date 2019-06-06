@@ -136,7 +136,7 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 			while(storage_result.next()) {
 				Array result = storage_result.getArray(1);
-				String[] result_set = result.toString().substring(1).split(",");
+				String[] result_set = result.toString().split(",");
 				returnable_result.add(result_set);
 			}
 		} catch(SQLException e){ throw new StorageErrorException("error with database query"); }
@@ -145,61 +145,24 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 		return returnable_result;
 	}
-	private String setQueryCall(List<String> resource_path) {
+	private String setQueryCall(List<String> resource_path) throws StorageErrorException {
 		String call = "";
-		String resource_switch = "";
-
-		//TODO: somehow, set switch using resource_path
-		/*
-				supported structures -->
-
-				GET / Agency / {ModuleObject implementation} / {uuid}
-							--> may limit data returned with query params
-
-				GET / Agency / {ModuleObject implementation} /
-							--> may limit objects returned with query params
-
-				GET / Agency / {uuid} / {ModuleObject implementation}
-							--> gets all objects related to specific resource
-							--> may limit returned objects with query params
-
-				POST / Agency /
-							--> no query
-							--> body includes: type & object_data
-
-				PUT / Agency /
-							--> body includes: id, type, object_data
-							--> query param opts: replace entire or up
-							--> must include object for updating with id in body
-
-				DELETE / Agency /
-							--> no body, just delete object with given id
-							--> use query to determine what happens to dependent objects
-							----> what to do when deleting object is a dependent of another
-		*/
+		String resource_switch = resource_path.toString();
 
 		switch(resource_switch){
-			case "category_resource":
-				call = "select agency.query_category_resource(?,?,?)";
-				break;
-			case "category_collection":
+			case "[Agency, categories]":
 				call = "select agency.query_category_collection(?,?,?)";
 				break;
-			case "definition_resource":
-				call = "select agency.query_definition_resource(?,?,?)";
-				break;
-			case "definition_collection":
+			case "[Agency, definitions]":
 				call = "select agency.query_definition_collection(?,?,?)";
 				break;
-			case "agent_resource":
-				call = "select agency.query_agent_resource(?,?,?)";
-				break;
-			case "agent_collection":
+			case "[Agency, agents]":
 				call = "select agency.query_agent_collection(?,?,?)";
 				break;
 			default:
-				call = "select agency.query_category_collection(?,?,?)";
+				throw new StorageErrorException("invalid resource request");
 		}
+
 		return call;
 	}
 

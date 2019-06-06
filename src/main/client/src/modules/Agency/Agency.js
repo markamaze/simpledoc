@@ -1,8 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Map } from 'immutable'
-import { loadAgencyData } from './module_actions'
-
+import { Route } from 'react-router-dom'
 import { ModulePageWrapper } from '../../root_styles'
 // import { agents } from './agency_constants'
 // import List from '../../utility/List'
@@ -28,7 +26,7 @@ import { ModulePageWrapper } from '../../root_styles'
 
 */
 
-export default class Agency extends React.Component {
+class Agency extends React.Component {
   // loadAgencyAgents() {
   //   return <TabbedViewport  header="Agent Lists"
   //                           items={this.loadItems()} />
@@ -81,25 +79,18 @@ export default class Agency extends React.Component {
   //   }
   // }
   render() {
-    loadAgencyData()
-
     return  <ModulePageWrapper>
+              in agency, this will eventually show the agents (both structural and actors)
 
-              display a heirarchy of all structural agents, as well as a list of all Actor agents
-
-              click on an agent to take a close look, which should display as a pop-up?
-
-              </ModulePageWrapper>
+            </ModulePageWrapper>
   //   return  <ModuleWrapper>
   //             <div className="agentlists">{ this.loadAgencyAgents() }</div>
   //     		  </ModuleWrapper>
   }
 }
 
-//
-// const mapStateToProps = (state, ownProps) => {
-//   return state.agency.toKeyedSeq().toJS()
-// }
-//
-//
-// export default connect(mapStateToProps)(Agency)
+const mapStateToProps = (state, ownProps) => {
+  return state.agency
+}
+
+export default connect(mapStateToProps)(Agency)

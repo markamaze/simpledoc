@@ -22,4 +22,6 @@ export const Container = styled.div`
 export const ModulePageWrapper = styled(Container)`
   min-width: 100%;
   max-width: 100%;
+  flex-direction: ${ props => props.column ? "column" : "row" }
+  overflow-x: auto;
 `

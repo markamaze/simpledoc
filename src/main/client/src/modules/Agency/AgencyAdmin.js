@@ -1,9 +1,16 @@
 import React from 'react'
+import { connect } from 'react-redux'
+
+import { ModulePageWrapper } from '../../root_styles'
+import { TableWrapper } from '../../components/component_styles'
+import Table from '../../components/Table'
+import { TableHeaderWrapper } from '../../components/component_styles'
+import Button from '../../components/atomic/Button'
+import Toolbar from '../../components/Toolbar'
 
 
 
-
-export default AgencyAdmin extends React.Component {
+class AgencyAdmin extends React.Component {
 
 
 //click on category item -> show all defs and agents of that category
@@ -13,16 +20,39 @@ export default AgencyAdmin extends React.Component {
 //have a "show all" button to show all objects of each type
 //each list should have a button to create new item, which will open in drawer
 
-  itemButtons() {
+  rowButtons(item) {
     //return buttons to either edit or delete the selected item
     //the buttons will have handlers attached
+    return  <Toolbar column={false}>
+              <Button label="edit" onClick={()=>console.log("edit item", item)} />
+              <Button label="delete" onClick={()=>console.log("delete item", item)} />
+            </Toolbar>
   }
 
-  listButtons(type) {
+  tableButtons(type) {
     //return a button to create a new item of given type
+    switch(type){
+      case "category":
+        return  <Toolbar column={false} className="toolbar_agencyAdmin" >
+                  <Button label="new category" onClick={()=>console.log("new category")} />
+                </Toolbar>
+      case "definition":
+        return  <Toolbar column={false} className="toolbar_agencyAdmin" >
+                  <Button label="new definition" onClick={()=>console.log("new definition")} />
+                </Toolbar>
+      case "agent":
+        return  <Toolbar column={false} className="toolbar_agencyAdmin" >
+                  <Button label="new agent" onClick={()=>console.log("new agent")} />
+                </Toolbar>
+    }
   }
 
-  listData(type) {
+  tableData(type) {
+    switch(type){
+      case "categories": return this.props.agency_categories
+      case "definitions": return this.props.agency_definitions
+      case "agents": return this.props.agency_agents
+    }
     //if local state has no selected item, then all data objects of given type returned
     //if local state has a selected item:
     //  switch on selected item type:
@@ -45,24 +75,60 @@ export default AgencyAdmin extends React.Component {
   }
 
   render() {
-    return  <ModulePageWrapper>
-              <List title="Categories"
-                    data={this.listData("category")}
-                    item_click={item => this.listItemClicked(item)}
-                    item_buttons={this.itemButtons()}
-                    list_buttons={this.listButtons("category")} />
-              <List title="Definitions"
-                    data={this.listData("definition")}
-                    item_click={item => this.listItemClicked(item)}
-                    item_buttons={this.itemButtons()}
-                    list_buttons={this.listButtons("definition")} />
-              <List title="Agents"
-                    data={this.listData("agents")}
-                    item_click={item => this.listItemClicked(item)}
-                    item_buttons={this.itemButtons()}
-                    list_buttons={this.listButtons("agents")} />
+    return  <ModulePageWrapper column>
+              <TableWrapper className="TableWrapper" height="30%" >
+                <TableHeaderWrapper>
+                  <header>Agent Categories</header>
+                  {this.tableButtons("category")}
+                </TableHeaderWrapper>
+                <Table  noHeader={true}
+                        subHeader={false}
+                        columns={[{selector:"id", name:"ID"},
+                                  {selector:"label", name: "Label"},
+                                  {selector:"behavior", name:"Behavior"},
+                                  {selector:"security", name:"Security"},
+                                  {name: "", ignoreRowClick: true, cell: row=> this.rowButtons(row) }]}
+                        data={this.tableData("categories")}
+                        rowClick={row=>console.log("row clicked", row)} />
+              </TableWrapper>
+              <TableWrapper className="TableWrapper" height="30%" >
+                <TableHeaderWrapper>
+                  <header>Agent Definitions</header>
+                  {this.tableButtons("definition")}
+                </TableHeaderWrapper>
+                <Table  noHeader={true}
+                        subHeader={false}
+                        columns={[{selector:"id", name:"ID"},
+                                  {selector:"label", name: "Label"},
+                                  {selector:"category_id", name:"CategoryID"},
+                                  {selector:"security", name:"Security"},
+                                  {name: "", ignoreRowClick: true, cell: row=> this.rowButtons(row) }]}
+                        data={this.tableData("definitions")}
+                        rowClick={row=>console.log("row clicked", row)} />
+              </TableWrapper>
+              <TableWrapper className="TableWrapper" height="30%" >
+                <TableHeaderWrapper>
+                  <header>Agents</header>
+                  {this.tableButtons("agent")}
+                </TableHeaderWrapper>
+                <Table  noHeader={true}
+                        subHeader={false}
+                        columns={[{selector:"id", name:"ID"},
+                                  {selector:"definition_id", name: "DefinitionID"},
+                                  {selector:"agent_link_id", name:"Linked To AgentID"},
+                                  {selector:"security", name:"Security"},
+                                  {name: "", ignoreRowClick: true, cell: row=> this.rowButtons(row) }]}
+                        data={this.tableData("agents")}
+                        rowClick={row=>console.log("row clicked", row)} />
+              </TableWrapper>
             </ModulePageWrapper>
   }
 
-
 }
+
+
+const mapStateToProps = (state, ownProps) => {
+  return state.agency
+}
+
+export default connect(mapStateToProps)(AgencyAdmin)

@@ -1,8 +1,0 @@
-/*
-  creates a set of tabs with a single viewport
-  tab for each child within the TabView component
-  each child should have a prop.title for tab label
-
-  viewport will render the component based on selected tab label  
-
-*/

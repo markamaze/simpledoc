@@ -7,8 +7,7 @@ export default class Toolbar extends React.Component {
   render() {
     return  <ToolbarWrapper column={this.props.column}
                           className={this.props.className}>
-              {React.Children.map(this.props.children, child =>
-                <Button button={child} />)}
+              {this.props.children}
             </ToolbarWrapper>
   }
 }

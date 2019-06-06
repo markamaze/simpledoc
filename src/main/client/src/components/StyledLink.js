@@ -13,7 +13,8 @@ export default class StyledLink extends React.Component {
       textSize: "1rem"
     }
     this.activeStyle = {
-      background: '#b0a18e',
+      display: 'flex',
+      flexDirection: 'column',
       color: 'purple'
     }
   }
@@ -22,6 +23,7 @@ export default class StyledLink extends React.Component {
                     activeStyle={this.activeStyle}
                     style={this.style} >
               {this.props.label}
+              {this.props.children}
             </NavLink>
 
   }

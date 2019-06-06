@@ -45,6 +45,8 @@ export const DrawerWrapper = styled(Container)`
 export const BodyWrapper = styled(Container)`
   background: ${colors.four};
   width: 95%;
+  max-height: 100%;
+  overflow-y: auto;
   justify-content: center;
   grid-column: 2;
   grid-row: 2;

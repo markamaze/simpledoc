@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 
+import { loadAgencyData } from './modules/Agency/module_actions'
 import { appStyle } from './root_styles'
 import Layout from './layout/Layout'
 import store from './store'
@@ -17,6 +18,8 @@ for (let i in appStyle.body){
 for (let i in appStyle.body){
   document.getElementById("app").style[i] = appStyle.body[i]
 }
+
+loadAgencyData()
 
 
 ReactDOM.render(
