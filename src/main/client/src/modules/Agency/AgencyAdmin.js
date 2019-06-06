@@ -12,70 +12,113 @@ import Toolbar from '../../components/Toolbar'
 
 class AgencyAdmin extends React.Component {
 
+  constructor(props){
+    super(props)
+    this.state = {
+      selectedListItem: null,
+      selectedListItemType: null
+    }
+  }
 
-//click on category item -> show all defs and agents of that category
-//click on def item -> show its category item and all agents of that def
-//click on agent item -> show its category and def items
-//double click any item -> opens that item for editing in drawer
-//have a "show all" button to show all objects of each type
-//each list should have a button to create new item, which will open in drawer
-
-  rowButtons(item) {
-    //return buttons to either edit or delete the selected item
-    //the buttons will have handlers attached
+  rowButtons(type, item) {
     return  <Toolbar column={false}>
-              <Button label="edit" onClick={()=>console.log("edit item", item)} />
-              <Button label="delete" onClick={()=>console.log("delete item", item)} />
+              <Button label="edit item" onClick={()=>this.loadToDrawer(type, item)} />
             </Toolbar>
   }
 
+
   tableButtons(type) {
-    //return a button to create a new item of given type
+    return  <Toolbar column={true} className="toolbar_agencyAdmin" >
+              <Button label="new item" onClick={()=>this.loadToDrawer(type, null)} />
+              <Button label="show all" onClick={()=>this.setState({selectedListItem: null, selectedListItemType: null})} />
+            </Toolbar>
+  }
+
+
+  tableColumns(type) {
     switch(type){
       case "category":
-        return  <Toolbar column={false} className="toolbar_agencyAdmin" >
-                  <Button label="new category" onClick={()=>console.log("new category")} />
-                </Toolbar>
+        return [{selector:"id", name:"ID"},
+                  {selector:"label", name: "Label"},
+                  {selector:"behavior", name:"Behavior"},
+                  {selector:"security", name:"Security"},
+                  {name: "", ignoreRowClick: true, cell: row=> this.rowButtons("category", row) }]
       case "definition":
-        return  <Toolbar column={false} className="toolbar_agencyAdmin" >
-                  <Button label="new definition" onClick={()=>console.log("new definition")} />
-                </Toolbar>
+        return [{selector:"id", name:"ID"},
+                  {selector:"label", name: "Label"},
+                  {selector:"category_id", name:"CategoryID"},
+                  {selector:"security", name:"Security"},
+                  {name: "", ignoreRowClick: true, cell: row=> this.rowButtons("definition", row) }]
       case "agent":
-        return  <Toolbar column={false} className="toolbar_agencyAdmin" >
-                  <Button label="new agent" onClick={()=>console.log("new agent")} />
-                </Toolbar>
+        return [{selector:"id", name:"ID"},
+                  {selector:"definition_id", name: "DefinitionID"},
+                  {selector:"agent_link_id", name:"Linked To AgentID"},
+                  {selector:"security", name:"Security"},
+                  {name: "", ignoreRowClick: true, cell: row=> this.rowButtons("agent", row) }]
     }
   }
 
+
+
+  // comment out filtering data until I can build a properly related set of agency objects
   tableData(type) {
-    switch(type){
-      case "categories": return this.props.agency_categories
-      case "definitions": return this.props.agency_definitions
-      case "agents": return this.props.agency_agents
-    }
-    //if local state has no selected item, then all data objects of given type returned
-    //if local state has a selected item:
-    //  switch on selected item type:
-    //      if selected item type is category:
-    //        for param type category -> only return that item
-    //        for param type definition -> only return defs with categoryid matching selected item
-    //        for param type agent -> only return agents with defs with categoryid matching selected item
-    //      if selected item type is definition:
-    //        for param type category -> only return category item of the selected item
-    //        for param type definition -> only return selected item
-    //        for param type agent -> only return agents with defs matching selected item item
-    //      if selected item type is agent:
-    //        for param type category -> return category item of the def of the agent
-    //        for param type definition -> return definition item of the agent
-    //        for param type agent -> only return selected agent
+    // let selectedType = this.state.selectedListItem
+    // selectedType === null ?
+      switch(type){
+        case "category": return this.props.agency_categories
+        case "definition": return this.props.agency_definitions
+        case "agent": return this.props.agency_agents
+      }
+      // : switch(selectedType){
+      //   // probably a more efficient way of doing this
+      //   case "category" :
+      //     let category_item = this.props.agency_categories.find( cat_item => this.state.selectedListItem.id === cat_item.id )
+      //     let definition_items = this.props.agency_definitions.filter( def_item => this.state.selectedListItem.id === def_item.category_id )
+      //     let agent_items = definition_items.map( found_def => this.props.agency_agents.filter( agnt_item => agnt_item.definition_id === found_def.id)) //may return an array of arrays?
+      //
+      //     if(type === "category") return category_item
+      //     if(type === "definition") return definition_items
+      //     if(type === "agent") return category_items
+      //
+      //   case "definition":
+      //     let category_item = this.props.agency_categories.find( cat_item => this.state.selectedListItem.category_id === cat_item.id)
+      //     let definition_item = this.props.agency_definitions.find( def_item => this.state.selectedListItem.id === def_item.id)
+      //     let agent_items = this.props.agency_agents.filter( agnt_item => this.state.selectedListItem.id === agnt_item.definition_id)
+      //
+      //     if(type === "category") return category_item
+      //     if(type === "definition") return definition_item
+      //     if(type === "agent") return agent_items
+      //
+      //   case "agent"
+      //     let agent_item = this.props.agency_agents.find( agnt_item => this.state.selectedListItem.id === agnt_item.id)
+      //     let definition_item = this.props.agency_definitions.find( def_item => this.state.selectedListItem.definition_id === def_item.id)
+      //     let category_item = this.props.agency_categories.find( cat_item => definition_item.category_id === cat_item.id)
+      //
+      //     if(type === "category") return category_item
+      //     if(type === "definition") return definition_item
+      //     if(type === "agent") return agent_item
+      //
+      // }
+
   }
 
-  listItemClicked(item) {
-    //the list item recieved will be set in local state
+
+  listItemClicked(type, item) {
+    this.setState({ selectedListItem: item, selectedListItemType: type })
   }
+
+
+  //TODO: load component instance into drawer for creating, editing, deleting object
+  //        if item is null, should create new object
+  loadToDrawer(type, item) {
+    console.log("load in drawer", type, item)
+  }
+
 
   render() {
+
     return  <ModulePageWrapper column>
+
               <TableWrapper className="TableWrapper" height="30%" >
                 <TableHeaderWrapper>
                   <header>Agent Categories</header>
@@ -83,14 +126,11 @@ class AgencyAdmin extends React.Component {
                 </TableHeaderWrapper>
                 <Table  noHeader={true}
                         subHeader={false}
-                        columns={[{selector:"id", name:"ID"},
-                                  {selector:"label", name: "Label"},
-                                  {selector:"behavior", name:"Behavior"},
-                                  {selector:"security", name:"Security"},
-                                  {name: "", ignoreRowClick: true, cell: row=> this.rowButtons(row) }]}
-                        data={this.tableData("categories")}
-                        rowClick={row=>console.log("row clicked", row)} />
+                        columns={this.tableColumns("category")}
+                        data={this.tableData("category")}
+                        rowClick={row=>this.listItemClicked("category", row)} />
               </TableWrapper>
+
               <TableWrapper className="TableWrapper" height="30%" >
                 <TableHeaderWrapper>
                   <header>Agent Definitions</header>
@@ -98,14 +138,11 @@ class AgencyAdmin extends React.Component {
                 </TableHeaderWrapper>
                 <Table  noHeader={true}
                         subHeader={false}
-                        columns={[{selector:"id", name:"ID"},
-                                  {selector:"label", name: "Label"},
-                                  {selector:"category_id", name:"CategoryID"},
-                                  {selector:"security", name:"Security"},
-                                  {name: "", ignoreRowClick: true, cell: row=> this.rowButtons(row) }]}
-                        data={this.tableData("definitions")}
-                        rowClick={row=>console.log("row clicked", row)} />
+                        columns={this.tableColumns("definition")}
+                        data={this.tableData("definition")}
+                        rowClick={row=>this.listItemClicked("definition", row)} />
               </TableWrapper>
+
               <TableWrapper className="TableWrapper" height="30%" >
                 <TableHeaderWrapper>
                   <header>Agents</header>
@@ -113,14 +150,11 @@ class AgencyAdmin extends React.Component {
                 </TableHeaderWrapper>
                 <Table  noHeader={true}
                         subHeader={false}
-                        columns={[{selector:"id", name:"ID"},
-                                  {selector:"definition_id", name: "DefinitionID"},
-                                  {selector:"agent_link_id", name:"Linked To AgentID"},
-                                  {selector:"security", name:"Security"},
-                                  {name: "", ignoreRowClick: true, cell: row=> this.rowButtons(row) }]}
-                        data={this.tableData("agents")}
-                        rowClick={row=>console.log("row clicked", row)} />
+                        columns={this.tableColumns("agent")}
+                        data={this.tableData("agent")}
+                        rowClick={row=>this.listItemClicked("agent", row)} />
               </TableWrapper>
+
             </ModulePageWrapper>
   }
 
