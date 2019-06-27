@@ -32,7 +32,7 @@ public class AgencyStorage implements ModuleObjectStorage {
 			Properties props = new Properties();
 			props.setProperty("user", username);
 			props.setProperty("password", password);
-			connection = DriverManager.getConnection(url, props);
+			connection = DriverManager.getConnection(System.getenv("DATABASE_URL"));
 		} catch (SQLException err) { throw new StorageErrorException("error connecting to database"); }}
 
 
