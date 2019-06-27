@@ -1,8 +1,7 @@
 const initialState = {
-  agency_categories: [{id:"1234", label:"label1", behavior:"STRUCTURAL", security:"4444", data_struct:"data" },
-                        {id:"1111", label:"label2", behavior: "ACTOR", security:"4444", data_struct:"data"}],
-  agency_definitions: [{id:"2345", label:"label1", category_id:"1234", security:"4444", data_struct:"data" }],
-  agency_agents: [{id:"3456", definition_id:"2345", agent_link_id:"root", security:"4444", data_struct:"data", agent_data:"agent data" }]
+  agency_categories: [],
+  agency_definitions: [],
+  agency_agents: []
 }
 
 
@@ -55,6 +54,7 @@ export default function agency_reducer (state=initialState, action) {
 
       return Object.assign({}, state, { agency_agents: new_agent_set })
     }
+
 
 
     default: return state

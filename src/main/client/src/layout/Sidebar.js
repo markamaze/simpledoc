@@ -15,12 +15,13 @@ export default class Sidebar extends React.Component {
 
     return  <SidebarWrapper >
               <Toolbar column>
-                <StyledLink to="/Home" label="Home" />
+                <StyledLink to="/" label="Home" />
                 <StyledLink to="/Agency" label="Agency" >
                   <Route path="/Agency" render={() =>
                       <StyledLink to="/Agency/Admin" label="> Admin" /> } />
                   </StyledLink>
                   <StyledLink to="/Forms" label="Forms" />
+                  <StyledLink to="/About" label="About" />
                 </Toolbar>
             </SidebarWrapper>
   }

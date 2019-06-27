@@ -1,23 +1,34 @@
 import styled from 'styled-components'
 import colors from '../colors'
 import DataTable from 'react-data-table-component'
-
+import Toolbar from './Toolbar'
 
 export const ButtonWrapper = styled.div`
   display: flex;
   :active {
     background: ${colors.success};
   }
-  min-width: 100%;
+  min-width: 1.5em;
+  max-width: 100%;
   min-height: 1.5em;
+  height: auto;
+  border: thin solid black;
+  margin: .2em;
+  background: ${colors.gray}
+  color: ${colors.white}
+  > div {
+    font-size: .7em;
+    max-width: 1em;
+    max-height: 1em;
+    min-width: 1em;
+    min-height: 1em;
+  }
 `
 
 export const ToolbarWrapper = styled.div`
   display: flex;
   justify-items: center;
-  flex-direction: ${props => props.column ? "column" : "row"}
-
-
+  flex-direction: ${props => props.column ? "column" : "row"};
 `
 
 export const StyledDataTable = styled(DataTable)`
@@ -27,22 +38,21 @@ export const StyledDataTable = styled(DataTable)`
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  width: 100%;
   overflow-y: hidden;
   overflow-x: auto;
-  > div {
+  /* > div {
     height: auto;
     width: 100%;
-  }
+  }*/
 
 
 
-  .rdt_Table {
+  /* .rdt_Table {
     line-height: 1em;
     height: 10%;
     width: auto;
 
-  }
+  } */
 
   .rdt_TableBody {
     margin: 0 auto;
@@ -102,8 +112,6 @@ export const StyledDataTable = styled(DataTable)`
 
 `
 
-
-
 export const TableHeaderWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -126,13 +134,21 @@ export const TableHeaderWrapper = styled.div`
 
 export const TableWrapper = styled.div`
   display: flex;
-  flex-direction: row;
-  height: auto;
-  min-width: 95%;
-  max-width: 95%;
-  max-height: 30%;
-  margin: .5em;
+  flex-direction: ${ props => props.column ? "column" : "row"};
+  width: ${props=> props.width === undefined ? "auto" : props.width};
+  height: ${ props => props.height === null ? "auto" : props.height };
+  margin: .5em auto;
   padding: 0;
   background: ${colors.white}
   overflow-y: none;
+`
+
+export const DrawerComponentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+`
+
+export const DrawerToolsWrapper = styled(Toolbar)`
+
 `

@@ -19,21 +19,10 @@ export default class Table extends React.Component {
                 columns={this.props.columns}
                 data={this.props.data}
                 onRowClicked={this.props.rowClick}
-                highlightOnHover />
-
-
-
-
-    // return  <TableWrapper width={this.props.width}>
-    //           <TableTitle >{this.props.title}</TableTitle>
-    //
-    //           <ReactDataGrid
-    //             columns={this.props.columns}
-    //             rowGetter={i=> (this.props.data)[i]}
-    //             rowsCount={this.props.data.length}
-    //             toolbar={this.props.tableButtons}
-    //             rowActionsCell={null} />
-    //
-    //         </TableWrapper>
+                highlightOnHover
+                width={this.props.width}
+                editable={this.props.editable} >
+                {this.props.children}
+              </StyledDataTable>
   }
 }

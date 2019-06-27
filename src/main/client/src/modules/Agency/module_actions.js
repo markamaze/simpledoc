@@ -16,7 +16,7 @@ function loadAgencyCategories() {
       type: "LOAD_AGENCY_CATEGORIES",
       payload: agency_categories
     })
-  }, function() { window.alert("error loading agency categories")})
+  }, function() { console.log("error loading agency categories")})
 }
 
 function loadAgencyDefinitions() {
@@ -26,7 +26,7 @@ function loadAgencyDefinitions() {
       type: "LOAD_AGENCY_DEFINITIONS",
       payload: agency_definitions
     })
-  }, function() { window.alert("error loading agency definitions")})
+  }, function() { console.log("error loading agency definitions")})
 }
 
 function loadAgencyAgents() {
@@ -36,5 +36,17 @@ function loadAgencyAgents() {
       type: "LOAD_AGENCY_AGENTS",
       payload: agency_agents
     })
-  }, function() { window.alert("error loading agency agents")})
+  }, function() { console.log("error loading agency agents")})
+}
+
+export function createCategory(data){
+  console.log("create category action")
+}
+
+export function updateCategory(data){
+  console.log("update category action")
+}
+
+export function deleteCategory(data){
+  console.log("delete category action")
 }

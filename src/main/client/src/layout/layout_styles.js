@@ -30,13 +30,15 @@ export const DrawerWrapper = styled(Container)`
   margin: 0 0 0 auto;
   grid-column: 2;
   grid-row: 2;
+  display: block;
+  position: relative;
+  top: 0;
+  right: 0;
   background: ${colors.two};
   justify-content: center;
-  width: 5%;
-  min-width: 3em;
-  :hover {
-    width: 85%;
-  }
+  width: ${ props => props.drawerOpen ? "100%" : "5%" };
+  height: 100%;
+  min-width: 3.5em;
   color: white;
   z-index: 3;
 
@@ -44,12 +46,16 @@ export const DrawerWrapper = styled(Container)`
 
 export const BodyWrapper = styled(Container)`
   background: ${colors.four};
-  width: 95%;
-  max-height: 100%;
-  overflow-y: auto;
   justify-content: center;
   grid-column: 2;
   grid-row: 2;
+`
+
+export const BodyViewport = styled.div`
+  display: ${ props => props.drawerOpen ? "none" : "block" };
+  width: 95%;
+  overflow-y: auto;
+
 `
 
 export const FooterWrapper = styled(Container)`

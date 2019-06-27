@@ -1,10 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { ModulePageWrapper } from '../../root_styles'
-import { TableWrapper } from '../../components/component_styles'
+import { AgencyAdminWrapper } from './module_styles'
 import Table from '../../components/Table'
-import { TableHeaderWrapper } from '../../components/component_styles'
+import {  TableHeaderWrapper,
+          TableWrapper } from '../../components/component_styles'
 import Button from '../../components/atomic/Button'
 import Toolbar from '../../components/Toolbar'
 
@@ -111,15 +111,42 @@ class AgencyAdmin extends React.Component {
   //TODO: load component instance into drawer for creating, editing, deleting object
   //        if item is null, should create new object
   loadToDrawer(type, item) {
-    console.log("load in drawer", type, item)
+    let component, key, data, component_type
+    key = item === null ? null : item.id
+    data = item === null ? null : item
+
+    switch(type){
+      case "category":
+        component_type = "AgencyCategory"
+        break
+      case "definition":
+        component_type = "AgencyDefinition"
+        break
+      case "agent":
+        component_type = "AgencyAgent"
+        break
+    }
+
+    component = {
+      type: component_type,
+      key: key,
+      props: {
+        data: data,
+        editable: true,
+        tempState: null
+      }
+    }
+
+
+    this.props.createDrawerComponent(component)
   }
 
 
   render() {
 
-    return  <ModulePageWrapper column>
+    return  <AgencyAdminWrapper column>
 
-              <TableWrapper className="TableWrapper" height="30%" >
+              <TableWrapper className="TableWrapper" height="30%" width="95%" >
                 <TableHeaderWrapper>
                   <header>Agent Categories</header>
                   {this.tableButtons("category")}
@@ -131,7 +158,7 @@ class AgencyAdmin extends React.Component {
                         rowClick={row=>this.listItemClicked("category", row)} />
               </TableWrapper>
 
-              <TableWrapper className="TableWrapper" height="30%" >
+              <TableWrapper className="TableWrapper" height="30%" width="95%" >
                 <TableHeaderWrapper>
                   <header>Agent Definitions</header>
                   {this.tableButtons("definition")}
@@ -143,7 +170,7 @@ class AgencyAdmin extends React.Component {
                         rowClick={row=>this.listItemClicked("definition", row)} />
               </TableWrapper>
 
-              <TableWrapper className="TableWrapper" height="30%" >
+              <TableWrapper className="TableWrapper" height="30%" width="95%" >
                 <TableHeaderWrapper>
                   <header>Agents</header>
                   {this.tableButtons("agent")}
@@ -155,14 +182,18 @@ class AgencyAdmin extends React.Component {
                         rowClick={row=>this.listItemClicked("agent", row)} />
               </TableWrapper>
 
-            </ModulePageWrapper>
+            </AgencyAdminWrapper>
   }
 
 }
 
 
 const mapStateToProps = (state, ownProps) => {
-  return state.agency
+  return {
+    agency_agents: state.agency.agency_agents,
+    agency_definitions: state.agency.agency_definitions,
+    agency_categories: state.agency.agency_categories
+  }
 }
 
 export default connect(mapStateToProps)(AgencyAdmin)
