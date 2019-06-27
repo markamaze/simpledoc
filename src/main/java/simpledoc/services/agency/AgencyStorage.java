@@ -1,5 +1,7 @@
 package simpledoc.services.agency;
 
+import java.net.URISyntaxException;
+import java.net.URI;
 import java.sql.SQLException;
 import simpledoc.exceptions.StorageErrorException;
 import java.util.UUID;
@@ -22,20 +24,26 @@ import simpledoc.services.ModuleObjectStorage;
 public class AgencyStorage implements ModuleObjectStorage {
 	//TODO: remove credientials, use environment variables
 	private static Connection connection;
-	private static String url = "jdbc:postgresql://ec2-54-243-197-120.compute-1.amazonaws.com:5432/da16p9r5cqnbfj";
-	private static String username = "pqtafaszpcncjx";
-	private static String password = "fdfa9f7f87e9bba343a3c303b7c6dae39006a5adbc4345e535fb0b3f16340904";
-
+	// private static String url = "jdbc:postgresql://ec2-54-243-197-120.compute-1.amazonaws.com:5432/da16p9r5cqnbfj";
+	// private static String username = "pqtafaszpcncjx";
+	// private static String password = "fdfa9f7f87e9bba343a3c303b7c6dae39006a5adbc4345e535fb0b3f16340904";
 
 	public AgencyStorage() throws StorageErrorException {
 		try {
+			URI dbUri = new URI(System.getenv("DATABASE_URL"));
+			String username = dbUri.getUserInfo().split(":")[0];
+			String password = dbUri.getUserInfo().split(":")[1];
+			String dbUrl = "jdbc:postresql://" + dbUri.getHost() + ":" + dbUri.getPort() + dbUri.getPath() + "?sslmode=require";
+
 			Properties props = new Properties();
 			props.setProperty("user", username);
 			props.setProperty("password", password);
-			System.out.println(System.getenv("JDBC_DATABASE_URL"));
-			connection = DriverManager.getConnection(System.getenv("JDBC_DATABASE_URL"));
+			connection = DriverManager.getConnection(dbUrl, props);
 
-		} catch (SQLException err) { throw new StorageErrorException("error connecting to database"); }}
+		}
+		catch (SQLException err) { throw new StorageErrorException("error connecting to database"); }
+		catch (URISyntaxException err) { throw new StorageErrorException("error with database uri"); }
+		}
 
 
 
