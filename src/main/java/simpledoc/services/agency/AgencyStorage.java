@@ -1,6 +1,6 @@
 package simpledoc.services.agency;
 
-import java.net.URISyntaxException;
+import java.util.Properties;
 import java.net.URI;
 import java.sql.SQLException;
 import simpledoc.exceptions.StorageErrorException;
@@ -14,28 +14,38 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.util.Map;
 import java.util.List;
-import java.util.Properties;
-
 import simpledoc.services.ModuleObject;
 import simpledoc.services.ModuleObjectStorage;
 
 
-
 public class AgencyStorage implements ModuleObjectStorage {
+	//TODO: remove credientials, use environment variables
 	private static Connection connection;
 
 	public AgencyStorage() throws StorageErrorException {
 		try {
-			URI dbUri = new URI(System.getenv("DATABASE_URL"));
-			String username = dbUri.getUserInfo().split(":")[0];
-			String password = dbUri.getUserInfo().split(":")[1];
-			String dbUrl = "jdbc:postresql://" + dbUri.getHost() + ":" + dbUri.getPort() + dbUri.getPath() + "?sslmode=require";
+			 	// String database_url_string = System.getenv("DATABASE_URL");
+				// String database_url_string = "postgres://pqtafaszpcncjx:fdfa9f7f87e9bba343a3c303b7c6dae39006a5adbc4345e535fb0b3f16340904@ec2-54-243-197-120.compute-1.amazonaws.com:5432/da16p9r5cqnbfj";
 
-			connection = DriverManager.getConnection(dbUrl, username, password);
+				// URI dbUri = new URI(database_url_string);
+				//
+				// String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ":"	+ dbUri.getPort() + dbUri.getPath()	+ "?sslmode=require";
+				// String username = dbUri.getUserInfo().split(":")[0];
+				// String password = dbUri.getUserInfo().split(":")[1];
+				//
+				// connection = DriverManager.getConnection(dbUrl, username, password);
+
+
+				String database_url_string = "jdbc:postgresql://ec2-54-243-197-120.compute-1.amazonaws.com:5432/da16p9r5cqnbfj?user=pqtafaszpcncjx&password=fdfa9f7f87e9bba343a3c303b7c6dae39006a5adbc4345e535fb0b3f16340904&sslmode=require";
+				connection = DriverManager.getConnection(database_url_string);
 
 		}
-		catch (SQLException err) { throw new StorageErrorException("error connecting to database"); }
-		catch (URISyntaxException err) { throw new StorageErrorException("error with database uri"); }
+		catch (SQLException err) {
+			err.printStackTrace();
+			throw new StorageErrorException("error connecting to database");
+		}
+		// catch (URISyntaxException err) { throw new StorageErrorException("error with database uri"); }
+		catch (Exception err) { err.printStackTrace(); }
 		}
 
 
