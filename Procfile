@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -jar -Dserver.port=$PORT target/simpledoc-0.12.0.jar
+web: java $JAVA_OPTS -jar -Dserver.port=$PORT target/runnable-simpledoc-0.12.0.jar
