@@ -24,19 +24,8 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 	public AgencyStorage() throws StorageErrorException {
 		try {
-			 	// String database_url_string = System.getenv("DATABASE_URL");
-				// String database_url_string = "postgres://pqtafaszpcncjx:fdfa9f7f87e9bba343a3c303b7c6dae39006a5adbc4345e535fb0b3f16340904@ec2-54-243-197-120.compute-1.amazonaws.com:5432/da16p9r5cqnbfj";
-
-				// URI dbUri = new URI(database_url_string);
-				//
-				// String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ":"	+ dbUri.getPort() + dbUri.getPath()	+ "?sslmode=require";
-				// String username = dbUri.getUserInfo().split(":")[0];
-				// String password = dbUri.getUserInfo().split(":")[1];
-				//
-				// connection = DriverManager.getConnection(dbUrl, username, password);
-
-
-				String database_url_string = "jdbc:postgresql://ec2-54-243-197-120.compute-1.amazonaws.com:5432/da16p9r5cqnbfj?user=pqtafaszpcncjx&password=fdfa9f7f87e9bba343a3c303b7c6dae39006a5adbc4345e535fb0b3f16340904&sslmode=require";
+				// String database_url_string = "jdbc:postgresql://ec2-54-243-197-120.compute-1.amazonaws.com:5432/da16p9r5cqnbfj?user=pqtafaszpcncjx&password=fdfa9f7f87e9bba343a3c303b7c6dae39006a5adbc4345e535fb0b3f16340904&sslmode=require";
+				String database_url_string = System.getenv("JDBC_DATABASE_URL");
 				connection = DriverManager.getConnection(database_url_string);
 
 		}
