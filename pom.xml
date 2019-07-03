@@ -30,7 +30,7 @@
   </properties>
   <build>
   	<plugins>
-      
+
       <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -75,13 +75,7 @@
           </archive>
         </configuration>
   		</plugin>
-
-      <plugin>
-        <groupId>com.heroku.sdk</groupId>
-        <artifactId>heroku-maven-plugin</artifactId>
-        <version>2.0.8</version>
-      </plugin>
-
+      
   	</plugins>
 
 	</build>
