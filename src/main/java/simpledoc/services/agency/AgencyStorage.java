@@ -32,7 +32,7 @@ public class AgencyStorage implements ModuleObjectStorage {
 			err.printStackTrace();
 			throw new StorageErrorException("error connecting to database");
 		}
-
+	}
 
 
 
