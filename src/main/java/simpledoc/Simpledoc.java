@@ -12,7 +12,7 @@ public class Simpledoc {
 
 		ServiceLoader loader = new ServiceLoader();
 		Integer port = Integer.parseInt(System.getenv("PORT"));
-		// Integer port = 3000;
+
 		try{
 		  HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 	    HttpContext context = server.createContext("/");
