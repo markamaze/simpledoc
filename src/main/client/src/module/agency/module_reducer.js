@@ -1,8 +1,6 @@
-const initialState = {
-  agency_categories: [],
-  agency_definitions: [],
-  agency_agents: []
-}
+import sampleData from '../../sample_data'
+
+const initialState = sampleData.agency
 
 
 

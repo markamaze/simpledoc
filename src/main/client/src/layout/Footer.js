@@ -1,11 +1,17 @@
 import React from 'react'
+import styled from 'styled-components'
+import { Container } from 'react-bootstrap'
 
-import { FooterWrapper } from './layout_styles'
+
+
+const StyleWrapper = styled(Container)`
+
+`
 
 export default class Footer extends React.Component {
   render() {
-    return  <FooterWrapper>
-              A learning project developed by: MARK A MAZE
-            </FooterWrapper>
+    return  <StyleWrapper className="footer_container">
+              <h6>A learning project developed by: MARK A MAZE</h6>
+            </StyleWrapper>
   }
 }
