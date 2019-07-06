@@ -41,6 +41,7 @@ export default class Layout extends React.Component {
                     <Route exact path="/" render={()=> <Container>Welcome</Container>} />
                     <Route exact path="/Home" render={()=> <div>Home</div>} />
         						<Route exact path="/Agency" render={() => <Agency />} />
+                    <Route exact path="/Workspace" render={() => <Workspace />} />
                   </Switch>
         				</BodyViewport>
                 <Footer />

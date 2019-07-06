@@ -26,8 +26,10 @@ const NavbarWrapper = styled(Navbar)`
   }
 
   header {
-    font-size: 1.5rem;
+    font-size: 2rem;
+    letter-spacing: .2rem;
     font-style: italic;
+    font-weight: 500;
     color: ${colors.four};
   }
 `
@@ -42,6 +44,7 @@ export default class Navigation extends React.Component {
                 <Nav className="mr-auto">
                   <Link to="/Home">Home</Link>
                   <Link to="/Agency">Agency</Link>
+                  <Link to="/Workspace">Workspace</Link>
                 </Nav>
               </Navbar.Collapse>
               <Container className="flex-grow-1 justify-content-center">
@@ -49,9 +52,9 @@ export default class Navigation extends React.Component {
                   <Route exact path="/" render={()=> <header>Welcome</header>} />
                   <Route exact path="/Home" render={()=> <header>Home</header>} />
                   <Route exact path="/Agency" render={() => <header>Agency</header>} />
+                  <Route exact path="/Workspace" render={() => <header>Workspace</header>} />
                 </Switch>
               </Container>
-              {this.props.children}
             </NavbarWrapper>
   }
 }

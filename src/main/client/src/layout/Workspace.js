@@ -1,37 +1,63 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Container, Modal, Tabs, Tab } from 'react-bootstrap'
+import { connect } from 'react-redux'
+import { Container, Modal, Tabs, Tab, Button } from 'react-bootstrap'
 
+import WorkspaceNote from './WorkspaceNote'
+import AgentCategoryEditor from '../module/agency/AgentCategoryEditor'
 import colors from '../colors'
 
 
 const StyleWrapper = styled(Container)`
-  background: rgb(0, 0, 0, .8);
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
+  font-size: 1.5rem;
+
 `
 
 
 
-export default class Workspace extends React.Component {
+class Workspace extends React.Component {
 
+  loadComponent(component){
+    switch(component.componentType){
+      case "AgencyCategory":
+        return <AgentCategoryEditor
+                  category={component.data}
+                  savedState={component.workspaceState}
+                  key={`category_editor_${component.key}`} />
+
+      case "AgencyDefinition":
+        return <div>Hello Definition Component</div>
+
+    }
+  }
 
   render() {
-    return  <StyleWrapper className="Workspace_Container d-flex flex-column align-content-stretch">
-              <Modal.Dialog className="">
-                <Modal.Header closeButton>
-                  <Modal.Title>Workspace</Modal.Title>
-                </Modal.Header>
 
-                <Modal.Body className="flex-grow-1">
-                  <p>Workspace Body</p>
-                  <p>other stuff</p>
-                </Modal.Body>
-
-              </Modal.Dialog>
+    return  <StyleWrapper className="p-5">
+              This area is meant to be a place that Modules can send data creating or modifying components which are in progress and require the user to work on: such as a Form to be filled out or changes made to an Agent. For where I am now, it's not really too useful so just setting aside for future development.
             </StyleWrapper>
+
+    // return  <Tabs className="">
+    //             { this.props.workspaceComponents.map( component =>
+    //                 <Tab
+    //                   eventKey={component.key}
+    //                   title={component.componentType}
+    //                   key={`workspace_tab_${component.key}`}
+    //                   className="d-flex flex-row"
+    //                 >
+    //                   {this.loadComponent(component)}
+    //                 <WorkspaceNote data={component.workspaceNote} />
+    //                 </Tab>)}
+    //           </Tabs>
+
   }
 }
+
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    workspaceComponents: state.layout.workspaceComponents
+  }
+}
+
+export default connect(mapStateToProps)(Workspace)

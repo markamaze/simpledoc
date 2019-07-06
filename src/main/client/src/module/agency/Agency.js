@@ -8,6 +8,7 @@ import AgencyOrganization from './AgencyOrganization'
 import ImplementedAgents from './ImplementedAgents'
 
 import colors from '../../colors'
+import * as layout_actions from '../../layout/layout_actions'
 
 
 const StyleWrapper = styled(Container)`
@@ -48,7 +49,8 @@ const mapStateToProps = (state, ownProps) => {
   return {
     agency_agents: state.agency.agency_agents,
     agency_definitions: state.agency.agency_definitions,
-    agency_categories: state.agency.agency_categories
+    agency_categories: state.agency.agency_categories,
+    layout_actions: layout_actions
   }
 }
 

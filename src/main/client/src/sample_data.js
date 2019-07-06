@@ -1,7 +1,17 @@
 const sampleData = {
   layout: {
-    drawerComponents: [],
-    activeDrawerComponentKey: null
+    workspaceComponents: [
+      { key: "1",
+        componentType: "AgencyCategory",
+        data: {
+          id:"-7906a9c-5fda-4b73-a83d-59ab2978b7a8",
+          label:'Agency',
+          behavior:'STRUCTURAL'
+        },
+        workspaceState: {},
+        workspaceNote: "add notes here"
+      }
+    ]
   },
   agency: {
     agency_categories: [

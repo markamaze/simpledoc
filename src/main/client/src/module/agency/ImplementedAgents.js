@@ -13,7 +13,7 @@ export default class ImplementedAgents extends React.Component {
 
   renderTableData(type) {
     return this.props.agency_agents.map( agent =>
-        <tr>
+        <tr key={`agent_list_${agent.id}`}>
           <td>{agent.label}</td>
           <td>{this.findDefinition(agent.definition_id).label}</td>
           <td>{this.findCategory(this.findDefinition(agent.definition_id).category_id).label}</td>
@@ -35,7 +35,7 @@ export default class ImplementedAgents extends React.Component {
   render() {
 
     return  <StyleWrapper className="p-1">
-                  <Table id="agency_agents_table" className="table-responsive">
+                  <Table id="agency_agents_table" className="table-responsive table-hover">
                     <thead>
                       <tr>
                         <th>Agent Label</th>
