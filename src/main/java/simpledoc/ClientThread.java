@@ -22,27 +22,20 @@ public class ClientThread extends Thread {
 
 	 @Override
 	 public void run() {
-		 System.out.println("ClientThread running");
-		 System.out.println(this.exchange.getRequestMethod() + this.exchange.getRequestURI());
-	 	switch(this.exchange.getRequestURI().getPath()) {
-	 		case "/":
-	 			loadFile("index.html");
-	 			break;
-	 		case "/simpledoc.bundle.js":
-	 			loadFile("simpledoc.bundle.js");
-	 			break;
-			case "/favicon.ico":
-				System.out.println("!loading favicon");
-				break;
-	 		default:
-	 			handleResourceRequest();
-	 			break;
-	 	}
+		 String path = this.exchange.getRequestURI().getPath();
+		 String [] path_array = path.split("/");
 
+		 if(path_array.length == 0) loadFile("index.html");
+		 else {
+			 String last_path_entry = path_array[path_array.length-1];
+			 if(last_path_entry.contains(".")) loadFile(path);
+			 else handleResourceRequest();
+
+		 }
 	 }
 
 	 private void handleResourceRequest() {
-    OutputStream out = null;
+		OutputStream out = null;
 		ResourceResponse response;
 		ResourceRequest request;
 		ServiceFunction service;
@@ -80,14 +73,11 @@ public class ClientThread extends Thread {
 	 }
 
 	 private void loadFile(String directory) {
-		 System.out.println("in loadFile");
 	 	OutputStream out = null;
 	 	FileReader in = null;
 	 	String path = "./src/main/webapp/";
 
 	 	try {
-//	 		exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "[::1]:3333");
-//	 		exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "POST");
 	 		exchange.sendResponseHeaders(200, 0);
 	 		out = exchange.getResponseBody();
 

@@ -1,5 +1,7 @@
 package simpledoc.services.agency;
 
+import java.util.Properties;
+import java.net.URI;
 import java.sql.SQLException;
 import simpledoc.exceptions.StorageErrorException;
 import java.util.UUID;
@@ -12,29 +14,25 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.util.Map;
 import java.util.List;
-import java.util.Properties;
-
 import simpledoc.services.ModuleObject;
 import simpledoc.services.ModuleObjectStorage;
 
 
-
 public class AgencyStorage implements ModuleObjectStorage {
-	//TODO: remove credientials, use environment variables
 	private static Connection connection;
-	private static String url = "jdbc:postgresql://ec2-54-243-197-120.compute-1.amazonaws.com:5432/da16p9r5cqnbfj";
-	private static String username = "pqtafaszpcncjx";
-	private static String password = "fdfa9f7f87e9bba343a3c303b7c6dae39006a5adbc4345e535fb0b3f16340904";
-
 
 	public AgencyStorage() throws StorageErrorException {
 		try {
-			Properties props = new Properties();
-			props.setProperty("user", username);
-			props.setProperty("password", password);
-			connection = DriverManager.getConnection(url, props);
-		} catch (SQLException err) { throw new StorageErrorException("error connecting to database"); }}
+				String database_url_string = System.getenv("JDBC_DATABASE_URL");
 
+				connection = DriverManager.getConnection(database_url_string);
+
+		}
+		catch (SQLException err) {
+			err.printStackTrace();
+			throw new StorageErrorException("error connecting to database");
+		}
+	}
 
 
 
@@ -136,7 +134,7 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 			while(storage_result.next()) {
 				Array result = storage_result.getArray(1);
-				String[] result_set = result.toString().substring(1).split(",");
+				String[] result_set = result.toString().split(",");
 				returnable_result.add(result_set);
 			}
 		} catch(SQLException e){ throw new StorageErrorException("error with database query"); }
@@ -145,61 +143,24 @@ public class AgencyStorage implements ModuleObjectStorage {
 
 		return returnable_result;
 	}
-	private String setQueryCall(List<String> resource_path) {
+	private String setQueryCall(List<String> resource_path) throws StorageErrorException {
 		String call = "";
-		String resource_switch = "";
-
-		//TODO: somehow, set switch using resource_path
-		/*
-				supported structures -->
-
-				GET / Agency / {ModuleObject implementation} / {uuid}
-							--> may limit data returned with query params
-
-				GET / Agency / {ModuleObject implementation} /
-							--> may limit objects returned with query params
-
-				GET / Agency / {uuid} / {ModuleObject implementation}
-							--> gets all objects related to specific resource
-							--> may limit returned objects with query params
-
-				POST / Agency /
-							--> no query
-							--> body includes: type & object_data
-
-				PUT / Agency /
-							--> body includes: id, type, object_data
-							--> query param opts: replace entire or up
-							--> must include object for updating with id in body
-
-				DELETE / Agency /
-							--> no body, just delete object with given id
-							--> use query to determine what happens to dependent objects
-							----> what to do when deleting object is a dependent of another
-		*/
+		String resource_switch = resource_path.toString();
 
 		switch(resource_switch){
-			case "category_resource":
-				call = "select agency.query_category_resource(?,?,?)";
-				break;
-			case "category_collection":
+			case "[Agency, categories]":
 				call = "select agency.query_category_collection(?,?,?)";
 				break;
-			case "definition_resource":
-				call = "select agency.query_definition_resource(?,?,?)";
-				break;
-			case "definition_collection":
+			case "[Agency, definitions]":
 				call = "select agency.query_definition_collection(?,?,?)";
 				break;
-			case "agent_resource":
-				call = "select agency.query_agent_resource(?,?,?)";
-				break;
-			case "agent_collection":
+			case "[Agency, agents]":
 				call = "select agency.query_agent_collection(?,?,?)";
 				break;
 			default:
-				call = "select agency.query_category_collection(?,?,?)";
+				throw new StorageErrorException("invalid resource request");
 		}
+
 		return call;
 	}
 

@@ -103,6 +103,7 @@ public class AgencyService implements ServiceModule {
 
 
 
+		//TODO: BUG: somehow I'm loosing first digit of UUID's when getting from DB
 		services.put("GET", request -> {
 			AgencyValidator validator = new AgencyValidator();
 			AgencyStorage storage = new AgencyStorage();
