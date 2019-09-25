@@ -1,19 +1,34 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Container, Row, Col } from 'react-bootstrap'
+
+import colors from '../colors'
 
 
-const StyleWrapper = styled(Container)`
+const StyleWrapper = styled.div`
+  padding: 1rem 1rem 0;
+  display: flex;
+  flex-direction: column;
+  background: ${colors.three};
+  color: ${colors.four};
+
+  header {
+    font-size: 1.6rem;
+  }
+  nav {
+    justify-content: center
+  }
+
+  nav a {
+    flex-basis: 12%;
+  }
 
 `
 
 export default class Header extends React.Component {
   render() {
-    return  <StyleWrapper className="header_wrapper text-center">
-              <Row>
-                <Col xl={12}><h2>Simpledoc: AI Clerk</h2></Col>
-                <Col>{this.props.children}</Col>
-              </Row>
+    return  <StyleWrapper>
+              <header>Simpledoc: AI Clerk</header>
+              {this.props.children}
             </StyleWrapper>
   }
 }

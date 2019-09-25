@@ -1,121 +1,235 @@
 import React from 'react'
-import { Container, ListGroup, Col, Row } from 'react-bootstrap'
+import { connect } from 'react-redux'
 import styled from 'styled-components'
 
+import TagWrapper from '../../components/TagWrapper'
+import * as layout_actions from '../../layout/layout_actions'
+import * as agency_actions from './module_actions'
 import colors from '../../colors'
-import ModalTool from '../../components/ModalTool'
 
+/*
+  purpose:  display STRUCTURALNODES as heirarchy
+            include AGENTS and the USERS they are assigned to
+            display AGENTS as heirarchy based on STRUCTURALNODES and securityCode
+*/
 
-const StyleWrapper = styled(Container)`
-  .agent {
+const Wrapper = styled.div`
+  background: ${colors.four};
+  color: ${colors.three};
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 1rem;
+  height: auto;
+  min-height: 100%;
+  align-items: stretch;
+  div:empty {
+    display: none;
+  }
+
+  .structure {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding: .5rem;
+    margin: .5rem;
+    border: 1px solid ${colors.three};
+    border-radius: .5rem;
+    width: 100%;
+
+    @media (max-width: 700px) {
+      width: 100%;
+    }
+  }
+
+  .structure-min {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    max-height: 1.5rem;
+  }
+  header {
+    display: block;
+    width: 100%;
+    max-height: 2rem;
+    font-weight: bold;
+  }
+  .structure-min header {
+    font-weight: normal;
+  }
+  .agent-templates {
+    font-size: .8rem;
     header {
-      font-size: 1.1rem;
+      font-size: .8rem;
     }
-    p {
-      font-size: .75rem;
-    }
+  }
+  .tags {
+    display: flex;
+    flex-direction: column;
+    padding: .5rem;
+  }
+  .child-structures {
+    display: flex;
+    flex-grow: 2;
+  }
+  .active-agents {
+    margin-left: 1rem;
+    background: lightgray;
+  }
+
+  .filters {
+    display: flex;
+    width: 100%;
+    background: white;
+    border: thin solid black;
+  }
+  .agency-filter {
+    padding: 1rem;
+  }
+  .display-filter {
+    padding: 1rem;
   }
 `
+class AgencyOrganization extends React.Component {
 
 
-export default class AgencyOrganization extends React.Component {
+  buildOrganization(id, depthIndex) {
+    let children = this.getChildrenStructures(id)
+    let depth = ++depthIndex
 
-  constructor(props){
-    super(props)
-    this.state = {
-      showModal: false,
-      agentModal: null
-    }
+    return children.map( child => depth > 2 ?
+                <div className="structure-min" depth={depth} style={{ paddingLeft: depth + "rem"}}>
+                  <header>{child.label}</header>
+                  { this.buildOrganization(child.id, depth)}
+                </div> :
+                <div className="structure" depth={depth} >
+                  <div className="general-info">
+                    <header>{child.label}</header>
+                    <div className="tags">{this.loadTags(child)}</div>
+                    <div className="agent-templates">
+                      <header>Agent Templates</header>
+                      {
+                        this.getAgentTemplates(child).map( template => {
+                          return  <div>
+                                    <span>{template.label}</span>
+                                    <span className="active-agents">
+                                      { this.getActiveAgents(child.id, template.id).map( agent => agent.label) }
+                                    </span>
+                                  </div> })}
+
+                    </div>
+                  </div>
+                  <div className="child-structures">{ this.buildOrganization(child.id, depth) }</div>
+                </div>)
+
   }
 
-  findAgentDefinition(agent_definition_id){
-    return this.props.agency_definitions.find( definition =>
-              definition.id === agent_definition_id)
+  getActiveAgents(structureId, templateId){
+    return this.props.agents.filter( agent => agent.agentLink === structureId && agent.templateId === templateId )
   }
 
-
-
-  /*
-      need to set a depth index and use as a z-index in order to
-      be sure to select the correct agent when editing
-  */
-  loadChildrenAgents(parent_id, depth){
-    let children = this.props.agency_agents.filter( agent =>
-                      agent.agent_link_id === parent_id )
-
-    let depth_index = depth + 1
-
-    return  <Row className="p-1 m-1 agent_structure_item" key={`agent_structure_item_${parent_id}`}>{children.map( child =>
-              <Col className="agent border m-1 flex-wrap"
-                    style={{zIndex: depth_index}}
-                    key={`agent_structure_item_${child.id}`}
-              >
-                <header className="p-1 m-0 agent_structure_header"
-                        onClick={() => this.showModal(child)}>
-                  {child.label}
-                </header>
-                <p>-{this.findAgentDefinition(child.definition_id).label}</p>
-                {this.loadChildrenAgents(child.id, depth_index)}
-              </Col>)}
-            </Row>
+  loadTags(structure){
+    let tagIds = structure.dataTags
+    console.log(structure.label, tagIds)
+    return tagIds.map( tagid => <TagWrapper>{this.props.dataTags.find( tag => tag.id === tagid).label}</TagWrapper>)
   }
 
-  hideModal(){ this.setState({ showModal: false, agentModal: null }) }
+  getChildrenStructures(id) {
+    return this.props.agencyStructures.filter( structure => structure.parentId === id )
+  }
 
-  showModal(agent){ this.setState({ showModal: true, agentModal: agent }) }
+  getAgentTemplates(structure){
+    let templates = []
 
-  modalButtonHandler(type){
-    switch(type){
-      case "discard":
-        this.hideModal()
-        break
-      case "revert":
-        console.log("revert changes, keep modal open")
-        break
-      case "save":
-        console.log("save changes, keep modal open")
-        break
-      case "workspace":
-        console.log("send to workspace, close modal")
-        this.hideModal()
-        break
-      case "delete":
-        console.log("delete item, close modal")
-        this.hideModal()
-        break
-    }
+    structure.agentAssignments.forEach( item => {
+      let template = this.props.agentTemplates.find( template => template.id === item.id)
+      let index = item.limit
+      while(index > 0){
+        templates = Object.assign([], templates.concat(template))
+        --index
+      }
+
+    })
+
+
+    return templates
+  }
+
+  agencyFilter() {
+
+    return  <div className="agency-filter">
+              <form>
+                <fieldset>
+                  <label name="filter-structure-branch">structure branch</label>
+                  <select name="filter-structure-branch">
+                    {
+                      this.props.agencyStructures.map(structure =>
+                        <option value={structure.id}>{structure.label}</option>)
+                    }
+                  </select>
+
+                </fieldset>
+                <fieldset>
+                  <label name="filter-by-tag">filter by tag</label>
+                  <select name="filter-by-tag">
+                    { this.props.dataTags.map(tag => <option value={tag.id}>{tag.label}</option>) }
+                  </select>
+                </fieldset>
+              </form>
+            </div>
+  }
+
+  displayFilter(){
+    return  <div className="display-filter">
+              <form>
+                <fieldset>
+                  <label name="display-agent-templates">show agent templates</label>
+
+                </fieldset>
+                <fieldset>
+                  <label name="display-tags">show data tags</label>
+
+                </fieldset>
+                <fieldset>
+                  <label name="display-active-agents">show active agents</label>
+
+                </fieldset>
+                <fieldset>
+
+                </fieldset>
+              </form>
+            </div>
   }
 
   render() {
-    let root_agent = this.props.agency_agents.find( agent =>
-                        agent.agent_link_id === 'root')
-    return  <StyleWrapper>
-              <Row>
-                <Col xl={12}
-                      className='agent border m-1 flex-wrap'
-                      style={{zIndex: 0}} >
-                  <header className="p-1 m-0 agency_org_agent_header"
-                          onClick={() => this.showModal(root_agent)}>
-                    {root_agent.label}
-                  </header>
-                  <p>-{this.findAgentDefinition(root_agent.definition_id).label}</p>
-                  {this.loadChildrenAgents(root_agent.id, 0)}
-                </Col>
-              </Row>
+    let root = this.props.agencyStructures.find( structure => structure.parentId === "root")
+    return  <Wrapper>
+              <div className="filters">
+                { this.agencyFilter() }
+                { this.displayFilter() }
+              </div>
+              <header>{root.label}</header>
+              { this.buildOrganization(root.id, 0) }
+            </Wrapper>
 
-              {
-                this.state.showModal ?
-                <ModalTool
-                  showModal={this.state.showModal}
-                  hideModal={this.hideModal.bind(this)}
-                  title='Modify Structural Agent'
-                  body={<div>Structural Agent to Edit: {this.state.agentModal.label}</div>}
-                  modalButtonHandler={this.modalButtonHandler.bind(this)}
-                />
-                : null
-              }
-
-
-            </StyleWrapper>
   }
 }
+
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    agents: state.agency.agents,
+    agencyStructures: state.agency.structuralNodes,
+    agentTemplates: state.agency.agentTemplates,
+    dataTags: state.agency.dataTags,
+    users: state.agency.users,
+    temp_state: state.layout.savedTempState,
+    layout_actions: layout_actions,
+    agency_actions: agency_actions
+  }
+}
+
+export default connect(mapStateToProps)(AgencyOrganization)

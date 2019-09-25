@@ -1,11 +1,15 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Container } from 'react-bootstrap'
+
+import colors from '../colors'
 
 
-
-const StyleWrapper = styled(Container)`
-
+const StyleWrapper = styled.div`
+  background: ${colors.three};
+  color: ${colors.four};
+  display: flex;
+  width: 100%;
+  padding: .5rem 1rem 1rem;
 `
 
 export default class Footer extends React.Component {

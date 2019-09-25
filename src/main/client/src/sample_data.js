@@ -1,224 +1,331 @@
 const sampleData = {
   layout: {
-    workspaceComponents: [
-      { key: "1",
-        componentType: "AgencyCategory",
-        data: {
-          id:"-7906a9c-5fda-4b73-a83d-59ab2978b7a8",
-          label:'Agency',
-          behavior:'STRUCTURAL'
-        },
-        workspaceState: {},
-        workspaceNote: "add notes here"
-      }
-    ]
+    workspaceComponents: [],
+
+    savedTempState: []
   },
   agency: {
-    agency_categories: [
+    structuralNodes: [
       {
-        id: '-7906a9c-5fda-4b73-a83d-59ab2978b7a8',
-        label: 'Agency',
-        behavior: 'STRUCTURAL'
+        label: "Adult Learning Systems of Oregon",
+        id: "1000",
+        parentId: "root",
+        agentAssignments: [{id: '2016', limit: 1}, {id: '2015', limit: 1}, {id: '2014', limit: 1}, {id: '2013', limit: 1}, {id: '2012', limit: 1}],
+        dataTags: [],
+        type: "structuralNode"
       },
       {
-        id: '-73e328d-70c3-42ae-b503-9de726530c1b',
-        label: 'Service Provider',
-        behavior: 'STRUCTURAL'
+        label: "Residential Services",
+        id: "1001",
+        parentId: "1000",
+        agentAssignments: [{id: '2008', limit: 1},{id: '2011', limit: 1},{id:'2013', limit: 1}],
+        dataTags: ["3001"],
+        type: "structuralNode"
       },
       {
-        id: '-9cf2870-0ecc-4696-b893-b2081c7dc79d',
-        label: 'Department',
-        behavior: 'STRUCTURAL'
+        label: "Group Home 1",
+        id: "1002",
+        parentId: "1001",
+        agentAssignments: [{id: '2002', limit: 1}, {id: '2000', limit: 0}],
+        dataTags: ["3002","3003"],
+        type: "structuralNode"
       },
       {
-        id: '-ea48197-2d15-4cdc-9385-48c3ee57acff',
-        label: 'Executive',
-        behavior: 'ACTOR'
+        label: "Accounting",
+        id: "1003",
+        parentId: "1000",
+        agentAssignments: [{id: '2004', limit: 1},{id: '2005', limit: 1},{id: '2006', limit: 1}],
+        dataTags: [],
+        type: "structuralNode"
       },
       {
-        id: '-28fbde7-efb5-4905-aad5-25554c62eeaa',
-        label: 'Administrator',
-        behavior: 'ACTOR'
+        label: "Human Resources",
+        id: "1004",
+        parentId: "1000",
+        agentAssignments: [{id: '2007', limit: 1},{id: '2013', limit: 1}],
+        dataTags: [],
+        type: "structuralNode"
       },
       {
-        id: '-44e2d55-6cba-4186-b4bd-f2ef3ca2bf9a',
-        label: 'Manager',
-        behavior: 'ACTOR'
+        label: "Vocational Services",
+        id: "1005",
+        parentId: "1000",
+        agentAssignments: [{id: '2009', limit: 1}],
+        dataTags: [],
+        type: "structuralNode"
       },
       {
-        id: '-9b23863-0c50-46dd-9116-71846a3c369f',
-        label: 'Staff',
-        behavior: 'ACTOR',
-        security: '4444',
-        data_struct: '{program_name=string-30}'
+        label: "Supported Living Services",
+        id: "1006",
+        parentId: "1000",
+        agentAssignments: [{id: '2010', limit: 1}],
+        dataTags: [],
+        type: "structuralNode"
+      },
+      {
+        label: "VOC program 1",
+        id: "1007",
+        parentId: "1005",
+        agentAssignments: [{id: '2000', limit: 0}],
+        dataTags: [],
+        type: "structuralNode"
+      },
+      {
+        label: "VOC program 2",
+        id: "1008",
+        parentId: "1005",
+        agentAssignments: [{id: '2000', limit: 0}],
+        dataTags: [],
+        type: "structuralNode"
+      },
+      {
+        label: "SLP 1",
+        id: "1009",
+        parentId: "1006",
+        agentAssignments: [{id: '2000', limit: 0},{id: '2003', limit: 1}],
+        dataTags: [],
+        type: "structuralNode"
+      },
+      {
+        label: "SLP 2",
+        id: "1010",
+        parentId: "1006",
+        agentAssignments: [{id: '2000', limit: 0}, {id: '2003', limit: 1}],
+        dataTags: [],
+        type: "structuralNode"
+      },
+      {
+        label: "SLP 3",
+        id: "1011",
+        parentId: "1006",
+        agentAssignments: [{id: '2000', limit: 0}, {id: '2003', limit: 1}],
+        dataTags: [],
+        type: "structuralNode"
+      },
+      {
+        label: "Group Home 2",
+        id: "1012",
+        parentId: "1001",
+        agentAssignments: [{id: '2000', limit: 0}, {id: '2002', limit: 1}],
+        dataTags: [],
+        type: "structuralNode"
+      },
+      {
+        label: "Group Home 3",
+        id: "1013",
+        parentId: "1001",
+        agentAssignments: [{id: '2000', limit: 0}, {id: '2002', limit: 1}],
+        dataTags: [],
+        type: "structuralNode"
       }
     ],
-    agency_definitions: [
+
+    agentTemplates: [
       {
-        id: '-5d44256-e4a5-4b12-812c-f066bf504b67',
-        label: 'Agency',
-        category_id: '-7906a9c-5fda-4b73-a83d-59ab2978b7a8'
+        label: "Direct Support Professional",
+        id: "2000",
+        securityCode: "",
+        dataTags: [],
+        type: "agentTemplate"
       },
       {
-        id: '-0a42ff2-48f9-4e15-954a-b14b99e43566',
-        label: 'Group Home',
-        category_id: '-73e328d-70c3-42ae-b503-9de726530c1b'
+        label: "Job Coach",
+        id: "2001",
+        securityCode: "",
+        dataTags: [],
+        type: "agentTemplate"
       },
       {
-        id: '-e59e565-6300-4644-a66c-cbdf80eabca8',
-        label: 'Voc Program',
-        category_id: '-73e328d-70c3-42ae-b503-9de726530c1b'
+        label: "Residential Manager",
+        id: "2002",
+        securityCode: "",
+        dataTags: [],
+        type: "agentTemplate"
       },
       {
-        id: '-4ccfad8-9888-4005-b212-6a801fb6fd4e',
-        label: 'SLP Program',
-        category_id: '-73e328d-70c3-42ae-b503-9de726530c1b'
+        label: "Supported Living Manager",
+        id: "2003",
+        securityCode: "",
+        dataTags: [],
+        type: "agentTemplate"
       },
       {
-        id: '-9d4cab0-b1ba-490c-bf04-fd09869d4ac8',
-        label: 'Residential Services',
-        category_id: '-9cf2870-0ecc-4696-b893-b2081c7dc79d'
+        label: "Accounts Payable",
+        id: "2004",
+        securityCode: "",
+        dataTags: [],
+        type: "agentTemplate"
       },
       {
-        id: '-ffe0964-e613-4e24-a325-38c0b23e469c',
-        label: 'Vocational Services',
-        category_id: '-9cf2870-0ecc-4696-b893-b2081c7dc79d'
+        label: "Payroll Coordinator",
+        id: "2005",
+        securityCode: "",
+        dataTags: [],
+        type: "agentTemplate"
       },
       {
-        id: '-0d03e7d-dc9b-4f16-af6b-eb56b7732485',
-        label: 'Supported Living Services',
-        category_id: '-9cf2870-0ecc-4696-b893-b2081c7dc79d'
+        label: "Accounts Recievable",
+        id: "2006",
+        securityCode: "",
+        dataTags: [],
+        type: "agentTemplate"
       },
       {
-        id: '-4b4252e-2c3a-4703-b464-be9259ef62e3',
-        label: 'Human Resources',
-        category_id: '-9cf2870-0ecc-4696-b893-b2081c7dc79d'
+        label: "Human Resources Director",
+        id: "2007",
+        securityCode: "",
+        dataTags: [],
+        type: "agentTemplate"
       },
       {
-        id: '-6d49ffa-171f-4108-893d-1e59a9b3cc8a',
-        label: 'CEO',
-        category_id: '-ea48197-2d15-4cdc-9385-48c3ee57acff'
+        label: "Residential Director",
+        id: "2008",
+        securityCode: "",
+        dataTags: [],
+        type: "agentTemplate"
       },
       {
-        id: '-a283ebf-03c7-4937-b96f-230c9b2f035b',
-        label: 'COO',
-        category_id: '-ea48197-2d15-4cdc-9385-48c3ee57acff'
+        label: "Vocational Director",
+        id: "2009",
+        securityCode: "",
+        dataTags: [],
+        type: "agentTemplate"
       },
       {
-        id: '-b07c5c1-4bf6-4ed2-bdda-c30f45ae9871',
-        label: 'HR Director',
-        category_id: '-28fbde7-efb5-4905-aad5-25554c62eeaa'
+        label: "Supported Living Director",
+        id: "2010",
+        securityCode: "",
+        dataTags: [],
+        type: "agentTemplate"
       },
       {
-        id: '-62a7731-d1c0-4497-9f01-830f7a5169c4',
-        label: 'Residential Director',
-        category_id: '-28fbde7-efb5-4905-aad5-25554c62eeaa'
+        label: "Associate Residential Director",
+        id: "2011",
+        securityCode: "",
+        dataTags: [],
+        type: "agentTemplate"
       },
       {
-        id: '-ebb8e49-210e-46bb-b014-6af9ef46c61',
-        label: 'Vocational Director',
-        category_id: '-28fbde7-efb5-4905-aad5-25554c62eeaa'
+        label: "Quality Assurance Coordiantor",
+        id: "2012",
+        securityCode: "",
+        dataTags: [],
+        type: "agentTemplate"
       },
       {
-        id: '-9fdb67b-c703-4a06-87b6-bb9b5b30a61e',
-        label: 'Supported Living Director',
-        category_id: '-28fbde7-efb5-4905-aad5-25554c62eeaa'
+        label: "Administrative Assistant",
+        id: "2013",
+        securityCode: "",
+        dataTags: [],
+        type: "agentTemplate"
       },
       {
-        id: '-33a9925-e7a4-4ca7-bef4-e997033eba94',
-        label: 'Residential Manager',
-        category_id: '-44e2d55-6cba-4186-b4bd-f2ef3ca2bf9a'
+        label: "Executive Assistant",
+        id: "2014",
+        securityCode: "",
+        dataTags: [],
+        type: "agentTemplate"
       },
       {
-        id: '-3887e43-9521-45b8-8596-5e1734405408',
-        label: 'Vocational Manager',
-        category_id: '-44e2d55-6cba-4186-b4bd-f2ef3ca2bf9a'
+        label: "Chief Executive Officer",
+        id: "2015",
+        securityCode: "",
+        dataTags: [],
+        type: "agentTemplate"
       },
       {
-        id: '-c1e432f-3d0a-4d18-a36d-4900393cb06d',
-        label: 'Supported Living Manager',
-        category_id: '-44e2d55-6cba-4186-b4bd-f2ef3ca2bf9a'
+        label: "Chief Operations Officer",
+        id: "2016",
+        securityCode: "",
+        dataTags: [],
+        type: "agentTemplate"
+      }
+    ],
+
+    agents: [
+      {
+        id: 4000,
+        label: "sample agent",
+        securityCode: 3333,
+        dataTags: [],
+        type: "agent",
+        agentLink: "1013",
+        templateId: "2002"
       },
       {
-        id: '-f7e5345-780e-4644-b074-2d2b8c027561',
-        label: 'Lead Direct Support Professional',
-        category_id: '-9b23863-0c50-46dd-9116-71846a3c369f'
+        id: 4001,
+        label: "sample agent",
+        securityCode: 3333,
+        dataTags: [],
+        type: "agent",
+        agentLink: "1001",
+        templateId: "2008"
+      }
+    ],
+
+    dataTags: [
+      {
+        label: "Company",
+        id: "3000",
+        type: "dataTag",
+        tagFor: "structural"
       },
       {
-        id: '-605e35c-c5a6-4505-90c0-33642067fc1b',
-        label: 'Direct Support Professional',
-        category_id: '-9b23863-0c50-46dd-9116-71846a3c369f'
+        label: "Department",
+        id: "3001",
+        type: "dataTag",
+        tagFor: "structural"
+      },
+      {
+        label: "Service Provider",
+        id: "3002",
+        type: "dataTag",
+        tagFor: "structural"
+      },
+      {
+        label: "Group Home",
+        id: "3003",
+        type: "dataTag",
+        tagFor: "structural"
+      },
+      {
+        label: "Supported Living Program",
+        id: "3004",
+        type: "dataTag",
+        tagFor: "structural"
+      },
+      {
+        label: "Vocational Program",
+        id: "3005",
+        type: "dataTag",
+        tagFor: "structural"
+      },
+      {
+        label: "Employee",
+        id: "3006",
+        type: "dataTag",
+        tagFor: "agent"
+      },
+      {
+        label: "Management",
+        id: "3007",
+        type: "dataTag",
+        tagFor: "agent"
+      },
+      {
+        label: "Administration",
+        id: "3008",
+        type: "dataTag",
+        tagFor: "agent"
       }
 
-
-
     ],
-    agency_agents: [
+
+    users: [
       {
-        id: '-20f65ce-763f-40b8-88be-7b1770751b35',
-        definition_id: '-5d44256-e4a5-4b12-812c-f066bf504b67',
-        agent_link_id: 'root',
-        label: 'Adult Learning Systems of Oregon'
-      },
-      {
-        id: '-ee65247-9bda-40d2-b8af-b7f03c94f53c',
-        definition_id: '-4b4252e-2c3a-4703-b464-be9259ef62e3',
-        agent_link_id: '-20f65ce-763f-40b8-88be-7b1770751b35',
-        label: 'Human Resources'
-      },
-      {
-        id: '-8b9347e-5c32-4eb1-913f-f6d620798c38',
-        definition_id: '-9d4cab0-b1ba-490c-bf04-fd09869d4ac8',
-        agent_link_id: '-20f65ce-763f-40b8-88be-7b1770751b35',
-        label: 'Residential Services'
-      },
-      {
-        id: '-93bce5e-8e1a-48d4-9ae7-c060452259e2',
-        definition_id: '-ffe0964-e613-4e24-a325-38c0b23e469c',
-        agent_link_id: '-20f65ce-763f-40b8-88be-7b1770751b35',
-        label: 'Vocational Services'
-      },
-      {
-        id: '-867c64d-8188-496c-bbba-a9a0035da856',
-        definition_id: '-0d03e7d-dc9b-4f16-af6b-eb56b7732485',
-        agent_link_id: '-20f65ce-763f-40b8-88be-7b1770751b35',
-        label: 'Supported Living Services'
-      },
-      {
-        id: '-0bb2d04-6592-4f66-a474-179c4f8586a0',
-        definition_id: '-0a42ff2-48f9-4e15-954a-b14b99e43566',
-        agent_link_id: '-8b9347e-5c32-4eb1-913f-f6d620798c38',
-        label: 'Group Home - 1'
-      },
-      {
-        id: '-1363a84-2e99-43ce-9391-ba2cebabbbb5',
-        definition_id: '-0a42ff2-48f9-4e15-954a-b14b99e43566',
-        agent_link_id: '-8b9347e-5c32-4eb1-913f-f6d620798c38',
-        label: 'Group Home - 2'
-      },
-      {
-        id: '-570484c-1a02-4313-8aa3-85c868b75b2b',
-        definition_id: '-e59e565-6300-4644-a66c-cbdf80eabca8',
-        agent_link_id: '-93bce5e-8e1a-48d4-9ae7-c060452259e2',
-        label: 'Vocational Program - 1'
-      },
-      {
-        id: '-b02a406-f6b2-453a-ad6b-d765cf870973',
-        definition_id: '-e59e565-6300-4644-a66c-cbdf80eabca8',
-        agent_link_id: '-93bce5e-8e1a-48d4-9ae7-c060452259e2',
-        label: 'Vocational Program - 2'
-      },
-      {
-        id: '-f417092-b0c6-49c1-a5c4-be2e1b208554',
-        definition_id: '-4ccfad8-9888-4005-b212-6a801fb6fd4e',
-        agent_link_id: '-867c64d-8188-496c-bbba-a9a0035da856',
-        label: 'Supported Living Program - 1'
-      },
-      {
-        id: '-dc42833-fd09-4d7b-b50b-849f460a6b56',
-        definition_id: '-4ccfad8-9888-4005-b212-6a801fb6fd4e',
-        agent_link_id: '-867c64d-8188-496c-bbba-a9a0035da856',
-        label: 'Supported Living Program - 2'
+        id: 5000,
+        username: "sample_user",
+        type: "user"
       }
     ]
   }

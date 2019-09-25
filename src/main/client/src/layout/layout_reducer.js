@@ -87,6 +87,18 @@ export default function layoutReducer (state=initialState, action) {
     //   console.log("clearing component state")
     // }
 
+    case "UPDATE_TEMP_STATE": {
+      let updated_temp_state_set = Object.assign([], state.savedTempState.filter( state => state.id !== action.payload.id).concat(action.payload))
+
+      return Object.assign({}, state, {savedTempState: updated_temp_state_set})
+    }
+
+    case "CLEAR_TEMP_STATE": {
+      let updated_temp_state_set = Object.assign([], state.savedTempState.filter( state => state.id !== action.payload.id))
+
+      return Object.assign({}, state, {savedTempState: updated_temp_state_set})
+    }
+
 
     default: return state
   }

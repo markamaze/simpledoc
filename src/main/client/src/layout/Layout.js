@@ -1,5 +1,4 @@
 import React from 'react'
-import Container from 'react-bootstrap/Container'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -8,12 +7,14 @@ import Header from './Header'
 import Navigation from './Navigation'
 import Workspace from './Workspace'
 
-import Agency from '../module/agency/Agency'
+import AgencyModule from '../module/agency/AgencyModule'
 
 import colors from '../colors'
 
-const BodyWrapper = styled(Container)`
-  background: ${colors.one};
+const BodyWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-content: stretch;
   position: fixed;
   top: 0;
   left: 0;
@@ -21,27 +22,34 @@ const BodyWrapper = styled(Container)`
   right: 0;
   height: 100%;
   width: 100%;
-  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+
 `
-const BodyViewport = styled(Container)`
+const BodyViewport = styled.div`
+  display: flex;
   background: ${colors.four};
-  border-radius: .5rem;
+  height: 100%;
+  width: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
 `
 
 export default class Layout extends React.Component {
 
   render() {
     return  <BrowserRouter history={history}>
-              <BodyWrapper className="d-flex flex-column align-content-stretch my-1 mx-auto" >
+              <BodyWrapper >
                 <Header >
                   <Navigation />
                 </Header>
-                <BodyViewport className="my-3 mx-auto flex-grow-1">
+                <BodyViewport>
                   <Switch>
-                    <Route exact path="/" render={()=> <Container>Welcome</Container>} />
-                    <Route exact path="/Home" render={()=> <div>Home</div>} />
-        						<Route exact path="/Agency" render={() => <Agency />} />
-                    <Route exact path="/Workspace" render={() => <Workspace />} />
+                    <Route exact path="/" render={()=> <div>Welcome</div>} />
+                    <Route path="/Home" render={()=> <div>Home</div>} />
+        						<Route path="/Agency" render={() => <AgencyModule />} />
                   </Switch>
         				</BodyViewport>
                 <Footer />

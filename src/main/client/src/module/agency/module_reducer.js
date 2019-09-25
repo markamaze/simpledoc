@@ -1,59 +1,158 @@
 import sampleData from '../../sample_data'
+import * as agencyObject from './agencyObjects'
+
+
+// const initialState = {
+//   structuralNodes: [],
+//   agentTemplates: [],
+//   agents: [],
+//   dataTags: [],
+//   users: []
+// }
 
 const initialState = sampleData.agency
 
 
 
-
-
 export default function agency_reducer (state=initialState, action) {
   switch(action.type) {
-    case "LOAD_AGENCY_CATEGORIES": {
-      let new_category_set = []
-      action.payload.forEach( item => {
-        let category = Object.assign({}, { id: item[0],
-                                            label: item[1],
-                                            behavior: item[2],
-                                            security: item[3],
-                                            data_struct: item[4] })
-        new_category_set = [ ...new_category_set, category ]
-      })
+    case "LOAD_AGENCY_STORE": {
+      console.log("loading agency", action.payload)
 
-      return Object.assign({}, state, {agency_categories: new_category_set} )
+
+      return Object.assign({}, state, { structuralNodes: action.payload.structuralNodes,
+                                        agents: action.payload.agents,
+                                        agentTemplates: action.payload.agentTemplates,
+                                        dataTags: action.payload.dataTags,
+                                        users: action.payload.users
+                                      })
     }
 
 
-    case "LOAD_AGENCY_DEFINITIONS": {
-      let new_definition_set = []
-      action.payload.forEach( item => {
-        let definition = Object.assign({}, { id: item[0],
-                                        label: item[1],
-                                        category_id: item[2],
-                                        security: item[3],
-                                        data_struct: item[4] })
-        new_definition_set = [ ...new_definition_set, definition ]
-      })
+    case "CREATE_AGENT_TEMPLATE": {
+      let updatedSet = Object.assign([], state.agentTemplates.concat(action.payload))
 
-      return Object.assign({}, state, { agency_definitions: new_definition_set })
+      return Object.assign({}, state, {agentTemplates: updatedSet})
     }
 
 
-    case "LOAD_AGENCY_AGENTS": {
-      let new_agent_set = []
-      action.payload.forEach( item => {
-        let agent = Object.assign({}, { id: item[0],
-                                        definition_id: item[1],
-                                        agent_link_id: item[2],
-                                        security: item[3],
-                                        data_struct: item[4],
-                                        agent_data: item[5] })
-        new_agent_set = [ ...new_agent_set, agent ]
-      })
+    case "UPDATE_AGENT_TEMPLATE": {
+      let updatedSet = Object.assign([],
+        state.agentTemplates.filter( item =>
+          item.id !== action.payload.id).concat(action.payload))
 
-      return Object.assign({}, state, { agency_agents: new_agent_set })
+      return Object.assign({}, state, {agentTemplates: updatedSet})
     }
 
 
+    case "DELETE_AGENT_TEMPLATE": {
+      let updatedSet = Object.assign([],
+        state.agentTemplates.filter( item =>
+          item.id !== action.payload.id))
+
+      return Object.assign({}, state, {agentTemplates: updatedSet})
+    }
+
+
+    case "CREATE_AGENT": {
+      let updatedSet = Object.assign([], state.agents.concat(action.payload))
+
+      return Object.assign({}, state, {agents: updatedSet})
+    }
+
+
+    case "UPDATE_AGENT": {
+      let updatedSet = Object.assign([],
+        state.agents.filter( item =>
+          item.id !== action.payload.id).concat(action.payload))
+
+      return Object.assign({}, state, {agents: updatedSet})
+    }
+
+
+    case "DELETE_AGENT": {
+      let updatedSet = Object.assign([],
+        state.agents.filter( item =>
+          item.id !== action.payload.id))
+
+      return Object.assign({}, state, {agents: updatedSet})
+    }
+
+
+    case "CREATE_STRUCTURAL_NODE": {
+      let updatedSet = Object.assign([], state.structuralNodes.concat(action.payload))
+
+      return Object.assign({}, state, {structuralNodes: updatedSet})
+    }
+
+
+    case "UPDATE_STRUCTURAL_NODE": {
+      console.log(action)
+      let updatedSet = Object.assign([],
+        state.structuralNodes.filter( item =>
+          item.id !== action.payload.id).concat(action.payload))
+
+      return Object.assign({}, state, {structuralNodes: updatedSet})
+    }
+
+
+    case "DELETE_STRUCTURAL_NODE": {
+      let updatedSet = Object.assign([],
+        state.structuralNodes.filter( item =>
+          item.id !== action.payload.id))
+
+      return Object.assign({}, state, {structuralNodes: updatedSet})
+    }
+
+
+    case "CREATE_DATA_TAG": {
+      let updatedSet = Object.assign([], state.dataTags.concat(action.payload))
+
+      return Object.assign({}, state, {dataTags: updatedSet})
+    }
+
+
+    case "UPDATE_DATA_TAG": {
+      let updatedSet = Object.assign([],
+        state.dataTags.filter( item =>
+          item.id !== action.payload.id).concat(action.payload))
+
+      return Object.assign({}, state, {dataTags: updatedSet})
+    }
+
+
+    case "DELETE_DATA_TAG": {
+      let updatedSet = Object.assign([],
+        state.dataTags.filter( item =>
+          item.id !== action.payload.id))
+
+      return Object.assign({}, state, {dataTags: updatedSet})
+    }
+
+
+    case "CREATE_USER": {
+      let updatedSet = Object.assign([], state.users.concat(action.payload))
+
+      return Object.assign({}, state, {users: updatedSet})
+    }
+
+
+    case "UPDATE_USER": {
+      let updatedSet = Object.assign([],
+        state.users.filter( item =>
+          item.id !== action.payload.id).concat(action.payload))
+
+      return Object.assign({}, state, {users: updatedSet})
+    }
+
+
+    case "DELETE_USER": {
+      let updatedSet = Object.assign([],
+        state.users.filter( item =>
+          item.id !== action.payload.id))
+
+      return Object.assign({}, state, {users: updatedSet})
+    }
 
     default: return state
   }

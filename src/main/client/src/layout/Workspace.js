@@ -1,14 +1,13 @@
 import React from 'react'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
-import { Container, Modal, Tabs, Tab, Button } from 'react-bootstrap'
+import { Tabs, Tab } from 'react-bootstrap'
 
 import WorkspaceNote from './WorkspaceNote'
-import AgentCategoryEditor from '../module/agency/AgentCategoryEditor'
 import colors from '../colors'
 
 
-const StyleWrapper = styled(Container)`
+const StyleWrapper = styled.div`
   font-size: 1.5rem;
 
 `

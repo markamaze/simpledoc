@@ -1,6 +1,6 @@
 {
 	"name": "client",
-	"version": "0.12.0",
+	"version": "0.13.0",
 	"description": "simpledoc client",
 	"main": "/src/main/client/src/index.js",
 	"scripts": {
@@ -10,31 +10,31 @@
 	"author": "Mark A Maze",
 	"license": "ISC",
 	"dependencies": {
+		"react": "^16.8.6",
+		"react-data-table-component": "^1.5.3",
+		"react-dom": "^16.8.6",
+		"react-redux": "^5.1.1",
+		"react-router-dom": "^4.3.1",
+		"redux": "^3.7.2",
+		"redux-thunk": "^2.3.0",
+		"styled-components": "^3.4.10"
+	},
+	"devDependencies": {
 		"babel-core": "^6.26.3",
 		"babel-loader": "^7.1.5",
 		"babel-plugin-transform-react-jsx": "^6.24.1",
 		"babel-preset-env": "^1.7.0",
-		"bson-objectid": "^1.2.3",
+		"bson-objectid": "^1.2.5",
 		"clean-webpack-plugin": "^0.1.19",
-		"heroku": "^7.22.9",
+		"heroku": "^7.25.0",
 		"html-webpack-plugin": "^3.2.0",
-		"immutable": "^3.8.2",
-		"npm": "^6.4.1",
-		"react": "^16.3.2",
-		"react-bootstrap": "^1.0.0-beta.9",
-		"react-data-table-component": "^1.5.3",
-		"react-dom": "^16.3.2",
-		"react-redux": "^5.0.6",
-		"react-router-dom": "^4.2.2",
-		"redux": "^3.7.2",
-		"redux-devtools-extension": "^2.13.2",
+		"npm": "^6.9.0",
+		"react-bootstrap": "^1.0.0-beta.12",
+		"redux-devtools-extension": "^2.13.8",
 		"redux-logger": "^3.0.6",
-		"redux-thunk": "^2.2.0",
-		"styled-components": "^3.2.6",
-		"webpack": "^4.30.0",
-		"webpack-cli": "^3.1.2"
-	},
-	"devDependencies": {
-		"webpack-dev-server": "^3.1.10"
+		"webpack": "^4.32.2",
+		"webpack-cli": "^3.3.2",
+		"webpack-dev-server": "^3.5.1"
+
 	}
 }

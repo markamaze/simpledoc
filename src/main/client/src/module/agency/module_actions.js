@@ -1,52 +1,136 @@
 import store from '../../store'
 import { put, get, post, remove } from '../../utility/ajax'
+import objectId from 'bson-objectid'
 
 
 
-export function loadAgencyData() {
-  loadAgencyCategories()
-  loadAgencyDefinitions()
-  loadAgencyAgents()
+export function loadAgencyStore() {
+  let agents, agencyTemplates, structuralNodes, dataTags, users
+
+
+  // get('/Agency/agents', function(request) {
+  //     agents = JSON.parse(request.response).data
+  //   }, function() { console.log("error loading agency agents")})
+  //
+  //   .then(
+  //     console.log("get agentTemplates next")
+  //   )
+  //   .then(
+  //     console.log("get structuralNodes next")
+  //   )
+  //   .then(
+  //     console.log("get tags next")
+  //   )
+  //   .then(
+  //     console.log("get tagdataset next")
+  //   )
+  //   .finally(
+
+      store.dispatch({
+        type: "LOAD_AGENCY_STORE",
+        payload: {
+          agents: agents,
+          agencyTemplates: agencyTemplates,
+          structuralNodes: structuralNodes,
+          dataTags: dataTags,
+          users: users
+        }
+      })
+    // )
 }
 
-function loadAgencyCategories() {
-  get('/Agency/categories', function(request) {
-    let agency_categories = JSON.parse(request.response).data
-    store.dispatch({
-      type: "LOAD_AGENCY_CATEGORIES",
-      payload: agency_categories
-    })
-  }, function() { console.log("error loading agency categories")})
+export function createAgentTemplate(agentTemplate) {
+  store.dispatch({
+    type: "CREATE_AGENT_TEMPLATE",
+    payload: Object.assign({}, agentTemplate, {id: new objectId().toString()})
+  })
+}
+export function updateAgentTemplate(agentTemplate) {
+  store.dispatch({
+    type: "UPDATE_AGENT_TEMPLATE",
+    payload: agentTemplate
+  })
+}
+export function deleteAgentTemplate(agentTemplate) {
+  store.dispatch({
+    type: "DELETE_AGENT_TEMPLATE",
+    payload: agentTemplate
+  })
 }
 
-function loadAgencyDefinitions() {
-  get('/Agency/definitions', function(request) {
-    let agency_definitions = JSON.parse(request.response).data
-    store.dispatch({
-      type: "LOAD_AGENCY_DEFINITIONS",
-      payload: agency_definitions
-    })
-  }, function() { console.log("error loading agency definitions")})
+export function createAgent(agent) {
+
+  store.dispatch({
+    type: "CREATE_AGENT",
+    payload: Object.assign({}, agent, {id: new objectId().toString()})
+  })
+}
+export function updateAgent(agent) {
+  store.dispatch({
+    type: "UPDATE_AGENT",
+    payload: agent
+  })
+}
+export function deleteAgent(agent) {
+  store.dispatch({
+    type: "DELETE_AGENT",
+    payload: agent
+  })
 }
 
-function loadAgencyAgents() {
-  get('/Agency/agents', function(request) {
-    let agency_agents = JSON.parse(request.response).data
-    store.dispatch({
-      type: "LOAD_AGENCY_AGENTS",
-      payload: agency_agents
-    })
-  }, function() { console.log("error loading agency agents")})
+export function createStructuralNode(structuralNode) {
+  store.dispatch({
+    type: "CREATE_STRUCTURAL_NODE",
+    payload: Object.assign({}, structuralNode, {id: new objectId().toString()})
+  })
+}
+export function updateStructuralNode(structuralNode) {
+  store.dispatch({
+    type: "UPDATE_STRUCTURAL_NODE",
+    payload: structuralNode
+  })
+}
+export function deleteStructuralNode(structuralNode) {
+  store.dispatch({
+    type: "DELETE_STRUCTURAL_NODE",
+    payload: structuralNode
+  })
 }
 
-export function createCategory(data){
-  console.log("create category action")
+export function createDataTag(dataTag) {
+  store.dispatch({
+    type: "CREATE_DATA_TAG",
+    payload: Object.assign({}, dataTag, {id: new objectId().toString()})
+  })
+}
+export function updateDataTag(dataTag) {
+  store.dispatch({
+    type: "UPDATE_DATA_TAG",
+    payload: dataTag
+  })
+}
+export function deleteDataTag(dataTag) {
+  store.dispatch({
+    type: "DELETE_DATA_TAG",
+    payload: dataTag
+  })
 }
 
-export function updateCategory(data){
-  console.log("update category action")
+export function createUser(user) {
+  store.dispatch({
+    type: "CREATE_USER",
+    payload: Object.assign({}, user, {id: new objectId().toString()})
+  })
 }
-
-export function deleteCategory(data){
-  console.log("delete category action")
+export function updateUser(user) {
+  store.dispatch({
+    type: "UPDATE_USER",
+    payload: user
+  })
+}
+export function deleteUser(user) {
+  store.dispatch({
+    type: "DELETE_USER",
+    payload: user
+  })
 }
