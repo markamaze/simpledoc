@@ -7,11 +7,6 @@ import * as layout_actions from '../../layout/layout_actions'
 import * as agency_actions from './module_actions'
 import colors from '../../colors'
 
-/*
-  purpose:  display STRUCTURALNODES as heirarchy
-            include AGENTS and the USERS they are assigned to
-            display AGENTS as heirarchy based on STRUCTURALNODES and securityCode
-*/
 
 const Wrapper = styled.div`
   background: ${colors.four};
@@ -133,7 +128,6 @@ class AgencyOrganization extends React.Component {
 
   loadTags(structure){
     let tagIds = structure.dataTags
-    console.log(structure.label, tagIds)
     return tagIds.map( tagid => <TagWrapper>{this.props.dataTags.find( tag => tag.id === tagid).label}</TagWrapper>)
   }
 

@@ -5,30 +5,36 @@ import colors from '../colors'
 
 
 const StyleWrapper = styled.div`
-  padding: 1rem 1rem 0;
+
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   background: ${colors.three};
   color: ${colors.four};
+  max-height: 5%;
 
   header {
-    font-size: 1.6rem;
-  }
-  nav {
-    justify-content: center
+    display: inline-flex;
+    font-size: 2vh + 4vw;
+    flex-grow: 2;
+    padding: 1rem;
+    text-align: center;
   }
 
-  nav a {
-    flex-basis: 12%;
+  nav {
+    display: inline-flex;
   }
+
+  /* nav a {
+    flex-basis: 12%;
+  } */
 
 `
 
 export default class Header extends React.Component {
   render() {
     return  <StyleWrapper>
-              <header>Simpledoc: AI Clerk</header>
               {this.props.children}
+              <header>Simpledoc: AI Clerk</header>
             </StyleWrapper>
   }
 }

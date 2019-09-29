@@ -7,7 +7,7 @@ import * as agency_actions from './module_actions'
 
 import AgentTemplateEditor from './AgentTemplateEditor'
 import DataTableWrapper from '../../components/DataTableWrapper'
-import ModalTool from '../../components/ModalTool'
+import Overlay from '../../components/Overlay'
 import TagWrapper from '../../components/TagWrapper'
 
 const Wrapper = styled.div`
@@ -20,59 +20,58 @@ class AgentBuilder extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      modalData: null,
-      showModal: false
+      overlayData: null,
+      showOverlay: false
     }
   }
 
-  renderModal(){
-    return  <ModalTool
-              showModal={this.state.showModal}
-              hideModal={() => this.closeModal()}
-              title="Agent Template Editor"
-              body={
+  renderOverlay(){
+    return  <Overlay
+              header="Agent Template Editor"
+              closeOverlay={() => this.closeOverlay()}
+              content={
                 <AgentTemplateEditor {...this.props}
-                                agent={this.state.modalData}
-                                buttons={this.modalButtons()} /> } />
+                                agent={this.state.overlayData}
+                                buttons={this.overlayButtons()} /> } />
   }
 
-  modalButtons() {
+  overlayButtons() {
     return [
-      {label: "Submit", handler: (data)=> this.modalButtonAction("submit", data)},
-      {label: "Revert", handler: (data)=> this.modalButtonAction("revert", data)},
-      {label: "Delete", handler: (data)=> this.modalButtonAction("delete", data)},
-      {label: "Save", handler: (data)=> this.modalButtonAction("save", data)},
-      {label: "Workspace", handler: (data)=> this.modalButtonAction("workspace", data)}
+      {label: "Submit", handler: (data)=> this.overlayButtonAction("submit", data)},
+      {label: "Revert", handler: (data)=> this.overlayButtonAction("revert", data)},
+      {label: "Delete", handler: (data)=> this.overlayButtonAction("delete", data)},
+      {label: "Save", handler: (data)=> this.overlayButtonAction("save", data)},
+      {label: "Workspace", handler: (data)=> this.overlayButtonAction("workspace", data)}
     ]
   }
 
-  modalButtonAction(buttonAction, data){
+  overlayButtonAction(buttonAction, data){
     switch(buttonAction){
       case "submit":
         if(!data.id || data.id === null) this.props.agency_actions.createAgentTemplate(data)
         else this.props.agency_actions.updateAgentTemplate(data)
-        this.closeModal()
+        this.closeOverlay()
         break
       case "revert":
         this.props.layout_actions.clearTempState(data.id)
         break
       case "delete":
         this.props.agency_actions.deleteAgentTemplate(data)
-        this.closeModal()
+        this.closeOverlay()
         break
       case "save":
         this.props.layout_actions.updateTempState(data.id, data)
-        this.closeModal()
+        this.closeOverlay()
         break
       case "workspace":
         this.props.layout_actions.addToWorkspace(data.type, data)
-        this.closeModal()
+        this.closeOverlay()
         break
     }
   }
 
-  closeModal(){
-    this.setState({showModal: false, modalType: null})
+  closeOverlay(){
+    this.setState({showOverlay: false, overlayType: null})
   }
 
   getTableColumnsAgentTemplate(){
@@ -106,15 +105,15 @@ class AgentBuilder extends React.Component {
                     <div
                         className="px-2 mr-0 ml-auto"
                         style={{background: "lightGray"}}
-                        onClick={()=> this.setState({showModal: true, modalData: {type: "agentTemplate"}})}>New Agent Template</div>
+                        onClick={()=> this.setState({showOverlay: true, overlayData: {type: "agentTemplate"}})}>New Agent Template</div>
                   }
                   columns={this.getTableColumnsAgentTemplate()}
                   data={this.getTableDataAgentTemplate()}
-                  onRowClicked={row => this.setState({showModal: true, modalData: this.props.agentTemplates.find( template => template.id === row.id )})}
+                  onRowClicked={row => this.setState({showOverlay: true, overlayData: this.props.agentTemplates.find( template => template.id === row.id )})}
               />
 
 
-              { !this.state.showModal ? null : this.renderModal() }
+              { !this.state.showOverlay ? null : this.renderOverlay() }
 
             </Wrapper>
 

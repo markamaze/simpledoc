@@ -6,8 +6,8 @@ import { connect } from 'react-redux'
 import * as layout_actions from '../../layout/layout_actions'
 import * as agency_actions from './module_actions'
 
-import DataTagEditor from './DataTagEditor'
-import ModalTool from '../../components/ModalTool'
+import Overlay from '../../components/Overlay'
+import TagEditor from './TagEditor'
 import TagWrapper from '../../components/TagWrapper'
 
 const Wrapper = styled.div`
@@ -21,58 +21,57 @@ class TagManager extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      modalData: null,
-      showModal: false
+      overlayData: null,
+      showOverlay: false
     }
   }
 
-  renderModal(){
-    return  <ModalTool
-              showModal={this.state.showModal}
-              hideModal={() => this.closeModal()}
-              title="Data Tag Editor"
-              body={
-                <DataTagEditor {...this.props}
-                                dataTag={this.state.modalData}
-                                buttons={this.modalButtons()} /> } />
+  renderOverlay(){
+    return  <Overlay
+              closeOverlay={() => this.closeOverlay()}
+              header="Data Tag Editor"
+              content={
+                <TagEditor {...this.props}
+                                dataTag={this.state.overlayData}
+                                buttons={this.overlayButtons()} /> } />
   }
 
-  modalButtons() {
+  overlayButtons() {
     return [
-      {label: "Submit", handler: (data)=> this.modalButtonAction("submit", data)},
-      {label: "Revert", handler: (data)=> this.modalButtonAction("revert", data)},
-      {label: "Delete", handler: (data)=> this.modalButtonAction("delete", data)},
-      {label: "Save", handler: (data)=> this.modalButtonAction("save", data)},
-      {label: "Workspace", handler: (data)=> this.modalButtonAction("workspace", data)}
+      {label: "Submit", handler: (data)=> this.overlayButtonAction("submit", data)},
+      {label: "Revert", handler: (data)=> this.overlayButtonAction("revert", data)},
+      {label: "Delete", handler: (data)=> this.overlayButtonAction("delete", data)},
+      {label: "Save", handler: (data)=> this.overlayButtonAction("save", data)},
+      {label: "Workspace", handler: (data)=> this.overlayButtonAction("workspace", data)}
     ]
   }
 
-  modalButtonAction(buttonAction, data){
+  overlayButtonAction(buttonAction, data){
     switch(buttonAction){
       case "submit":
         if(!data.id || data.id === null) this.props.agency_actions.createDataTag(data)
         else this.props.agency_actions.updateDataTag(data)
-        this.closeModal()
+        this.closeOverlay()
         break
       case "revert":
         this.props.layout_actions.clearTempState(data.id)
         break
       case "delete":
         this.props.agency_actions.deleteDataTag(data)
-        this.closeModal()
+        this.closeOverlay()
         break
       case "save":
         this.props.layout_actions.updateTempState(data.id, data)
-        this.closeModal()
+        this.closeOverlay()
         break
       case "workspace":
         this.props.layout_actions.addToWorkspace(data.type, data)
-        this.closeModal()
+        this.closeOverlay()
         break
     }
   }
 
-  closeModal(){ this.setState({showModal: false, modalType: null}) }
+  closeOverlay(){ this.setState({showOverlay: false, overlayType: null}) }
 
   render() {
     return  <Wrapper>
@@ -80,14 +79,14 @@ class TagManager extends React.Component {
               <div
                   className="px-2 mr-0 ml-auto"
                   style={{background: "lightGray"}}
-                  onClick={() => this.setState({showModal: true, modalData: {type: "dataTag"}})} >+</div>
+                  onClick={() => this.setState({showOverlay: true, overlayData: {type: "dataTag"}})} >+</div>
               <Row className="">
                 <Col lg={4} id="structural-tagmanager" className="p-3 mx-3 border">
                   <header className="p-1">Structural Tags</header>
                   {
                     this.props.dataTags.filter(dataTag => dataTag.tagFor === 'structural').map( dataTag =>
                       <Row
-                          onClick={() => this.setState({showModal: true, modalData: dataTag })}
+                          onClick={() => this.setState({showOverlay: true, overlayData: dataTag })}
                           key={`structural-tagmanager-${dataTag.id}`}>
                           <TagWrapper>{dataTag.label}</TagWrapper>
                       </Row> )
@@ -98,7 +97,7 @@ class TagManager extends React.Component {
                   {
                     this.props.dataTags.filter(dataTag => dataTag.tagFor === 'agent').map( dataTag =>
                       <Row
-                          onClick={() => this.setState({showModal: true, modalData: dataTag })}
+                          onClick={() => this.setState({showOverlay: true, overlayData: dataTag })}
                           key={`agent-tagmanager-${dataTag.id}`}>
                         <TagWrapper>{dataTag.label}</TagWrapper>
                       </Row> )
@@ -106,7 +105,7 @@ class TagManager extends React.Component {
                 </Col>
               </Row>
 
-              { !this.state.showModal ? null : this.renderModal() }
+              { !this.state.showOverlay ? null : this.renderOverlay() }
 
             </Wrapper>
 

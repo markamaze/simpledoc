@@ -7,7 +7,7 @@ import * as agency_actions from './module_actions'
 
 import DataTableWrapper from '../../components/DataTableWrapper'
 import List from '../../components/List'
-import ModalTool from '../../components/ModalTool'
+import Overlay from '../../components/Overlay'
 import UserEditor from './UserEditor'
 
 const Wrapper = styled.div`
@@ -22,60 +22,59 @@ class UserManager extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      showModal: false,
-      modalData: null
+      showOverlay: false,
+      overlayData: null
     }
   }
 
-  renderModal(){
-    return  <ModalTool
-              showModal={this.state.showModal}
-              hideModal={() => this.closeModal()}
-              title="User Object Editor"
-              body={
+  renderOverlay(){
+    return  <Overlay
+              closeOverlay={() => this.closeOverlay()}
+              header="User Object Editor"
+              content={
                 <UserEditor {...this.props}
-                                user={this.state.modalData}
-                                buttons={this.modalButtons()} />
+                                user={this.state.overlayData}
+                                buttons={this.overlayButtons()} />
               } />
   }
 
-  modalButtons() {
+  overlayButtons() {
     return [
-      {label: "Submit", handler: (data)=> this.modalButtonAction("submit", data)},
-      {label: "Revert", handler: (data)=> this.modalButtonAction("revert", data)},
-      {label: "Delete", handler: (data)=> this.modalButtonAction("delete", data)},
-      {label: "Save", handler: (data)=> this.modalButtonAction("save", data)},
-      {label: "Workspace", handler: (data)=> this.modalButtonAction("workspace", data)}
+      {label: "Submit", handler: (data)=> this.overlayButtonAction("submit", data)},
+      {label: "Revert", handler: (data)=> this.overlayButtonAction("revert", data)},
+      {label: "Delete", handler: (data)=> this.overlayButtonAction("delete", data)},
+      {label: "Save", handler: (data)=> this.overlayButtonAction("save", data)},
+      {label: "Workspace", handler: (data)=> this.overlayButtonAction("workspace", data)}
     ]
   }
 
-  modalButtonAction(buttonAction, data){
+  overlayButtonAction(buttonAction, data){
     switch(buttonAction){
       case "submit":
         if(!data.id || data.id === null) this.props.agency_actions.createUser(data)
         else this.props.agency_actions.updateUser(data)
-        this.closeModal()
+        this.closeOverlay()
         break
       case "revert":
         this.props.layout_actions.clearTempState(data.id)
         break
       case "delete":
         this.props.agency_actions.deleteUser(data)
-        this.closeModal()
+        this.closeOverlay()
         break
       case "save":
         this.props.layout_actions.updateTempState(data.id, data)
-        this.closeModal()
+        this.closeOverlay()
         break
       case "workspace":
         this.props.layout_actions.addToWorkspace(data.type, data)
-        this.closeModal()
+        this.closeOverlay()
         break
     }
   }
 
-  closeModal(){
-    this.setState({showModal: false, modalData: null})
+  closeOverlay(){
+    this.setState({showOverlay: false, overlayData: null})
   }
 
   getTableColumnsUsers() {
@@ -92,10 +91,10 @@ class UserManager extends React.Component {
                 <List
                     listData={this.props.users}
                     emptySetMessage="No Users have been created"
-                    onItemClick={item => this.setState({showModal: true, modalData: item})}
+                    onItemClick={item => this.setState({showOverlay: true, overlayData: item})}
                     listHeaders={["username"]} />
 
-              { !this.state.showModal ? null : this.renderModal() }
+              { !this.state.showOverlay ? null : this.renderOverlay() }
 
             </Wrapper>
     }

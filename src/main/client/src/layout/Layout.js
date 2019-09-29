@@ -1,13 +1,12 @@
 import React from 'react'
-import { BrowserRouter, Route, Switch } from 'react-router-dom'
+import { BrowserRouter, Route, Switch, Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 import Footer from './Footer'
 import Header from './Header'
 import Navigation from './Navigation'
-import Workspace from './Workspace'
+import { modules, linkdata } from './moduleData'
 
-import AgencyModule from '../module/agency/AgencyModule'
 
 import colors from '../colors'
 
@@ -24,7 +23,6 @@ const BodyWrapper = styled.div`
   width: 100%;
   padding: 0;
   margin: 0;
-
 `
 const BodyViewport = styled.div`
   display: flex;
@@ -37,21 +35,27 @@ const BodyViewport = styled.div`
   padding: 0;
 `
 
+
+
+
+const modulesRoutes = () =>
+  <Switch>
+    {
+      modules.map(route =>
+        <Route exact={route.exact} path={route.path} render={()=> route.render} />)
+    }
+  </Switch>
+
 export default class Layout extends React.Component {
 
   render() {
+    console.log(window.location.pathname)
     return  <BrowserRouter history={history}>
               <BodyWrapper >
                 <Header >
-                  <Navigation />
+                  <Navigation links={linkdata} />
                 </Header>
-                <BodyViewport>
-                  <Switch>
-                    <Route exact path="/" render={()=> <div>Welcome</div>} />
-                    <Route path="/Home" render={()=> <div>Home</div>} />
-        						<Route path="/Agency" render={() => <AgencyModule />} />
-                  </Switch>
-        				</BodyViewport>
+                <BodyViewport>{ modulesRoutes() }</BodyViewport>
                 <Footer />
               </BodyWrapper>
             </BrowserRouter>

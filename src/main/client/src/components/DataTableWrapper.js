@@ -12,6 +12,10 @@ const Wrapper = styled.div`
     padding: 0;
 
   }
+  .rdt_TableRow {
+    min-height: 1.5rem;
+  }
+
 
 `
 
