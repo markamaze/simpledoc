@@ -7,10 +7,13 @@ import colors from '../colors'
 const StyleWrapper = styled.div`
 
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   background: ${colors.three};
   color: ${colors.four};
 
+  @media (min-width: 500px){
+    flex-direction: row;
+  }
   header {
     display: inline-flex;
     font-size: 4vh + 4vw;

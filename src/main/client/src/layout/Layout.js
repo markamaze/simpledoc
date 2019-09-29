@@ -20,9 +20,22 @@ const BodyWrapper = styled.div`
   bottom: 0;
   right: 0;
   height: 100%;
-  width: 100%;
+  width: 300px;
   padding: 0;
-  margin: 0;
+  margin: 0 auto;
+
+  @media (min-width: 500px) {
+    width: 500px;
+  }
+  @media (min-width: 700px) {
+    width: 700px;
+  }
+  @media (min-width: 950px) {
+    width: 950px;
+  }
+  @media (min-width: 1200px) {
+    width: 1200px;
+  }
 `
 const BodyViewport = styled.div`
   display: flex;
