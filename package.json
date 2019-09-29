@@ -5,7 +5,8 @@
 	"main": "/src/main/client/src/index.js",
 	"scripts": {
 		"test": "jest",
-		"start": "webpack src/main/client/src/index.js -o src/main/webapp/simpledoc.bundle.js"
+		"start": "webpack src/main/client/src/index.js -o src/main/webapp/simpledoc.bundle.js",
+		"webserver": "webpack-dev-server"
 	},
 	"author": "Mark A Maze",
 	"license": "ISC",

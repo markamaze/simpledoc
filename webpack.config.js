@@ -10,8 +10,8 @@ const config = {
     filename: 'simpledoc.bundle.js'
   },
   devServer: {
-    publicPath: '/dist/',
-    contentBase: path.resolve(__dirname, "./dist"),
+    publicPath: '/src/main/webapp/',
+    contentBase: path.resolve(__dirname, "./src/main/webapp/"),
     watchContentBase: true,
     compress: true,
     port: 3333
