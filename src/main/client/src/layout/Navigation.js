@@ -12,7 +12,7 @@ const NavigationWrapper = styled.div`
     flex-direction: row;
     width: auto;
     height: auto;
-
+    padding: .5rem;
   }
 
   .nav-tool-open {

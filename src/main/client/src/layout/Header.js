@@ -10,11 +10,10 @@ const StyleWrapper = styled.div`
   flex-direction: row;
   background: ${colors.three};
   color: ${colors.four};
-  max-height: 5%;
 
   header {
     display: inline-flex;
-    font-size: 2vh + 4vw;
+    font-size: 4vh + 4vw;
     flex-grow: 2;
     padding: 1rem;
     text-align: center;
@@ -23,11 +22,6 @@ const StyleWrapper = styled.div`
   nav {
     display: inline-flex;
   }
-
-  /* nav a {
-    flex-basis: 12%;
-  } */
-
 `
 
 export default class Header extends React.Component {
