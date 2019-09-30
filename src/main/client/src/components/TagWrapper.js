@@ -12,7 +12,7 @@ const Wrapper = styled.span`
 
 export default class TagWrapper extends React.Component{
   render() {
-      return <Wrapper>
+      return <Wrapper {...this.props}>
               {this.props.children}
             </Wrapper>
   }
