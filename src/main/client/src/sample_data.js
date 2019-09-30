@@ -250,16 +250,28 @@ const sampleData = {
         dataTags: [],
         type: "agent",
         agentLink: "1013",
-        templateId: "2002"
+        templateId: "2002",
+        assignedUserId: 5000
       },
       {
         id: 4001,
-        label: "sample agent",
+        label: "sample agent 2",
         securityCode: 3333,
         dataTags: [],
         type: "agent",
         agentLink: "1001",
-        templateId: "2008"
+        templateId: "2008",
+        assignedUserId: 5001
+      },
+      {
+        id: 4002,
+        label: "sample agent",
+        securityCode: 3333,
+        dataTags: [],
+        type: "agent",
+        agentLink: "1013",
+        templateId: "2000",
+        assignedUserId: 5000
       }
     ],
 
@@ -325,6 +337,11 @@ const sampleData = {
       {
         id: 5000,
         username: "sample_user",
+        type: "user"
+      },
+      {
+        id: 5001,
+        username: "sample_user 2",
         type: "user"
       }
     ]
