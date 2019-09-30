@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import * as layout_actions from '../../layout/layout_actions'
 import * as agency_actions from './module_actions'
 
-import { ManagerWrapper } from '../../styles/moduleStyles'
+import { ManagerWrapper } from '../moduleStyles'
 import Overlay from '../../components/Overlay'
 import TagEditor from './TagEditor'
 import TagWrapper from '../../components/TagWrapper'

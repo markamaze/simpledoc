@@ -6,7 +6,7 @@ import * as agency_actions from './module_actions'
 
 import AgentEditor from './AgentEditor'
 import DataTableWrapper from '../../components/DataTableWrapper'
-import { ManagerWrapper } from '../../styles/moduleStyles'
+import { ManagerWrapper } from '../moduleStyles'
 import Overlay from '../../components/Overlay'
 
 

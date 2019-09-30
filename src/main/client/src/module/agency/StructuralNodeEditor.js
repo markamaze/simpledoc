@@ -1,7 +1,7 @@
 import React from 'react'
 
 import DataTableWrapper from '../../components/DataTableWrapper'
-import { EditorWrapper } from '../../styles/moduleStyles'
+import { EditorWrapper } from '../moduleStyles'
 import TagWrapper from '../../components/TagWrapper'
 
 

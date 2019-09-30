@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import Overlay from '../../components/Overlay'
 import DataTableWrapper from '../../components/DataTableWrapper'
-import { ManagerWrapper } from '../../styles/moduleStyles'
+import { ManagerWrapper } from '../moduleStyles'
 import StructuralNodeEditor from './StructuralNodeEditor'
 import TagWrapper from '../../components/TagWrapper'
 import * as layout_actions from '../../layout/layout_actions'

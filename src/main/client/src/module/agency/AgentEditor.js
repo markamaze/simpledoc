@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { EditorWrapper } from '../../styles/moduleStyles'
+import { EditorWrapper } from '../moduleStyles'
 
 
 export default class AgentEditor extends React.Component {
