@@ -77,11 +77,34 @@ class Agents extends React.Component {
   }
 
   getTableColumnsAgents() {
-    console.log("get table columns for Agents table")
+    return [
+      { name: "Label", selector: "label", sortable: true },
+      { name: "Agent Type", selector: "agentType", sortable: true },
+      { name: "Agent Of", selector: "agentLink", sortable: true },
+      { name: "Assigned User", selector: "user", sortable: true }
+    ]
   }
 
   getTableDataAgents() {
-    console.log("get table data for Agents table")
+    let dataSet = []
+
+    this.props.agents.forEach( agent => {
+
+      dataSet = Object.assign([], dataSet.concat({
+        id: agent.id,
+        label: agent.label,
+        agentType: this.props.agentTemplates.find(temp => temp.id === agent.templateId).label,
+        agentLink: this.props.agencyStructures.find(struct => struct.id === agent.agentLink).label,
+        user: this.getUserUsername(agent)
+      }))
+    })
+
+    return dataSet
+  }
+
+  getUserUsername(userId){
+    let user = this.props.users.find( user => user.id == userId.assignedUserId )
+    return user ? user.username : null
   }
 
   render() {
