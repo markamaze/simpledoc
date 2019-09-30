@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import * as layout_actions from '../../layout/layout_actions'
+import * as workspace_actions from '../workspace/workspace_actions'
 import * as agency_actions from './module_actions'
 
 import AgentTemplateEditor from './AgentTemplateEditor'
@@ -51,18 +51,18 @@ class AgentBuilder extends React.Component {
         this.closeOverlay()
         break
       case "revert":
-        this.props.layout_actions.clearTempState(data.id)
+        this.props.workspace_actions.clearTempState(data.id)
         break
       case "delete":
         this.props.agency_actions.deleteAgentTemplate(data)
         this.closeOverlay()
         break
       case "save":
-        this.props.layout_actions.updateTempState(data.id, data)
+        this.props.workspace_actions.updateTempState(data.id, data)
         this.closeOverlay()
         break
       case "workspace":
-        this.props.layout_actions.addToWorkspace(data.type, data)
+        this.props.workspace_actions.addToWorkspace(data.type, data)
         this.closeOverlay()
         break
     }
@@ -125,8 +125,8 @@ const mapStateToProps = (state, ownProps) => {
     agentTemplates: state.agency.agentTemplates,
     dataTags: state.agency.dataTags,
     users: state.agency.users,
-    temp_state: state.layout.savedTempState,
-    layout_actions: layout_actions,
+    temp_state: state.workspace.savedTempState,
+    workspace_actions: workspace_actions,
     agency_actions: agency_actions
   }
 }

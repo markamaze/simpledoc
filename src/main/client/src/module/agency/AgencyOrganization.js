@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import styled from 'styled-components'
 
 import TagWrapper from '../../components/TagWrapper'
-import * as layout_actions from '../../layout/layout_actions'
+import * as workspace_actions from '../workspace/workspace_actions'
 import * as agency_actions from './module_actions'
 import colors from '../../colors'
 
@@ -220,8 +220,8 @@ const mapStateToProps = (state, ownProps) => {
     agentTemplates: state.agency.agentTemplates,
     dataTags: state.agency.dataTags,
     users: state.agency.users,
-    temp_state: state.layout.savedTempState,
-    layout_actions: layout_actions,
+    temp_state: state.workspace.savedTempState,
+    workspace_actions: workspace_actions,
     agency_actions: agency_actions
   }
 }

@@ -3,12 +3,12 @@ import thunk from 'redux-thunk'
 import logger from 'redux-logger'
 import { composeWithDevTools } from 'redux-devtools-extension'
 
-import layoutReducer from './layout/layout_reducer'
+import workspaceReducer from './module/workspace/workspace_reducer'
 import agencyReducer from './module/agency/module_reducer'
 
 var middleware = composeWithDevTools(applyMiddleware(thunk))
 
-var reducers = combineReducers({ layout: layoutReducer,
+var reducers = combineReducers({ workspace: workspaceReducer,
 																 agency: agencyReducer
 															  })
 
