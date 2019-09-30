@@ -1,17 +1,15 @@
 import React from 'react'
-import styled from 'styled-components'
 import { connect } from 'react-redux'
 
 import Overlay from '../../components/Overlay'
 import DataTableWrapper from '../../components/DataTableWrapper'
+import { ManagerWrapper } from '../../styles/moduleStyles'
 import StructuralNodeEditor from './StructuralNodeEditor'
 import TagWrapper from '../../components/TagWrapper'
 import * as layout_actions from '../../layout/layout_actions'
 import * as agency_actions from './module_actions'
-const Wrapper = styled.div`
-  padding: 1rem;
-  margin: 0 auto;
-`
+
+
 
 
 class StructureManager extends React.Component {
@@ -104,7 +102,7 @@ class StructureManager extends React.Component {
 
 
   render() {
-    return  <Wrapper>
+    return  <ManagerWrapper>
               <header>Manage Agency Structure</header>
               <DataTableWrapper
                   noHeader={true}
@@ -122,7 +120,7 @@ class StructureManager extends React.Component {
 
             { !this.state.showOverlay ? null : this.renderOverlay() }
 
-            </Wrapper>
+            </ManagerWrapper>
 
   }
 }

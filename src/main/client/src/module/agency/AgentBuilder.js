@@ -1,5 +1,4 @@
 import React from 'react'
-import styled from 'styled-components'
 import { connect } from 'react-redux'
 
 import * as layout_actions from '../../layout/layout_actions'
@@ -8,12 +7,11 @@ import * as agency_actions from './module_actions'
 import AgentTemplateEditor from './AgentTemplateEditor'
 import DataTableWrapper from '../../components/DataTableWrapper'
 import Overlay from '../../components/Overlay'
+import { ManagerWrapper } from '../../styles/moduleStyles'
 import TagWrapper from '../../components/TagWrapper'
 
-const Wrapper = styled.div`
-  padding: 1rem;
-  margin: 0 auto;
-`
+
+
 
 class AgentBuilder extends React.Component {
 
@@ -96,7 +94,7 @@ class AgentBuilder extends React.Component {
   }
 
   render() {
-    return  <Wrapper>
+    return  <ManagerWrapper>
               <header>Manage AgentsTemplates</header>
               <DataTableWrapper
                   noHeader={true}
@@ -115,7 +113,7 @@ class AgentBuilder extends React.Component {
 
               { !this.state.showOverlay ? null : this.renderOverlay() }
 
-            </Wrapper>
+            </ManagerWrapper>
 
   }
 }

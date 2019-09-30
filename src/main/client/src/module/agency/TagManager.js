@@ -1,18 +1,14 @@
 import React from 'react'
-import styled from 'styled-components'
 import { connect } from 'react-redux'
 
 import * as layout_actions from '../../layout/layout_actions'
 import * as agency_actions from './module_actions'
 
+import { ManagerWrapper } from '../../styles/moduleStyles'
 import Overlay from '../../components/Overlay'
 import TagEditor from './TagEditor'
 import TagWrapper from '../../components/TagWrapper'
 
-const Wrapper = styled.div`
-  padding: 1rem;
-  margin: 0 auto;
-`
 
 
 class TagManager extends React.Component {
@@ -73,7 +69,7 @@ class TagManager extends React.Component {
   closeOverlay(){ this.setState({showOverlay: false, overlayType: null}) }
 
   render() {
-    return  <Wrapper>
+    return  <ManagerWrapper>
               <header>Manage Data Tags</header>
               <div
                   className="px-2 mr-0 ml-auto"
@@ -106,7 +102,7 @@ class TagManager extends React.Component {
 
               { !this.state.showOverlay ? null : this.renderOverlay() }
 
-            </Wrapper>
+            </ManagerWrapper>
 
   }
 }

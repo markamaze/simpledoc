@@ -1,18 +1,14 @@
 import React from 'react'
-import styled from 'styled-components'
 import { connect } from 'react-redux'
 
 import * as layout_actions from '../../layout/layout_actions'
 import * as agency_actions from './module_actions'
 
 import DataTableWrapper from '../../components/DataTableWrapper'
+import { ManagerWrapper } from '../../styles/moduleStyles'
 import Overlay from '../../components/Overlay'
 import UserEditor from './UserEditor'
 
-const Wrapper = styled.div`
-  padding: 1rem;
-
-`
 
 
 
@@ -95,7 +91,7 @@ class UserManager extends React.Component {
   }
 
   render() {
-    return  <Wrapper>
+    return  <ManagerWrapper>
                 <header>Manage Users</header>
                 <DataTableWrapper
                     noHeader={true}
@@ -111,7 +107,7 @@ class UserManager extends React.Component {
 
               { !this.state.showOverlay ? null : this.renderOverlay() }
 
-            </Wrapper>
+            </ManagerWrapper>
     }
 }
 
