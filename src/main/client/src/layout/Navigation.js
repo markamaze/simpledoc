@@ -24,8 +24,8 @@ const NavigationWrapper = styled.div`
     background: ${colors.two};
     min-width: 98%;
     max-width: 98%;
-    min-height: 98%;
-    max-height: 98%;
+    min-height: 30%;
+    max-height: 100%;
     margin: auto;
     z-index: 5;
   }
