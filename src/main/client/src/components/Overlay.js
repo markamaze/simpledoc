@@ -28,9 +28,7 @@ const OverlayWrapper = styled.div`
     margin: 0 auto;
     height: 100%;
     max-height: 100%;
-    width: 300px;
-    min-width: 300px;
-    max-width: 300px;
+    width: 100%;
 
     @media (min-width: 500px) {
       width: 500px;
