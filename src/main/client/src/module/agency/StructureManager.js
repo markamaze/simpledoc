@@ -75,7 +75,7 @@ class StructureManager extends React.Component {
     }
   }
 
-  getTableColumnsStructural(){
+  getTableColumns(){
     return [
       { name: "Label", selector: "label", sortable: true },
       { name: "Parent Structure", selector: "parent", hide: "md", sortable: true, hide: 766 },
@@ -85,7 +85,7 @@ class StructureManager extends React.Component {
 
 
 
-  getTableDataStructural(){
+  getTableData(){
     let dataSet = []
     this.props.agencyStructures.forEach( structure => {
       let parentLabel = structure.parentId === "root" ? "root"
@@ -115,8 +115,8 @@ class StructureManager extends React.Component {
                         style={{background: "lightGray"}}
                         onClick={()=> this.setState({showOverlay: true, overlayData: {type: "structuralNode"}})}>New Agency Structure</div>
                   }
-                  columns={this.getTableColumnsStructural()}
-                  data={this.getTableDataStructural()}
+                  columns={this.getTableColumns()}
+                  data={this.getTableData()}
                   onRowClicked={row => this.setState({showOverlay: true, overlayData: this.props.agencyStructures.find( structure => structure.id === row.id )})}
               />
 
