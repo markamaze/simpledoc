@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Row, Col } from 'react-bootstrap'
 import { connect } from 'react-redux'
 
 import * as layout_actions from '../../layout/layout_actions'
@@ -80,30 +79,30 @@ class TagManager extends React.Component {
                   className="px-2 mr-0 ml-auto"
                   style={{background: "lightGray"}}
                   onClick={() => this.setState({showOverlay: true, overlayData: {type: "dataTag"}})} >+</div>
-              <Row className="">
-                <Col lg={4} id="structural-tagmanager" className="p-3 mx-3 border">
+              <div className="">
+                <div className="p-3 mx-3 border">
                   <header className="p-1">Structural Tags</header>
                   {
                     this.props.dataTags.filter(dataTag => dataTag.tagFor === 'structural').map( dataTag =>
-                      <Row
+                      <div
                           onClick={() => this.setState({showOverlay: true, overlayData: dataTag })}
                           key={`structural-tagmanager-${dataTag.id}`}>
                           <TagWrapper>{dataTag.label}</TagWrapper>
-                      </Row> )
+                      </div> )
                   }
-                </Col>
-                <Col lg={4} id="agent-tagmanager" className="p-3 mx-3 border">
+                </div>
+                <div className="p-3 mx-3 border">
                   <header className="p-1">Agent Tags</header>
                   {
                     this.props.dataTags.filter(dataTag => dataTag.tagFor === 'agent').map( dataTag =>
-                      <Row
+                      <div
                           onClick={() => this.setState({showOverlay: true, overlayData: dataTag })}
                           key={`agent-tagmanager-${dataTag.id}`}>
                         <TagWrapper>{dataTag.label}</TagWrapper>
-                      </Row> )
+                      </div> )
                   }
-                </Col>
-              </Row>
+                </div>
+              </div>
 
               { !this.state.showOverlay ? null : this.renderOverlay() }
 
