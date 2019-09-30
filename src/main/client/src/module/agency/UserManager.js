@@ -6,7 +6,6 @@ import * as layout_actions from '../../layout/layout_actions'
 import * as agency_actions from './module_actions'
 
 import DataTableWrapper from '../../components/DataTableWrapper'
-import List from '../../components/List'
 import Overlay from '../../components/Overlay'
 import UserEditor from './UserEditor'
 
@@ -73,26 +72,42 @@ class UserManager extends React.Component {
     }
   }
 
-  closeOverlay(){
-    this.setState({showOverlay: false, overlayData: null})
+  closeOverlay(){ this.setState({showOverlay: false, overlayData: null}) }
+
+  getTableColumns() {
+    return [
+      { name: "Username", selector: "username", sortable: true },
+      { name: "Assigned Agents", selector: "agents"}
+    ]
   }
 
-  getTableColumnsUsers() {
-    console.log("get table columns for Users table")
-  }
+  getTableData() {
+    let dataSet = []
 
-  getTableDataUsers() {
-    console.log("get table data for Users table")
+    this.props.users.forEach( user => {
+      let users_agents = this.props.agents.filter( agent => agent.assignedUserId === user.id )
+      dataSet = Object.assign([], dataSet.concat({
+        username: user.username,
+        id: user.id,
+        agents: users_agents.map(agent=><div>{this.props.agentTemplates.find(temp => temp.id === agent.templateId).label}</div>)}))
+    })
+    return dataSet
   }
 
   render() {
     return  <Wrapper>
                 <header>Manage Users</header>
-                <List
-                    listData={this.props.users}
-                    emptySetMessage="No Users have been created"
-                    onItemClick={item => this.setState({showOverlay: true, overlayData: item})}
-                    listHeaders={["username"]} />
+                <DataTableWrapper
+                    noHeader={true}
+                    subHeader={true}
+                    subHeaderComponent={
+                      <div onClick={()=> this.setState({showOverlay: true, overlayData: {type: "user"}})}>
+                        New User
+                      </div>
+                    }
+                    columns={this.getTableColumns()}
+                    data={this.getTableData()}
+                    onRowClicked={row => this.setState({showOverlay: true, overlayData: this.props.users.find(user => user.id === row.id )})} />
 
               { !this.state.showOverlay ? null : this.renderOverlay() }
 
