@@ -3,7 +3,6 @@ import { Container, Form, Button, Collapse, Row, Col } from 'react-bootstrap'
 import styled from 'styled-components'
 
 import DataTableWrapper from '../../components/DataTableWrapper'
-import List from '../../components/List'
 import TagWrapper from '../../components/TagWrapper'
 
 
