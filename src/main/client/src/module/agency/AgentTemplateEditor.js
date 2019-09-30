@@ -1,11 +1,70 @@
 import React from 'react'
-import { Container, Form, Button, Collapse, Row } from 'react-bootstrap'
 import styled from 'styled-components'
 
+import TagWrapper from '../../components/TagWrapper'
+import colors from '../../colors'
 
 
-const StyledWrapper = styled(Container)`
+const StyledWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  /* padding: 1rem 0; */
 
+  .editor-item {
+    display: flex;
+    flex-direction: row;
+    border: none;
+    /* margin: .5rem; */
+    height: 1.5rem;
+    padding: 1rem;
+    flex-wrap: wrap;
+    height: auto;
+  }
+
+  input {
+    display: flex;
+    width: 65%;
+    height: 100%;
+  }
+
+  .editor-item-label {
+    display: flex;
+    width: 30%;
+    height: 100%;
+    padding: auto 0;
+    margin: 0 .5rem 0 auto;
+    /* border: 1px solid black; */
+    justify-content: flex-end;
+  }
+  .editor-selector {
+    height: 1.5rem;
+    width: 65%;
+    background: white;
+  }
+  .editor-buttons {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: center;
+    border-top: 1px solid ${colors.two};
+    padding: .5rem 0;
+    margin: 1rem auto 0;
+  }
+
+  .tag-included {
+    background: pink;
+  }
+
+  .tag-excluded {
+    background: yellow;
+  }
+  button {
+    background: ${colors.two};
+    color: ${colors.one};
+    margin: .3rem;
+    padding: .2rem .8rem;
+    border: none;
+  }
 `
 
 
@@ -24,7 +83,7 @@ export default class AgentEditor extends React.Component {
     }
   }
 
-  updateLabel(event){ this.setState({ label: event.target.value })}
+  updateLabel(value){ this.setState({ data: Object.assign({}, this.state.data, {label: value}) }) }
 
   toggleDataTags(id){
     let currentTags = Object.assign([], this.state.data.dataTags)
@@ -37,57 +96,42 @@ export default class AgentEditor extends React.Component {
   }
 
   render() {
-    return  <Form>
-              <Form.Group controlId="">
-                <Form.Label>Agent Id</Form.Label>
-                <Form.Control type="text" disabled value={this.state.data.id} />
-              </Form.Group>
+    return  <StyledWrapper>
+              <div className="editor-item">
+                <div className="editor-item-label">Agent Id</div>
+                <input type="text" value={this.state.data.id} disabled />
+              </div>
 
-              <Form.Group controlId="agent-label">
-                <Form.Label>Agent Label</Form.Label>
-                <Form.Control
-                    type="text"
-                    onChange={() => this.updateLabel(event)}
-                    value={this.state.data.label} />
-              </Form.Group>
+              <div className="editor-item">
+                <div className="editor-item-label">Agent Label</div>
+                <input type="text" value={this.state.data.label}
+                    onChange={() => this.updateLabel(event.target.value)} />
+              </div>
 
-              <Form.Group controlId="agent-tag-setter" className="border p-1">
-                <Form.Label
-                    aria-controls="setDataTags"
-                    className="p-0 m-1"
-                    aria-expanded={this.state.openDataTagSetting}
-                    onClick={() => this.setState({openDataTagSetting: this.state.openDataTagSetting ? false : true })} >
-                  Set Tags  {this.state.openDataTagSetting ? "<<" : ">>"}</Form.Label>
-                <Collapse in={this.state.openDataTagSetting} >
-                  <Container id="setDataTags" className="p-1 flex-wrap" >
-                    {
-                      this.props.dataTags.filter(dataTag => dataTag.tagFor === "agent").map( dataTag =>
-                        <Row
-                            style={{background: this.state.data.dataTags.includes(dataTag.id) ? "lightGray" : null}}
-                            className="px-3 mx-5"
-                            key={`tag_item_${dataTag.id}`}
-                            onClick={() => this.toggleDataTags(dataTag.id)} >
-                          {dataTag.label}
-                        </Row>
-                      )
+              <div className="editor-item">
+                <div className="editor-item-label">Set Tags</div>
+                <div className="editor-item-tags">
+                  {
+                    this.props.dataTags.filter(dataTag => dataTag.tagFor === "agent")
+                                       .map( agentTag =>  <TagWrapper className={`tag${this.state.data.dataTags.includes(agentTag.id) ? "-included" : ""}`}
+                                                              onClick={() => this.toggleDataTags(agentTag.id)}>
+                                                            {agentTag.label}
+                                                          </TagWrapper>)
+                  }
+                </div>
+              </div>
+
+              {
+                !this.props.buttons ? null :
+                  <div className="editor-buttons">
+                    { this.props.buttons.map(button =>
+                        <button
+                            onClick={() => button.handler(this.state.data)}
+                            key={`user_editor_button_${button.label}_${this.state.data.id}`} >
+                        {button.label}</button>)
                     }
-                  </Container>
-                </Collapse>
-
-              </Form.Group>
-
-
-
-              <Form.Group controlId="buttons" className="flex-row p-3">
-                {
-                  !this.props.buttons ? null : this.props.buttons.map( button =>
-                    <Button
-                        key={`agent_template_editor_button_${button.label}_${this.state.data.id}`}
-                        onClick={() => button.handler(this.state.data)}>
-                      {button.label}
-                    </Button>
-                )}
-              </Form.Group>
-            </Form>
+                  </div>
+              }
+            </StyledWrapper>
   }
 }
