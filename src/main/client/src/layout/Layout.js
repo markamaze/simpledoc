@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import Footer from './Footer'
 import Header from './Header'
 import Navigation from './Navigation'
-import { modules, linkdata } from './moduleData'
+import { modules, linkdata } from '../module/moduleData'
 
 
 import colors from '../colors'
@@ -62,7 +62,6 @@ const modulesRoutes = () =>
 export default class Layout extends React.Component {
 
   render() {
-    console.log(window.location.pathname)
     return  <BrowserRouter history={history}>
               <BodyWrapper >
                 <Header >

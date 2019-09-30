@@ -1,6 +1,6 @@
 import React from 'react'
-import AgencyModule from '../module/agency/AgencyModule'
-import Workspace from './Workspace'
+import AgencyModule from './agency/AgencyModule'
+import Workspace from './workspace/Workspace'
 
 export const modules = [
   {path: "/", exact: true, render: <div>Welcome</div>},
