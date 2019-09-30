@@ -1,4 +1,4 @@
-import sampleData from '../sample_data'
+import sampleData from '../../sample_data'
 
 
 

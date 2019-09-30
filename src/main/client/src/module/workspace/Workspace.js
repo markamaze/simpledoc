@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { connect } from 'react-redux'
 
 import WorkspaceNote from './WorkspaceNote'
-import colors from '../colors'
+import colors from '../../colors'
 
 
 const StyleWrapper = styled.div`
