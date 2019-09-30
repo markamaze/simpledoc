@@ -5,18 +5,15 @@ import colors from '../colors'
 export const EditorWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  /* padding: 1rem 0; */
 
   .editor-item {
     display: flex;
     flex-direction: row;
     border: none;
-    /* margin: .5rem; */
     height: 1.5rem;
     padding: 1rem;
     flex-wrap: wrap;
     height: auto;
-    background: yellow;
   }
 
   .editor-selector {
