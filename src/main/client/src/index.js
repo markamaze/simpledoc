@@ -6,12 +6,13 @@ import { BrowserRouter } from 'react-router-dom'
 
 import Layout from './layout/Layout'
 import store from './store'
+import {loadAgencyStore} from './module/agency/module_actions'
 
 if (module.hot) {
   module.hot.accept()
 }
 
-
+loadAgencyStore()
 
 ReactDOM.render(
   (

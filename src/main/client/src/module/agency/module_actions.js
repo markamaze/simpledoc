@@ -1,6 +1,7 @@
 import store from '../../store'
 import { put, get, post, remove } from '../../utility/ajax'
 import objectId from 'bson-objectid'
+import sampleData from '../../sample_data'
 
 
 
@@ -29,108 +30,92 @@ export function loadAgencyStore() {
       store.dispatch({
         type: "LOAD_AGENCY_STORE",
         payload: {
-          agents: agents,
-          agencyTemplates: agencyTemplates,
-          structuralNodes: structuralNodes,
-          dataTags: dataTags,
-          users: users
+          agents: sampleData.agency.agents,
+          agentTemplates: sampleData.agency.agentTemplates,
+          structuralNodes: sampleData.agency.structuralNodes,
+          dataTags: sampleData.agency.dataTags,
+          users: sampleData.agency.users
         }
       })
     // )
 }
 
+export function createAgencyObject(type, data){
+  store.dispatch({
+    type: "CREATE_AGENCY_OBJECT",
+    agencyObjectType: type,
+    payload: Object.assign({}, data, { id: new objectId().toString()})
+  })
+}
+
+export function updateAgencyObject(type, data){
+  store.dispatch({
+    type: "UPDATE_AGENCY_OBJECT",
+    agencyObjectType: type,
+    payload: Object.assign({}, data)
+  })
+}
+
+export function deleteAgencyObject(type, data){
+  store.dispatch({
+    type: "DELETE_AGENCY_OBJECT",
+    agencyObjectType: type,
+    payload: Object.assign({}, data)
+  })
+}
+
+
+
+
+
 export function createAgentTemplate(agentTemplate) {
-  store.dispatch({
-    type: "CREATE_AGENT_TEMPLATE",
-    payload: Object.assign({}, agentTemplate, {id: new objectId().toString()})
-  })
+  createAgencyObject("agentTemplate", agentTemplate)
 }
-export function updateAgentTemplate(agentTemplate) {
-  store.dispatch({
-    type: "UPDATE_AGENT_TEMPLATE",
-    payload: agentTemplate
-  })
-}
-export function deleteAgentTemplate(agentTemplate) {
-  store.dispatch({
-    type: "DELETE_AGENT_TEMPLATE",
-    payload: agentTemplate
-  })
-}
-
 export function createAgent(agent) {
+  createAgencyObject("agent", agent)
+}
+export function createStructuralNode(structuralNode) {
+  createAgencyObject("structuralNode", structuralNode)
+}
+export function createDataTag(dataTag) {
+  createAgencyObject("dataTag", dataTag)
+}
+export function createUser(user) {
+  createAgencyObject("user", user)
+}
 
-  store.dispatch({
-    type: "CREATE_AGENT",
-    payload: Object.assign({}, agent, {id: new objectId().toString()})
-  })
+
+
+export function updateAgentTemplate(agentTemplate) {
+  updateAgencyObject("agentTemplate", agentTemplate)
 }
 export function updateAgent(agent) {
-  store.dispatch({
-    type: "UPDATE_AGENT",
-    payload: agent
-  })
-}
-export function deleteAgent(agent) {
-  store.dispatch({
-    type: "DELETE_AGENT",
-    payload: agent
-  })
-}
-
-export function createStructuralNode(structuralNode) {
-  store.dispatch({
-    type: "CREATE_STRUCTURAL_NODE",
-    payload: Object.assign({}, structuralNode, {id: new objectId().toString()})
-  })
+  updateAgencyObject("agent", agent)
 }
 export function updateStructuralNode(structuralNode) {
-  store.dispatch({
-    type: "UPDATE_STRUCTURAL_NODE",
-    payload: structuralNode
-  })
-}
-export function deleteStructuralNode(structuralNode) {
-  store.dispatch({
-    type: "DELETE_STRUCTURAL_NODE",
-    payload: structuralNode
-  })
-}
-
-export function createDataTag(dataTag) {
-  store.dispatch({
-    type: "CREATE_DATA_TAG",
-    payload: Object.assign({}, dataTag, {id: new objectId().toString()})
-  })
+  updateAgencyObject("structuralNode", structuralNode)
 }
 export function updateDataTag(dataTag) {
-  store.dispatch({
-    type: "UPDATE_DATA_TAG",
-    payload: dataTag
-  })
-}
-export function deleteDataTag(dataTag) {
-  store.dispatch({
-    type: "DELETE_DATA_TAG",
-    payload: dataTag
-  })
-}
-
-export function createUser(user) {
-  store.dispatch({
-    type: "CREATE_USER",
-    payload: Object.assign({}, user, {id: new objectId().toString()})
-  })
+  updateAgencyObject("dataTag", dataTag)
 }
 export function updateUser(user) {
-  store.dispatch({
-    type: "UPDATE_USER",
-    payload: user
-  })
+  updateAgencyObject("user", user)
+}
+
+
+
+export function deleteAgentTemplate(agentTemplate) {
+  deleteAgencyObject("agentTemplate", agentTemplate)
+}
+export function deleteAgent(agent) {
+  deleteAgencyObject("agent", agent)
+}
+export function deleteStructuralNode(structuralNode) {
+  deleteAgencyObject("structuralNode", structuralNode)
+}
+export function deleteDataTag(dataTag) {
+  deleteAgencyObject("dataTag", dataTag)
 }
 export function deleteUser(user) {
-  store.dispatch({
-    type: "DELETE_USER",
-    payload: user
-  })
+  deleteAgencyObject("user", user)
 }
