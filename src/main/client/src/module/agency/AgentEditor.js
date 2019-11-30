@@ -10,7 +10,7 @@ export default class AgentEditor extends React.Component {
       id: this.props.agent.id,
       type: "agent",
       label: this.props.agent.label ? this.props.agent.label : "",
-      agentLink: this.props.agent.agentLink ? this.props.agentLink : null,
+      agentLink: this.props.agent.agentLink ? this.props.agent.agentLink : null,
       assignedUserId: this.props.agent.assignedUserId ? this.props.agent.assignedUserId : null,
       templateId: this.props.agent.templateId ? this.props.agent.templateId : null
     }
