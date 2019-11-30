@@ -46,15 +46,15 @@ class AgentBuilder extends React.Component {
   overlayButtonAction(buttonAction, data){
     switch(buttonAction){
       case "submit":
-        if(!data.id || data.id === null) this.props.agency_actions.createAgentTemplate(data)
-        else this.props.agency_actions.updateAgentTemplate(data)
+        if(!data.id || data.id === null) this.props.agency_actions.createAgencyObject("agentTemplate", data)
+        else this.props.agency_actions.updateAgencyObject("agentTemplate", data)
         this.closeOverlay()
         break
       case "revert":
         this.props.workspace_actions.clearTempState(data.id)
         break
       case "delete":
-        this.props.agency_actions.deleteAgentTemplate(data)
+        this.props.agency_actions.deleteAgencyObject("agentTemplate", data)
         this.closeOverlay()
         break
       case "save":

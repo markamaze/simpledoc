@@ -111,7 +111,15 @@ export default function agency_reducer (state=initialState, action) {
 
 
     case "UPDATE_AGENCY_OBJECT": {
-      try {}
+      try {
+        let type = action.agencyObjectType
+        let updatedObject = Object.create(agencyObject[`${type}`]())
+        updatedObject = updatedObject.init(action.payload)
+        let updatedSet = [...state[`${type}s`] ]
+        updatedSet = updatedSet.filter(item => updatedObject.id != item.id)
+
+        return Object.assign({}, state, { [`${type}s`]: [...updatedSet, updatedObject] })
+      }
       catch(err) {
         window.alert(err.toString())
         return state
@@ -120,7 +128,12 @@ export default function agency_reducer (state=initialState, action) {
 
 
     case "DELETE_AGENCY_OBJECT": {
-      try {}
+      try {
+        let type = action.agencyObjectType
+        let updatedSet = state[`${type}s`].filter( item => item.id != action.payload.id)
+
+        return Object.assign({}, state, { [`${type}s`]: [...updatedSet] })
+      }
       catch(err) {
         window.alert(err.toString())
         return state

@@ -46,15 +46,15 @@ class UserManager extends React.Component {
   overlayButtonAction(buttonAction, data){
     switch(buttonAction){
       case "submit":
-        if(!data.id || data.id === null) this.props.agency_actions.createUser(data)
-        else this.props.agency_actions.updateUser(data)
+        if(!data.id || data.id === null) this.props.agency_actions.createAgencyObject("user", data)
+        else this.props.agency_actions.updateAgencyObject("user", data)
         this.closeOverlay()
         break
       case "revert":
         this.props.workspace_actions.clearTempState(data.id)
         break
       case "delete":
-        this.props.agency_actions.deleteUser(data)
+        this.props.agency_actions.deleteAgencyObject("user", data)
         this.closeOverlay()
         break
       case "save":
