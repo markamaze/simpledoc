@@ -1,0 +1,11 @@
+{"data": [
+    {   "id":"new_object",
+        "type":"AGENCY.USER",
+        "object_data": {
+          "username": "",
+          "user_data_structure": {},
+          "user_data": {}
+        }
+    }
+  ]
+}

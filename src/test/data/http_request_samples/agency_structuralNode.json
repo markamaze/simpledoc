@@ -1,0 +1,14 @@
+{"data": [
+    {   "id":"new_object",
+        "type":"AGENCY.STRUCTURALNODE",
+        "object_data": {
+          "structuralNode_label": "",
+          "structuralNode_dataTagIds": [],
+          "parentId": "",
+          "agentAssignments": [],
+          "structuralNode_data_structure": {},
+          "structuralNode_data": {}
+        }
+    }
+  ]
+}

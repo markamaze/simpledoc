@@ -1,0 +1,13 @@
+{"data": [
+    {   "id":"new_object",
+        "type":"AGENCY.AGENTTEMPLATE",
+        "object_data": {
+          "agentTemplate_label": "",
+          "agentTemplate_security": "4444",
+          "agentTemplate_dataTagIds": [],
+          "agentTemplate_data_structure": {},
+          "agent_data": {}
+        }
+    }
+  ]
+}
