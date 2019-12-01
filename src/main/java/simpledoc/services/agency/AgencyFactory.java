@@ -20,12 +20,22 @@ public class AgencyFactory implements ModuleObjectFactory {
 		String type = data_item.getType();
 
 		switch(type){
+			case "AGENCY.STRUCTURALNODE":
+				return new StructuralNode(id, type, data);
+			case "AGENCY.AGENTTEMPLATE":
+				return new AgentTemplate(id, type, data);
 			case "AGENCY.AGENT":
-				return new AgentObject(id, type, data);
-			case "AGENCY.DEFINITION":
-				return new AgentDefinition(id, type, data);
-			case "AGENCY.CATEGORY":
-				return new AgentCategory(id, type, data);
+				return new Agent(id, type, data);
+			case "AGENCY.DATATAG":
+				return new DataTag(id, type, data);
+			case "AGENCY.USER":
+				return new User(id, type, data);
+			// case "AGENCY.AGENT":
+			// 	return new AgentObject(id, type, data);
+			// case "AGENCY.DEFINITION":
+			// 	return new AgentDefinition(id, type, data);
+			// case "AGENCY.CATEGORY":
+			// 	return new AgentCategory(id, type, data);
 			default:
 				throw new ServiceErrorException("invalid Agency Object Type sent to factory");
 		}
