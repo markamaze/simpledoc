@@ -1,1 +1,1 @@
-curl --request GET localhost:3000/Agency/
+curl --request GET localhost:3000/Agency/agents && curl --request GET localhost:3000/Agency/agentTemplates && curl --request GET localhost:3000/Agency/structuralNodes && curl --request GET localhost:3000/Agency/users && curl --request GET localhost:3000/Agency/dataTags
