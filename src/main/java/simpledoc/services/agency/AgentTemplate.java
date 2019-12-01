@@ -13,7 +13,7 @@ public class AgentTemplate extends ModuleObject {
 
 
 
-	AgentCategory(UUID template_id, String type, Map<String, Object> object_data) throws ServiceErrorException {
+	AgentTemplate(UUID template_id, String type, Map<String, Object> object_data) throws ServiceErrorException {
 		super(template_id, type);
 
 	}

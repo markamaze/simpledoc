@@ -13,7 +13,7 @@ public class User extends ModuleObject {
 
 
 
-	AgentCategory(UUID user_id, String type, Map<String, Object> object_data) throws ServiceErrorException {
+	User(UUID user_id, String type, Map<String, Object> object_data) throws ServiceErrorException {
 		super(user_id, type);
 
 	}

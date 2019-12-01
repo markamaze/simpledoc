@@ -13,7 +13,7 @@ public class DataTag extends ModuleObject {
 
 
 
-	AgentCategory(UUID tag_id, String type, Map<String, Object> object_data) throws ServiceErrorException {
+	DataTag(UUID tag_id, String type, Map<String, Object> object_data) throws ServiceErrorException {
 		super(tag_id, type);
 
 	}

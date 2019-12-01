@@ -13,7 +13,7 @@ public class StructuralNode extends ModuleObject {
 
 
 
-	AgentCategory(UUID structuralNode_id, String type, Map<String, Object> object_data) throws ServiceErrorException {
+	StructuralNode(UUID structuralNode_id, String type, Map<String, Object> object_data) throws ServiceErrorException {
 		super(structuralNode_id, type);
 
 	}
