@@ -70,35 +70,77 @@ public class AgencyStorage implements ModuleObjectStorage {
 		CallableStatement cs = null;
 		String type = object.getModuleObjectType();
 
-		if(type.equalsIgnoreCase("AGENCY.CATEGORY")){
-			AgentCategory category = (AgentCategory) object;
-			cs = conn.prepareCall("call agency.create_category(?,?,?,?,?)");
-			cs.setObject(1, category.getId());
-			cs.setString(2, category.getCategoryLabel());
-			cs.setString(3, category.getCategoryBehavior());
-			cs.setString(4, category.getCategorySecurity());
-			cs.setString(5, category.getDataDefinition().toString());
+//		if(type.equalsIgnoreCase("AGENCY.CATEGORY")){
+//			AgentCategory category = (AgentCategory) object;
+//			cs = conn.prepareCall("call agency.create_category(?,?,?,?,?)");
+//			cs.setObject(1, category.getId());
+//			cs.setString(2, category.getCategoryLabel());
+//			cs.setString(3, category.getCategoryBehavior());
+//			cs.setString(4, category.getCategorySecurity());
+//			cs.setString(5, category.getDataDefinition().toString());
+//		}
+//		else if(type.equalsIgnoreCase("AGENCY.DEFINITION")){
+//			AgentDefinition definition = (AgentDefinition) object;
+//			cs = conn.prepareCall("call agency.create_definition(?,?,?,?,?)");
+//			cs.setObject(1, definition.getId());
+//			cs.setString(2, definition.getDefinitionLabel());
+//			cs.setObject(3, definition.getCategoryId());
+//			cs.setString(4, definition.getDefinitionSecurity());
+//			cs.setString(5, definition.getDataDefinition().toString());
+//		}
+//		else if(type.equalsIgnoreCase("AGENCY.AGENT")){
+//			AgentObject agent = (AgentObject) object;
+//			cs = conn.prepareCall("call agency.create_agent(?,?,?,?,?,?)");
+//			cs.setObject(1, agent.getId());
+//			cs.setObject(2, agent.getAgentLinkId());
+//			cs.setObject(3, agent.getDefinitionId());
+//			cs.setString(4, agent.getAgentSecurity());
+//			cs.setString(5, agent.getAgentDataStructure().toString());
+//			cs.setString(6, agent.getAgentData().toString());
+//		}
+		
+		if(type.equalsIgnoreCase("AGENCY.AGENTTEMPLATE")) {
+			AgentTemplate agentTemplate = (AgentTemplate) object;
+			cs = conn.prepareCall("call agency.create_agenttemplate(?,?,?,?,?)");
+			cs.setObject(1, agentTemplate.getId());
+			cs.setString(2, agentTemplate.getLabel());
+			cs.setString(3, agentTemplate.getSecurityCode());
+			cs.setArray(4, agentTemplate.getDataTags());
+			cs.setString(5, agentTemplate.getDataStructure());
 		}
-		else if(type.equalsIgnoreCase("AGENCY.DEFINITION")){
-			AgentDefinition definition = (AgentDefinition) object;
-			cs = conn.prepareCall("call agency.create_definition(?,?,?,?,?)");
-			cs.setObject(1, definition.getId());
-			cs.setString(2, definition.getDefinitionLabel());
-			cs.setObject(3, definition.getCategoryId());
-			cs.setString(4, definition.getDefinitionSecurity());
-			cs.setString(5, definition.getDataDefinition().toString());
-		}
-		else if(type.equalsIgnoreCase("AGENCY.AGENT")){
-			AgentObject agent = (AgentObject) object;
+		else if(type.equalsIgnoreCase("AGENCY.AGENT")) {
+			Agent agent = (Agent) object;
 			cs = conn.prepareCall("call agency.create_agent(?,?,?,?,?,?)");
 			cs.setObject(1, agent.getId());
-			cs.setObject(2, agent.getAgentLinkId());
-			cs.setObject(3, agent.getDefinitionId());
-			cs.setString(4, agent.getAgentSecurity());
-			cs.setString(5, agent.getAgentDataStructure().toString());
-			cs.setString(6, agent.getAgentData().toString());
+			
+			
+			
 		}
-
+		else if(type.equalsIgnoreCase("AGENCY.STRUCTURALNODE")) {
+			StructuralNode structuralNode = (StructuralNode) object;
+			cs = conn.prepareCall("call agency.create_structuralnode(?,?,?,?,?,?)");
+			cs.setObject(1, structuralNode.getId());
+			
+		
+		
+		}
+		else if(type.equalsIgnoreCase("AGENCY.DATATAG")) {
+			DataTag dataTag = (DataTag) object;
+			cs = conn.prepareCall("call agency.create_datatag(?,?,?)");
+			cs.setObject(1, dataTag.getId());
+			
+			
+			
+		}
+		else if(type.equalsIgnoreCase("AGENCY.USER")) {
+			User user = (User) object;
+			cs = conn.prepareCall("call agency.create_user(?,?,?)");
+			cs.setObject(1, user.getId());
+			
+			
+			
+		}
+			
 		return cs;
 	}
 
@@ -149,14 +191,20 @@ public class AgencyStorage implements ModuleObjectStorage {
 		String resource_switch = resource_path.toString();
 
 		switch(resource_switch){
-			case "[Agency, categories]":
-				call = "select agency.query_category_collection(?,?,?)";
-				break;
-			case "[Agency, definitions]":
-				call = "select agency.query_definition_collection(?,?,?)";
-				break;
 			case "[Agency, agents]":
 				call = "select agency.query_agent_collection(?,?,?)";
+				break;
+			case "[Agency, agentTemplates]":
+				call = "select agency.query_agenytemplate_collection(?,?,?)";
+				break;
+			case "[Agency, structuralNodes]":
+				call = "select agency.query_structuralnode_collection(?,?,?)";
+				break;
+			case "[Agency, dataTags]":
+				call = "select agency.query_datatag_collection(?,?,?)";
+				break;
+			case "[Agency, users]":
+				call = "select agency.query_user_collection(?,?,?)";
 				break;
 			default:
 				throw new StorageErrorException("invalid resource request");
