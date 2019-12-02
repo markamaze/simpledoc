@@ -1,30 +1,38 @@
-CREATE TABLE agency.category_objects (
-    category_id UUID,
-    category_label text,
-    category_behavior text,
-    category_security character(4),
-    category_data_structure text
+CREATE TABLE agency.agentTemplates (
+  agentTemplate_id UUID,
+  agentTemplate_label TEXT,
+  agentTemplate_secuirty CHAR(4),
+  agentTemplate_dataTags UUID[],
+  agentTemplate_data_structure TEXT
 );
 
-
-
-
-CREATE TABLE agency.definition_objects (
-    definition_id UUID,
-    definition_label text,
-    category_id UUID,
-    definition_security character(4),
-    definition_data_structure text
+CREATE TABLE agency.agents (
+  agent_id UUID,
+  agent_link_id UUID,
+  agent_template_id UUID,
+  assigned_user_id UUID,
+  agent_dataTags UUID[],
+  is_active BOOLEAN,
+  agent_data_structure TEXT
 );
 
+CREATE TABLE agency.structuralNodes (
+  structuralNode_id UUID,
+  structuralNode_label TEXT,
+  structuralNode_dataTags UUID[],
+  structuralNode_parent_id UUID,
+  agent_assignments TEXT,
+  structuralNode_data_structure TEXT
+);
 
+CREATE TABLE agency.dataTags (
+  dataTag_id UUID,
+  dataTag_label TEXT,
+  dataTag_for ENUM(["STRUCTURAL", "AGENT"])
+);
 
-
-CREATE TABLE agency.agent_objects (
-    agent_id UUID,
-    agent_link_id UUID,
-    definition_id UUID,
-    agent_security character(4),
-    agent_data_structure text,
-    agent_data text
+CREATE TABLE agency.users (
+  user_id UUID,
+  username text,
+  password text
 );

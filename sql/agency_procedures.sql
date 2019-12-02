@@ -1,74 +1,96 @@
-CREATE OR REPLACE PROCEDURE agency.create_category(
-  category_id uuid,
-  category_label text,
-  category_behavior text,
-  category_security character(4),
-  category_data_structure text)
+CREATE OR REPLACE PROCEDURE agency.create_agentTemplate (
+  id UUID,
+  label TEXT,
+  secuirity CHAR(4),
+  dataTags UUID[],
+  dataStructure TEXT )
 LANGUAGE sql
 AS $procedure$
-INSERT INTO agency.category_objects (
-  category_id,
-  category_label,
-  category_behavior,
-  category_security,
-  category_data_structure)
-VALUES (
-  category_id,
-  category_label,
-  category_behavior,
-  category_security,
-  category_data_structure);
+  INSERT INTO agency.agentTemplates (
+    agentTemplate_id,
+    agentTemplate_label,
+    agentTemplate_secuirty,
+    agentTemplate_dataTags,
+    agentTemplate_data_structure )
+  VALUES ( id, label, secuirity, dataTags, dataStructure );
 $procedure$;
 
 
 
-
-CREATE OR REPLACE PROCEDURE agency.create_definition(
-  definition_id UUID,
-  definition_label text,
-  category_id UUID,
-  definition_security character(4),
-  definition_data_structure text)
+CREATE OR REPLACE PROCEDURE agency.create_agent (
+  id UUID,
+  linkId UUID,
+  templateId UUID,
+  assigned_userId UUID,
+  isActive BOOLEAN,
+  dataStructure TEXT
+)
 LANGUAGE sql
 AS $procedure$
-INSERT INTO agency.definition_objects (
-  definition_id,
-  definition_label,
-  category_id,
-  definition_security,
-  definition_data_structure)
-VALUES (
-  definition_id,
-  definition_label,
-  category_id,
-  definition_security,
-  definition_data_structure);
+  INSERT INTO agency.agents (
+    agent_id,
+    agent_link_id,
+    agent_template_id,
+    assigned_user_id,
+    is_active,
+    agent_data_structure
+  )
+  VALUES ( id, linkId, templateId, assigned_userId, isActive, dataStructure );
 $procedure$;
 
 
 
-
-CREATE OR REPLACE PROCEDURE agency.create_agent(
-  agent_id UUID,
-  agent_link_id UUID,
-  definition_id UUID,
-  agent_security character(4),
-  agent_data_structure text,
-  agent_data text)
+CREATE OR REPLACE PROCEDURE agency.create_structuralNode (
+  id UUID,
+  label TEXT,
+  dataTags UUID[],
+  parentId UUID,
+  agentAssignments TEXT,
+  dataStructure TEXT
+)
 LANGUAGE sql
 AS $procedure$
-INSERT INTO agency.agent_objects (
-  agent_id,
-  agent_link_id,
-  definition_id,
-  agent_security,
-  agent_data_structure,
-  agent_data )
-VALUES (
-  agent_id,
-  agent_link_id,
-  definition_id,
-  agent_security,
-  agent_data_structure,
-  agent_data );
+  INSERT INTO agency.structuralNodes (
+    structuralNode_id,
+    structuralNode_label,
+    structuralNode_dataTags,
+    structuralNode_parent_id,
+    agent_assignments,
+    structuralNode_data_structure
+  )
+  VALUES (id, label, dataTags, parentId, agentAssignments, dataStructure);
+$procedure$;
+
+
+
+CREATE OR REPLACE PROCEDURE agency.create_dataTag (
+  id UUID,
+  label TEXT,
+  tagFor ENUM(["STRUCTURAL", "AGENT"])
+)
+LANGUAGE sql
+AS $procedure$
+  INSERT INTO agency.dataTags (
+    dataTag_id,
+    dataTag_label,
+    dataTag_for
+  )
+  VALUES ( id, label, tagFor );
+$procedure$;
+
+
+
+CREATE OR REPLACE PROCEDURE agency.create_user (
+  id UUID,
+  username TEXT,
+  password TEXT
+)
+LANGUAGE sql
+AS $procedure$
+  INSERT INTO agency.users (
+    user_id,
+    username,
+    password
+  )
+  VALUES ( id, username, password );
 $procedure$;
