@@ -1,42 +1,32 @@
 package simpledoc.services.agency;
 
-import java.util.HashMap;
-
-import simpledoc.exceptions.ServiceErrorException;
+import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
-import simpledoc.RequestData;
+
 import simpledoc.exceptions.UnsupportedServiceRequest;
+import simpledoc.services.ModuleObjectData;
 import simpledoc.services.ModuleValidation;
 
 
 
 public class AgencyValidator extends ModuleValidation {
 
-  @Override
-  public boolean validateRequest (Set<RequestData> request_data, String method, List<String> resource)
+  public boolean validateRequest (Set<ModuleObjectData> request_data, String method, List<String> resource)
           throws UnsupportedServiceRequest {
 
-    //this portion will validate the resource against the method
     if(method.equalsIgnoreCase("POST") ||
         method.equalsIgnoreCase("PUT") ||
         method.equalsIgnoreCase("DELETE")){
-          if(resource.size() != 1) /*for these methods, all data will be in the request body*/
+          if(resource.size() != 1)
             throw new UnsupportedServiceRequest("unsupported url for given method");
         }
     else if(method.equalsIgnoreCase("GET")) {
       //TODO: work out validating GET request url's
-      // any elements beyond the first, should be either a uuid or a type of agency object (category, agent, definition)
+      // any elements beyond the first, should be either a uuid or a type of agency object
       // there should be no more than one uuid in the url
-      // if a uuid is in the resource path, it should be either the second (after "/Agency") or the last (or both)
-      //    /Agency/UUID -> gets a single resource by id
-      //    /Agency/(agency object) -> gets all resources of the agency object type specified
-      //    /Agency/UUID/agent -> gets all agents associated with the given resource id
-      //    /Agency/UUID/category -> gets category objects of the given resource id
-      //    /Agency/UUID/definition -> gets definition objects of the given resource id
-
 
       //for now, just validate any get requests
 
@@ -44,101 +34,71 @@ public class AgencyValidator extends ModuleValidation {
     else throw new UnsupportedServiceRequest("unsupported request method");
 
 
+    if( request_data != null) {
+	    for(ModuleObjectData item: request_data) {
+	      String string_id = item.getIdString();
+	      String type = item.getType();
+	      Map<String, Object> data = item.getObjectData();
+	
+	      if(!validateUUIDString(string_id) && !string_id.equalsIgnoreCase("new_object"))
+	    	  throw new UnsupportedServiceRequest("invalid id: " + string_id);
+	      if(!validateObjectType(type))
+	    	  throw new UnsupportedServiceRequest("object type not supported: " + type);
+	      if(!validateObjectDataProperties(data, type)) 
+	    	  throw new UnsupportedServiceRequest("invalid properties found in object: " + string_id);
+	    };
+    }
+	else if( request_data == null && !method.equalsIgnoreCase("GET"))
+		throw new UnsupportedServiceRequest("invalid request structure");
 
-
-    //this portion will validate the contents of the data portion of the http request body
-    if( request_data != null)
-    for(RequestData item: request_data) {
-      String string_id = item.getIdString();
-      String type = item.getType();
-      Map<String, Object> data = item.getObjectData();
-
-
-      if(!validIdString(string_id, method)) throw new UnsupportedServiceRequest("invalid object id");
-
-      if(!validObjectType(type)) throw new UnsupportedServiceRequest("unsupported object type");
-
-      if(!validObjectDataStructure(data, type)) throw new UnsupportedServiceRequest("invalid object data structure");
-    };
-
-    //if it gets this far, then no exceptions were thrown so all should be good
     return true;
   }
-  private boolean validIdString(String string_id, String method){
 
-    if(string_id.equalsIgnoreCase("new_object") && method.equalsIgnoreCase("POST")) return true;
-
-    else try{
-      UUID.fromString(string_id);
-      return true;
-    }
-    catch(IllegalArgumentException err) { return false; }
-  }
-  private boolean validObjectType(String type){
+  private boolean validateObjectType(String type) {
     switch(type){
-      case "AGENCY.CATEGORY":
-      case "AGENCY.DEFINITION":
-      case "AGENCY.AGENT":
-        return true;
+		case "AGENCY.AGENT":
+		case "AGENCY.AGENTTEMPLATE":
+		case "AGENCY.STRUCTURALNODE":
+		case "AGENCY.DATATAG":
+		case "AGENCY.USER":
+			return true;
       default: return false;
     }
   }
-  private boolean validObjectDataStructure(Map<String, Object> data, String type) {
-    Set<String> keys = data.keySet();
-
+  private boolean validateObjectDataProperties(Map<String, Object> data, String type) {
+	  Field[] fields;
     switch(type) {
-      case "AGENCY.CATEGORY":
-        if(keys.containsAll(AgentCategory.getKeySet())
-        		&& keys.size() == AgentCategory.getKeySet().size()) return true;
-        else return false;
-      case "AGENCY.DEFINITION":
-        if(keys.containsAll(AgentDefinition.getKeySet())
-        		&& keys.size() == AgentDefinition.getKeySet().size()) return true;
-        else return false;
-      case "AGENCY.AGENT":
-        if(keys.containsAll(AgentObject.getKeySet())
-        		&& keys.size() == AgentObject.getKeySet().size()) return true;
-        else return false;
+    	case "AGENCY.AGENT":
+    		fields = Agent.class.getDeclaredFields();
+    		break;
+    	case "AGENCY.AGENTTEMPLATE":
+    		fields = AgentTemplate.class.getDeclaredFields();
+    		break;
+    	case "AGENCY.STRUCTURALNODE":
+    		fields = StructuralNode.class.getDeclaredFields();
+    		break;
+    	case "AGENCY.DATATAG":
+    		fields = DataTag.class.getDeclaredFields();
+    		break;
+    	case "AGENCY.USER":
+    		fields = User.class.getDeclaredFields();
+    		break;
       default: return false;
 
     }
-  }
-
-
-  public static String validBehavior(Object behavior_object) throws ServiceErrorException{
-    switch(behavior_object.toString()){
-      case "STRUCTURAL": return "STRUCTURAL";
-      case "ACTOR": return "ACTOR";
-      default: throw new ServiceErrorException("unknown agent category behavior");
+    
+	Set<String> fieldset = new HashSet<String>();
+	for(Field f : fields) { 
+		String name = f.getName();
+		fieldset.add(name); 
+	}
+	
+	for(String property : data.keySet()) {
+		if(!fieldset.contains(property)) return false;
     }
+    
+	return true;
+    
   }
 
-  @SuppressWarnings("unchecked")
-  public static Map<String, String> validDataStruct(Object data_struct) throws ServiceErrorException{
-
-    //the value of each label should be something like: string-30, date-mm/dd/yy, int-9, (data type)-(format or length)
-    //should use RegExp's for this eventually, but for now just stick to some basics
-    Map<String, String> validated_structure = new HashMap<String, String>();
-    Map<String, Object> data_map = null;
-
-    if(data_struct instanceof Map) data_map = (Map<String, Object>) data_struct;
-    else throw new ServiceErrorException("invalid data structure");
-
-    for(String key: data_map.keySet()) { AgencyValidator.validLabel(key); }
-
-    for(Object value: data_map.values()){
-      switch(value.toString()){
-        case "string-30": break;
-        case "date-mm/dd/yy": break;
-        case "string-any": break;
-        default: throw new ServiceErrorException("unsupported value in data structure");
-      }
-    }
-    data_map.forEach((key, value) -> {
-      validated_structure.put(key, value.toString());
-    });
-
-
-    return validated_structure;
-  }
 }

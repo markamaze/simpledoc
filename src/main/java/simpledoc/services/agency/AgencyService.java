@@ -1,18 +1,21 @@
 package simpledoc.services.agency;
 
-import simpledoc.RequestData;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import simpledoc.ResourceResponse;
 import simpledoc.ServiceFunction;
 import simpledoc.services.ModuleObject;
+import simpledoc.services.ModuleObjectData;
 import simpledoc.services.ServiceModule;
 
 
-public class AgencyService implements ServiceModule {
+public class AgencyService<T extends ModuleObject> implements ServiceModule {
 
 	public String moduleTitle() { return "Agency"; }
 
@@ -21,29 +24,24 @@ public class AgencyService implements ServiceModule {
 
 		services.put("POST", request -> {
 			AgencyValidator validator = new AgencyValidator();
-			AgencyStorage storage = new AgencyStorage();
-			Set<String> result_data = new HashSet<String>();
+			AgencyStorage<T> storage = new AgencyStorage<T>();
 			ResourceResponse response = new ResourceResponse();
-			Set<ModuleObject> working_data = new HashSet<ModuleObject>();
-			AgencyFactory factory = new AgencyFactory();
-
+			AgencyFactory<T> factory = new AgencyFactory<T>();
+			Set<String> result_data = new HashSet<String>();
+			Set<T> working_data = new HashSet<T>();
 
 
 			validator.validateRequest(request.getDataSet(), request.method(), request.resource());
 
-
-			for( RequestData item : request.getDataSet()){
-				working_data.add(factory.build(item));
+			for( ModuleObjectData item : request.getDataSet()){
+				working_data.add(factory.build(item)); 
 			}
 
-
 			storage.create(working_data);
-
 
 			working_data.stream().forEach( item -> {
 				result_data.add(item.getId().toString());
 			});
-
 
 			return response.setResponse(result_data, 200);
 		});
@@ -52,22 +50,46 @@ public class AgencyService implements ServiceModule {
 
 		services.put("PUT", request -> {
 			AgencyValidator validator = new AgencyValidator();
-			AgencyStorage storage = new AgencyStorage();
+			AgencyStorage<T> storage = new AgencyStorage<T>();
 			ResourceResponse response = new ResourceResponse();
-			AgencyFactory factory = new AgencyFactory();
-			Set<ModuleObject> working_data = new HashSet<ModuleObject>();
+			Set<T> working_data = new HashSet<T>();
 
 
 			validator.validateRequest(request.getDataSet(), request.method(), request.resource());
+			
+			for(ModuleObjectData item : request.getDataSet()) {
 
+				String id = item.getIdString();
+				String type = item.getType();
+				List<String> resource = new ArrayList<String>();
+				
+				resource.add("Agency");
+				switch(type) {
+					case "AGENCY.AGENT":
+						resource.add("agents");
+						break;
+					case "AGENCY.AGENTTEMPLATE":
+						resource.add("agentTemplates");
+						break;
+					case "AGENCY.STRUCTURALNODE":
+						resource.add("structuralNodes");
+						break;
+					case "AGENCY.DATATAG":
+						resource.add("dataTags");
+						break;
+					case "AGENCY.USER":
+						resource.add("users");
+						break;
+				}
+				resource.add(id);
+				
+				T currentObj = storage.queryResource(resource, Collections.emptyMap());
 
-			for(RequestData item: request.getDataSet()){
-				working_data.add(factory.build(item));
+				currentObj.update(item.getObjectData());
+				working_data.add(currentObj);
 			}
 
-
 			storage.update(working_data);
-
 
 			return response.setResponse("Successfully updated objects.", 200);
 
@@ -77,25 +99,20 @@ public class AgencyService implements ServiceModule {
 
 		services.put("DELETE", request -> {
 			AgencyValidator validator = new AgencyValidator();
-			AgencyStorage storage = new AgencyStorage();
+			AgencyStorage<T> storage = new AgencyStorage<T>();
 			ResourceResponse response = new ResourceResponse();
 			Map<String, UUID> working_data = new HashMap<String, UUID>();
 
+			//delete requests shouldn't have anything in the body?
+			//is it just a uuid string in the url? or is there a dataset in the body of the request?
 
-			//TODO BUG: when validating request, need to differentiate between what the data should contain.
-			//		For example: a DELETE request will only contain id and type, no object_data
-			//								a PUT request may not contain all elements of the object_data structure
-			//								a GET request should have a null dataSet as there is no request body
 			validator.validateRequest(request.getDataSet(), request.method(), request.resource());
 
-
-			for(RequestData item : request.getDataSet()){
+			for(ModuleObjectData item : request.getDataSet()){
 				working_data.put(item.getType(), UUID.fromString(item.getIdString()));
 			}
 
-
 			storage.delete(working_data);
-
 
 			return response.setResponse("All objects successfully removed from storage", 200);
 
@@ -103,63 +120,19 @@ public class AgencyService implements ServiceModule {
 
 
 
-		//TODO: BUG: somehow I'm loosing first digit of UUID's when getting from DB
 		services.put("GET", request -> {
 			AgencyValidator validator = new AgencyValidator();
-			AgencyStorage storage = new AgencyStorage();
+			AgencyStorage<T> storage = new AgencyStorage<T>();
 			ResourceResponse response = new ResourceResponse();
-
-//			AgencyFactory factory = new AgencyFactory();
-
-			Set<String[]> working_data = null;
-//			Set<ModuleObject> result_data = new HashSet<ModuleObject>();
-
-
-
+			Set<T> working_data = null;
+			
 			validator.validateRequest(null, request.method(), request.resource());
 
-
-			working_data = storage.query(request.resource(), request.query());
-
-
-			//TODO: not sure if I should build agency objects from results from storage
-			// on one hand, it provides validation prior to sending response
-			// on the other, the data was valid when sent to the database and should be unchanged?
-//			for(String[] item: working_data){
-//				result_data.add(factory.build(item));
-//			}
-
-
+			working_data = storage.queryCollection(request.resource(), request.query());
 
 			return response.setResponse(working_data, 200);
 
 		});
-
-
-
-		// //TODO: add business logic for subscribing to other ServiceModules
-		// services.put("subscribe", request -> {
-		// 	System.out.println("subscribe Agency Service Called");
-		// 	ResourceResponse response = null;
-		// 	return response;
-		// });
-		//
-		//
-		//
-		// //TODO: add business logic to unsubscribe from other ServiceModules
-		// services.put("unsubscribe", request -> {
-		// 	System.out.println("unsubscribe Agency Service Called");
-		// 	ResourceResponse response = null;
-		// 	return response;
-		// });
-		//
-		//
-		// //TODO: add business logic to notify other ServiceModules
-		// services.put("notify", request -> {
-		// 	System.out.println("notify Agency Service Called");
-		// 	ResourceResponse response = null;
-		// 	return response;
-		// });
 
 		return services;
 	}

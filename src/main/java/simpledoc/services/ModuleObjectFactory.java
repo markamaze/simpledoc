@@ -1,9 +1,8 @@
 package simpledoc.services;
 
 import simpledoc.exceptions.ServiceErrorException;
-import simpledoc.RequestData;
 
 
-public interface ModuleObjectFactory {
-	public ModuleObject build(RequestData data_item) throws ServiceErrorException;
+public interface ModuleObjectFactory<T extends ModuleObject> {
+	public T build(ModuleObjectData data) throws ServiceErrorException;
 }

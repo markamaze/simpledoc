@@ -14,7 +14,7 @@ public class ServiceLoader {
 
 	public ServiceLoader() {
 		services = new HashMap<String, Map<String, ServiceFunction>>();
-		services.put("Agency", new AgencyService().provideServices());
+		services.put("Agency", new AgencyService<>().provideServices());
 //		services.put("Forms", new FormsService().provideServices());
 	}
 

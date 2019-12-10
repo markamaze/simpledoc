@@ -1,44 +1,63 @@
 package simpledoc.services.agency;
 
-import java.util.Map;
 import java.util.UUID;
-import simpledoc.RequestData;
+
 import simpledoc.exceptions.ServiceErrorException;
 import simpledoc.services.ModuleObject;
+import simpledoc.services.ModuleObjectData;
 import simpledoc.services.ModuleObjectFactory;
 
 
-public class AgencyFactory implements ModuleObjectFactory {
+public class AgencyFactory<T extends ModuleObject> implements ModuleObjectFactory<T> {
 
-	public ModuleObject build(RequestData data_item) throws ServiceErrorException{
-		UUID id;
-		try {
-			if(data_item.getIdString().equalsIgnoreCase("new_object")) id = UUID.randomUUID();
-			else id = UUID.fromString(data_item.getIdString()); }
-		catch(IllegalArgumentException err) {throw new ServiceErrorException("invalid UUID sent to factory");}
-		Map<String, Object> data = data_item.getObjectData();
-		String type = data_item.getType();
+	@SuppressWarnings("unchecked")
+	public T build(ModuleObjectData item) throws ServiceErrorException {
+		UUID id = getUUID(item.getIdString());
+		String type = item.getType();
 
 		switch(type){
 			case "AGENCY.STRUCTURALNODE":
-				return new StructuralNode(id, type, data);
+				StructuralNode newStructuralNode = new StructuralNode(id, type, item.getObjectData());
+				if(newStructuralNode instanceof ModuleObject) return (T)newStructuralNode;
 			case "AGENCY.AGENTTEMPLATE":
-				return new AgentTemplate(id, type, data);
+				AgentTemplate newAgentTemplate = new AgentTemplate(id, type, item.getObjectData());
+				if(newAgentTemplate instanceof ModuleObject) return (T)newAgentTemplate;
 			case "AGENCY.AGENT":
-				return new Agent(id, type, data);
+				Agent newAgent = new Agent(id, type, item.getObjectData());
+				if(newAgent instanceof ModuleObject) return (T)newAgent;
 			case "AGENCY.DATATAG":
-				return new DataTag(id, type, data);
+				DataTag newDataTag = new DataTag(id, type, item.getObjectData());
+				if(newDataTag instanceof ModuleObject) return (T)newDataTag;
 			case "AGENCY.USER":
-				return new User(id, type, data);
-			// case "AGENCY.AGENT":
-			// 	return new AgentObject(id, type, data);
-			// case "AGENCY.DEFINITION":
-			// 	return new AgentDefinition(id, type, data);
-			// case "AGENCY.CATEGORY":
-			// 	return new AgentCategory(id, type, data);
+				User newUser = new User(id, type, item.getObjectData());
+				if(newUser instanceof ModuleObject) return (T)newUser;
 			default:
 				throw new ServiceErrorException("invalid Agency Object Type sent to factory");
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	public T build(String id_string, String type) throws ServiceErrorException {
+		UUID id = getUUID(id_string);
+		
+		switch(type){
+		case "AGENCY.STRUCTURALNODE":
+			return (T) new StructuralNode(id, type);
+		case "AGENCY.AGENTTEMPLATE":
+			return (T) new AgentTemplate(id, type);
+		case "AGENCY.AGENT":
+			return (T) new Agent(id, type);
+		case "AGENCY.DATATAG":
+			return (T) new DataTag(id, type);
+		case "AGENCY.USER":
+			return (T) new User(id, type);
+		default:
+			throw new ServiceErrorException("invalid Agency Object Type sent to factory");
+	}	}
+
+	private UUID getUUID(String id_string) throws ServiceErrorException {
+		if(id_string.equalsIgnoreCase("new_object")) return UUID.randomUUID();
+		else if(AgencyValidator.validateUUIDString(id_string)) return UUID.fromString(id_string);
+		else throw new ServiceErrorException("invalid UUID sent to factory");
+	}
 }
