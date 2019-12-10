@@ -2,10 +2,8 @@
     {   "id":"new_object",
         "type":"AGENCY.DATATAG",
         "object_data": {
-          "dataTag_label": "",
-          "tagFor": "",
-          "dataTag_data_structure": {},
-          "dataTag_data": {}
+          "dataTag_label": "asdf",
+          "dataTag_for_agent": false
         }
     }
   ]

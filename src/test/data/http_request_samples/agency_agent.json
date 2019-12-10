@@ -2,13 +2,15 @@
     {   "id":"new_object",
         "type":"AGENCY.AGENT",
         "object_data": {
-          "agent_link_id": "00000000-0000-0000-0000-000000000000",
-          "agentTemplate_id": "00a42ff2-48f9-4e15-954a-b14b99e43566",
-          "assigned_user_id": "",
-          "agent_is_active": true,
-          "agent_security": "4444",
-          "agent_data_structure": {},
-          "agent_data": {}
+          "structuralNode_link_id": "00000000-0000-0000-0000-000000000000",
+          "agentTemplate_id": "00a42ff2-48f9-4e15-954a-b14b99e4356",
+          "assigned_user_id": "00a42ff2-48f9-4e15-954a-b14b99e43567",
+          "agent_is_active": false,
+          "agent_dataTag_ids": [
+            "00000000-0000-0000-0000-000000000000",
+            "00000000-0000-0000-0000-000000000000",
+            "00000000-0000-0000-0000-000000000000"
+          ]
         }
     }
   ]

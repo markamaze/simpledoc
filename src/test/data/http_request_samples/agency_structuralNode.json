@@ -2,12 +2,14 @@
     {   "id":"new_object",
         "type":"AGENCY.STRUCTURALNODE",
         "object_data": {
-          "structuralNode_label": "",
-          "structuralNode_dataTagIds": [],
-          "parentId": "",
-          "agentAssignments": [],
-          "structuralNode_data_structure": {},
-          "structuralNode_data": {}
+          "structuralNode_label": "fdsafdsa",
+          "structuralNode_parent_id": "00000000-0000-0000-0000-000000000000",
+          "agent_assignments": [],
+          "structuralNode_dataTag_ids": [
+            "00000000-0000-0000-0000-000000000000",
+            "00000000-0000-0000-0000-000000000001",
+            "00000000-0000-0000-0000-000000000002"
+          ],
         }
     }
   ]
