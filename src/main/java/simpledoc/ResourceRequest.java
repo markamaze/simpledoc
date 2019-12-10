@@ -2,6 +2,9 @@ package simpledoc;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import simpledoc.services.ModuleObjectData;
+
 import java.io.IOException;
 import java.util.Set;
 import java.io.InputStream;
@@ -43,8 +46,8 @@ public class ResourceRequest {
 	}
 
 
-	public Set<RequestData> getDataSet() {
-		Set<RequestData> data_set = new HashSet<RequestData>();
+	public Set<ModuleObjectData> getDataSet() {
+		Set<ModuleObjectData> data_set = new HashSet<ModuleObjectData>();
 		JSONObject json_body = new JSONObject(body);
 		JSONArray data_array = json_body.optJSONArray("data");
 
@@ -54,7 +57,7 @@ public class ResourceRequest {
 			String type = json_item.optString("type");
 			Map<String, Object> data = json_item.optJSONObject("object_data").toMap();
 
-			data_set.add(new RequestData(id, type, data));
+			data_set.add(new ModuleObjectData(id, type, data));
 		});
 
 		return data_set;
