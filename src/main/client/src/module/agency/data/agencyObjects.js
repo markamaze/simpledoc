@@ -47,7 +47,14 @@ const baseObj = (type, properties) => ({
 
 
 
-
+// const agentProperties = {
+//   id: Object.create(propertyBase( false, id => data.id(id) )),
+//   type: null,
+//   structuralNode_link_id: Object.create(propertyBase(true, linkId => data.id(linkId) )),
+//   agentTemplate_id: Object.create(propertyBase(true, templateId => data.id(templateId) )),
+//   assigned_user_id: Object.create(propertyBase(true, userId => data.id(userId) )),
+//   agent_is_active: Object.create(propertyBase(true, value => value)),
+//   agent_dataTag_ids: Object.create(propertyBase(true, tagSet => tagSet.map(tag => data.dataTag(tag)) )) }
 const agentProperties = {
   id: Object.create(propertyBase( false, id => data.id(id) )),
   label: Object.create(propertyBase(false, label => data.string(label, { noSpaces: false, maxLength: 40, minLength: 1 }) )),
@@ -60,7 +67,12 @@ export const agent = () => Object.create(baseObj("agent", agentProperties))
 
 
 
-
+// const agentTemplateProperties = {
+//   id: Object.create(propertyBase( false, id => data.id(id) )),
+//   type: ,
+//   agentTemplate_label: Object.create(propertyBase( false, label => data.string(label, { noSpaces: false, maxLength: 40, minLength: 1}) )),
+//   agentTemplate_security: Object.create(propertyBase(true, code => data.securityCode(code) )),
+//   agentTemplate_dataTag_ids: Object.create(propertyBase(true, tagSet => tagSet.map(tag => data.dataTag(tag)) )) }
 const agentTemplateProperties = {
   id: Object.create(propertyBase( false, id => data.id(id) )),
   label: Object.create(propertyBase( false, label => data.string(label, { noSpaces: false, maxLength: 40, minLength: 1}) )),
@@ -71,14 +83,13 @@ export const agentTemplate = () => Object.create(baseObj("agentTemplate", agentT
 
 
 
-const userProperties = {
-  id: Object.create(propertyBase( false, id => data.id(id) )),
-  username: Object.create(propertyBase( false, username => data.string(username, { noSpaces: true, maxLength: 16, minLength: 4}) )) }
-export const user = () => Object.create(baseObj("user", userProperties))
-
-
-
-
+// const structuralNodeProperties = {
+//   id: Object.create(propertyBase( false, id => data.id(id) )),
+//   type: ,
+//   structuralNode_label: Object.create(propertyBase( false, label => data.string(label, { noSpaces: false, maxLength: 40, minLength: 1}) )),
+//   structuralNode_parent_id: Object.create(propertyBase( false, parentId => data.id(parentId) )),
+//   agent_assignments: Object.create(propertyBase( false, agentId => data.id(agentId) )),
+//   structuralNode_dataTag_ids: Object.create(propertyBase(true, tagSet => tagSet.map(tag => data.dataTag(tag)) )) }
 const structuralNodeProperties = {
   id: Object.create(propertyBase( false, id => data.id(id) )),
   label: Object.create(propertyBase( false, label => data.string(label, { noSpaces: false, maxLength: 40, minLength: 1}) )),
@@ -89,9 +100,25 @@ export const structuralNode = () => Object.create(baseObj("structuralNode", stru
 
 
 
-
+// const dataTagProperties = {
+//   id: Object.create(propertyBase( false, id => data.id(id) )),
+//   type: ,
+//   dataTag_label: Object.create(propertyBase( false, label => data.string(label, { noSpaces: false, maxLength: 40, minLength: 1}) )),
+//   dataTag_for_agent: Object.create(propertyBase( false, tagType => data.tagType(tagType) )) }
 const dataTagProperties = {
   id: Object.create(propertyBase( false, id => data.id(id) )),
   label: Object.create(propertyBase( false, label => data.string(label, { noSpaces: false, maxLength: 40, minLength: 1}) )),
   tagFor: Object.create(propertyBase( false, tagType => data.tagType(tagType) )) }
 export const dataTag = () => Object.create(baseObj("dataTag", dataTagProperties))
+
+
+
+
+// const userProperties = {
+//   id: Object.create(propertyBase( false, id => data.id(id) )),
+//   type: ,
+//   username: Object.create(propertyBase( false, username => data.string(username, { noSpaces: true, maxLength: 16, minLength: 4}) )) }
+const userProperties = {
+  id: Object.create(propertyBase( false, id => data.id(id) )),
+  username: Object.create(propertyBase( false, username => data.string(username, { noSpaces: true, maxLength: 16, minLength: 4}) )) }
+export const user = () => Object.create(baseObj("user", userProperties))
