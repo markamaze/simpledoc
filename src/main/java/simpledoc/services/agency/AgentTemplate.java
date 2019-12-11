@@ -122,8 +122,21 @@ public class AgentTemplate extends ModuleObject {
 	
 	@Override
 	public String writeToJson() {
-		// TODO Auto-generated method stub
-		return null;
+		String tag_json = "";
+		for(UUID id : this.agentTemplate_dataTag_ids) {
+			tag_json += "\"" + id.toString() + "\",";
+		}
+		tag_json = tag_json.substring(0, tag_json.length()-1);
+		
+		String result = "{" +
+				"\"id\":\"" + this.getId().toString() + "\"," +
+				"\"type\":\"" + this.getModuleObjectType() + "\"," +
+				"\"agentTemplate_label\":\"" + this.getLabel() + "\"," +
+				"\"agentTemplate_security\":\"" + this.getSecurityCode() + "\"," +
+				"\"agentTemplate_dataTag_ids\":" + "[" + tag_json + "]" +					
+				"}";
+
+		return result;
 	}
 
 }

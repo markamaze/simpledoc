@@ -86,8 +86,15 @@ public class DataTag extends ModuleObject {
 	
 	@Override
 	public String writeToJson() {
-		// TODO Auto-generated method stub
-		return null;
+
+		String result = "{" +
+				"\"id\":\"" + this.getId().toString() + "\"," +
+				"\"type\":\"" + this.getModuleObjectType() + "\"," +
+				"\"dataTag_label\":\"" + this.getLabel() + "\"," +
+				"\"dataTag_for_agent\":\"" + this.isForAgent().toString() + "\"," +
+				"}";
+
+		return result;
 	}
 
 }

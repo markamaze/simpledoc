@@ -153,8 +153,23 @@ public class Agent extends ModuleObject {
 	
 	@Override
 	public String writeToJson() {
-		// TODO Auto-generated method stub
-		return null;
+		String tag_json = "";
+		for(UUID id : this.agent_dataTag_ids) {
+			tag_json += "\"" + id.toString() + "\",";
+		}
+		tag_json = tag_json.substring(0, tag_json.length()-1);
+		
+		String result = "{" +
+				"\"id\":\"" + this.getId().toString() + "\"," +
+				"\"type\":\"" + this.getModuleObjectType() + "\"," +
+				"\"structuralNode_link_id\":\"" + this.getStructuralNodeLinkId().toString() + "\"," +
+				"\"agentTemplate_id\":\"" + this.getAgentTemplateId().toString() + "\"," +
+				"\"assigned_user_id\":\"" + this.getAssignedUserId().toString() + "\"," +
+				"\"agent_is_active\":\"" + this.isAgentActive().toString() + "\"," +
+				"\"agent_dataTag_ids\":" + "[" + tag_json + "]" +					
+				"}";
+
+		return result;
 	}
 
 }

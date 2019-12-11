@@ -144,8 +144,26 @@ public class StructuralNode extends ModuleObject {
 
 	@Override
 	public String writeToJson() {
-		// TODO Auto-generated method stub
-		return null;
+		String assignments_json = "";
+		//TODO: write json string for agent assignements
+		
+		
+		String tag_json = "";
+		for(UUID id : this.structuralNode_dataTag_ids) {
+			tag_json += "\"" + id.toString() + "\",";
+		}
+		tag_json = tag_json.substring(0, tag_json.length()-1);
+		
+		String result = "{" +
+				"\"id\":\"" + this.getId().toString() + "\"," +
+				"\"type\":\"" + this.getModuleObjectType() + "\"," +
+				"\"structuralNode_label\":\"" + this.getLabel() + "\"," +
+				"\"structuralNode_parent_id\":\"" + this.getParentId().toString() + "\"," +
+				"\"agent_assignments\":\"" + "[" + assignments_json + "]" +
+				"\"structuralNode_dataTag_ids\":" + "[" + tag_json + "]" +					
+				"}";
+
+		return result;
 	}
 
 }

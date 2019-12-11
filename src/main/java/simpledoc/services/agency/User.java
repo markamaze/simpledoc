@@ -92,8 +92,13 @@ public class User extends ModuleObject {
 		
 	@Override
 	public String writeToJson() {
-		// TODO Auto-generated method stub
-		return null;
+		String result = "{" +
+				"\"id\":\"" + this.getId().toString() + "\"," +
+				"\"type\":\"" + this.getModuleObjectType() + "\"," +
+				"\"username\":\"" + this.getUsername() + "\"," +
+				"}";
+
+		return result;
 	}
 	
 }
