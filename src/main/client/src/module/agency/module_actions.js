@@ -6,38 +6,36 @@ import sampleData from '../../sample_data'
 
 
 export function loadAgencyStore() {
-  let agents, agencyTemplates, structuralNodes, dataTags, users
+  let agents = [], agentTemplates = [], structuralNodes =[], dataTags=[], users=[]
 
 
-  // get('/Agency/agents', function(request) {
-  //     agents = JSON.parse(request.response).data
-  //   }, function() { console.log("error loading agency agents")})
-  //
-  //   .then(
-  //     console.log("get agentTemplates next")
-  //   )
-  //   .then(
-  //     console.log("get structuralNodes next")
-  //   )
-  //   .then(
-  //     console.log("get tags next")
-  //   )
-  //   .then(
-  //     console.log("get tagdataset next")
-  //   )
-  //   .finally(
+  get('/Agency/agents', function(request) {
+      agents = JSON.parse(request.response).data
+      get('/Agency/agentTemplates', function(request) {
+          agentTemplates = JSON.parse(request.response).data
+          get('/Agency/structuralNodes', function(request) {
+              structuralNodes = JSON.parse(request.response).data
+              get('/Agency/dataTags', function(request) {
+                  dataTags = JSON.parse(request.response).data
+                  get('/Agency/users', function(request) {
+                      users = JSON.parse(request.response).data
+                      store.dispatch({
+                        type: "LOAD_AGENCY_STORE",
+                        payload: {
+                          agents: agents,
+                          agentTemplates: agentTemplates,
+                          structuralNodes: structuralNodes,
+                          dataTags: dataTags,
+                          users: users
+                        }
+                      })
+                    }, function() { console.log("error loading agency users")})
+                }, function() { console.log("error loading agency dataTags")})
+            }, function() { console.log("error loading agency structuralNodes")})
+        }, function() { console.log("error loading agency agentTemplates")})
 
-      store.dispatch({
-        type: "LOAD_AGENCY_STORE",
-        payload: {
-          agents: sampleData.agency.agents,
-          agentTemplates: sampleData.agency.agentTemplates,
-          structuralNodes: sampleData.agency.structuralNodes,
-          dataTags: sampleData.agency.dataTags,
-          users: sampleData.agency.users
-        }
-      })
-    // )
+    }, function() { console.log("error loading agency agents")})
+
 }
 
 export function createAgencyObject(type, data){
