@@ -125,12 +125,25 @@ public class AgencyService<T extends ModuleObject> implements ServiceModule {
 			AgencyStorage<T> storage = new AgencyStorage<T>();
 			ResourceResponse response = new ResourceResponse();
 			Set<T> working_data = null;
+			String response_string = "";
 			
 			validator.validateRequest(null, request.method(), request.resource());
 
 			working_data = storage.queryCollection(request.resource(), request.query());
+			
+			if(working_data.size() < 1) response_string = "[]";
+			else {
+				response_string = "[";
+				for(T item : working_data) {
+					response_string += item.writeToJson();
+					response_string += ",";
+				}
+						
+				response_string = response_string.substring(0, response_string.length()-1) + "]";
+								
+			}
 
-			return response.setResponse(working_data, 200);
+			return response.setResponse(response_string, 200);
 
 		});
 
