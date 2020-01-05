@@ -118,26 +118,28 @@ public class AgencyStorage<T extends ModuleObject> implements ModuleObjectStorag
 				
 				switch(type) {
 				case "AGENCY.AGENT":
-					call = "call agency.delete_agent(?)";
+					call = "delete from agency.agents where id='" + id + "'";
 					break;
 				case "AGENCY.AGENTTEMPLATE":
-					call = "call agency.delete_agenttemplate(?)";
+					call = "delete from agency.agenttemplates where id='" + id + "'";
 					break;
 				case "AGENCY.STRUCTURALNODE":
-					call = "call agency.delete_structuralnode(?)";
+					call = "delete from agency.structualnodes where id='" + id + "'";
 					break;
 				case "AGENCY.DATATAG":
-					call = "call agency.delete_datatag(?)";
+					call = "delete from agency.datatags where id='" + id + "'";
 					break;
 				case "AGENCY.USER":
-					call = "call agency.delete_user(?)";
+					call = "delete from agency.users where id='" + id + "'";
 					break;
 				}
 				
 				PreparedStatement cs = connection.prepareStatement(call);
-				cs.setObject(1, id);
-				boolean result = cs.execute();
-				if(!result) {
+//				cs.setObject(1, id);
+				int result = cs.executeUpdate();
+				//returning 0 
+				
+				if(result < 1) {
 					committed = false;
 					break;
 				}
@@ -148,9 +150,9 @@ public class AgencyStorage<T extends ModuleObject> implements ModuleObjectStorag
 				connection.rollback();
 				throw new StorageErrorException("error deleting objects from database");
 			}
-		} catch(SQLException err) { throw new StorageErrorException("couldn't delete objects from database"); }
+		} catch(SQLException err) { throw new StorageErrorException("couldn't delete objects from database: " + err.getMessage()); }
 
-		return false;
+		return committed;
 	}
 
 	

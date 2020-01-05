@@ -26,7 +26,8 @@ CREATE OR REPLACE PROCEDURE agency.update_agentTemplate (
   _id UUID,
   _label TEXT,
   _security CHAR(4),
-  _dataTags UUID[] )
+  _dataTags UUID[],
+  _properties JSON )
 LANGUAGE sql
 AS $procedure$
   UPDATE
@@ -34,7 +35,8 @@ AS $procedure$
   SET
     agentTemplate_label = _label,
     agentTemplate_security = _security,
-    agentTemplate_dataTag_ids = _dataTags
+    agentTemplate_dataTag_ids = _dataTags,
+    agentTemplate_properties = _properties
   WHERE
     id = _id;
 $procedure$;
@@ -46,8 +48,9 @@ CREATE OR REPLACE PROCEDURE agency.update_structuralNode (
   _id UUID,
   _label TEXT,
   _parentId UUID,
-  _agentAssignments TEXT,
-  _dataTagIds UUID[] )
+  _agentAssignments JSON,
+  _dataTagIds UUID[],
+  _properties JSON )
 LANGUAGE sql
 AS $procedure$
   UPDATE
@@ -56,7 +59,8 @@ AS $procedure$
     structuralNode_label = _label,
     structuralNode_parent_id = _parentId,
     agent_assignments = _agentAssignments,
-    structuralNode_dataTag_ids = _dataTagIds
+    structuralNode_dataTag_ids = _dataTagIds,
+    structuralNode_properties = _properties
   WHERE
     id = _id;
 $procedure$;
@@ -67,14 +71,18 @@ $procedure$;
 CREATE OR REPLACE PROCEDURE agency.update_dataTag (
   _id UUID,
   _label TEXT,
-  _tagForAgent BOOLEAN )
+  _tagType TEXT,
+  _properties JSON,
+  _typeObjects JSON )
 LANGUAGE sql
 AS $procedure$
   UPDATE
     agency.dataTags
   SET
     dataTag_label = _label,
-    dataTag_for_agent = _tagForAgent
+    dataTag_tagType = _tagType,
+    dataTag_properties = _properties,
+    dataTag_typeObjects = _typeObjects
   WHERE
     id = _id;
 $procedure$;

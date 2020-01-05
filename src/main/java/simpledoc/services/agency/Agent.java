@@ -14,6 +14,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.json.JSONObject;
+
 import java.util.UUID;
 import simpledoc.services.ModuleObject;
 
@@ -153,23 +156,17 @@ public class Agent extends ModuleObject {
 	
 	@Override
 	public String writeToJson() {
-		String tag_json = "";
-		for(UUID id : this.agent_dataTag_ids) {
-			tag_json += "\"" + id.toString() + "\",";
-		}
-		tag_json = tag_json.substring(0, tag_json.length()-1);
+		JSONObject json_result = new JSONObject();
+		json_result.put("id", this.getId());
+		json_result.put("type", this.getModuleObjectType());
+		json_result.put("structuralNode_link_id", this.getStructuralNodeLinkId());
+		json_result.put("agentTemplate_id", this.getAgentTemplateId());
+		json_result.put("assigned_user_id", this.getAssignedUserId());
+		json_result.put("agent_is_active", this.isAgentActive());
+		json_result.put("agent_dataTag_ids", this.getDataTagIds());
 		
-		String result = "{" +
-				"\"id\":\"" + this.getId().toString() + "\"," +
-				"\"type\":\"" + this.getModuleObjectType() + "\"," +
-				"\"structuralNode_link_id\":\"" + this.getStructuralNodeLinkId().toString() + "\"," +
-				"\"agentTemplate_id\":\"" + this.getAgentTemplateId().toString() + "\"," +
-				"\"assigned_user_id\":\"" + this.getAssignedUserId().toString() + "\"," +
-				"\"agent_is_active\":\"" + this.isAgentActive().toString() + "\"," +
-				"\"agent_dataTag_ids\":" + "[" + tag_json + "]" +					
-				"}";
-
-		return result;
+		return json_result.toString();
+	
 	}
 
 }

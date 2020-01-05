@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 
-import TagWrapper from '../../components/TagWrapper'
+import TagWrapper from './moduleComponents/TagWrapper'
 import * as workspace_actions from '../workspace/workspace_actions'
 import * as agency_actions from './module_actions'
 import colors from '../../colors'

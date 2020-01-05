@@ -14,6 +14,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.json.JSONObject;
+import org.postgresql.util.PGobject;
+import org.json.JSONArray;
+
 import java.util.UUID;
 
 import simpledoc.services.ModuleObject;
@@ -23,6 +28,7 @@ public class AgentTemplate extends ModuleObject {
 	private String agentTemplate_label;
 	private String agentTemplate_security;
 	private Set<UUID> agentTemplate_dataTag_ids;
+	private List<Object> agentTemplate_properties;
 
 
 	AgentTemplate(UUID id, String type) { super(id, type); }
@@ -31,9 +37,18 @@ public class AgentTemplate extends ModuleObject {
 		setLabel(data.get("agentTemplate_label").toString());
 		setSecurity(data.get("agentTemplate_security").toString());
 		setDataTagIds(data.get("agentTemplate_dataTag_ids"));
+		setProperties(data.get("agentTemplate_properties"));
 	}
 	
 
+	private void setProperties(Object object) throws ServiceErrorException {
+		if(object instanceof PGobject) this.agentTemplate_properties = new JSONArray(((PGobject)object).getValue()).toList();
+		else if(object instanceof String) this.agentTemplate_properties = new JSONArray(object).toList();
+		else if(object instanceof List) this.agentTemplate_properties = (List<Object>) object;
+		else if(object == null) this.agentTemplate_properties = new ArrayList<Object>();
+		else throw new ServiceErrorException("invalid format for agentTemplate properties");
+	}
+	
 	private void setDataTagIds(Object object) throws ServiceErrorException {
 		List<UUID> tagsList = new ArrayList<UUID>();
 		
@@ -44,11 +59,16 @@ public class AgentTemplate extends ModuleObject {
 		
 		else if(object instanceof ArrayList) {
 			for(Object id : (ArrayList<?>) object) {
-				if(AgencyValidator.validateUUIDString(id.toString()))
+				if(AgencyValidator.validateUUIDString(id.toString())) {
 					tagsList.add(UUID.fromString(id.toString()));
+				}
 				else throw new ServiceErrorException("invalid id in dataTag list");
 			}
+			this.agentTemplate_dataTag_ids = new HashSet<UUID>(tagsList);
 		}
+		
+		else if(object == null) this.agentTemplate_dataTag_ids = new HashSet<UUID>(tagsList);
+
 		
 		else throw new ServiceErrorException("invalid dataTag list format");
 	
@@ -69,6 +89,7 @@ public class AgentTemplate extends ModuleObject {
 	public String getLabel() { return this.agentTemplate_label; }
 	public String getSecurityCode() { return this.agentTemplate_security; }
 	public Set<UUID> getDataTagIds() { return this.agentTemplate_dataTag_ids; }
+	public List<Object> getProperties() { return this.agentTemplate_properties; }
 
 	@Override
 	public boolean update(Map<String, Object> objectData) throws ServiceErrorException {
@@ -83,6 +104,8 @@ public class AgentTemplate extends ModuleObject {
 			case "agentTemplate_dataTag_ids":
 				setDataTagIds(entry.getValue());
 				break;
+			case "agentTemplate_properties":
+				setProperties(entry.getValue());
 			}
 		}
 		return true;
@@ -94,8 +117,8 @@ public class AgentTemplate extends ModuleObject {
 		setLabel(rs.getString("agentTemplate_label"));
 		setSecurity(rs.getString("agentTemplate_security"));
 		setDataTagIds(rs.getArray("agentTemplate_dataTag_ids").getArray());
-
-		return false;
+		setProperties(rs.getObject("agentTemplate_properties"));
+		return true;
 	}
 	@Override
 	public PreparedStatement writeStorageStatement(String type, Connection connection) throws ServiceErrorException {
@@ -104,16 +127,23 @@ public class AgentTemplate extends ModuleObject {
 		try {
 			switch(type) {
 			case "create":
-				statement = connection.prepareStatement("call agency.create_agentTemplate(?,?,?,?)");
+				statement = connection.prepareStatement("call agency.create_agentTemplate(?,?,?,?,?)");
 				break;
 			case "update":
-				statement = connection.prepareStatement("call agency.update_agentTemplate(?,?,?,?)");
+				statement = connection.prepareStatement("call agency.update_agentTemplate(?,?,?,?,?)");
 				break;
 			}
+			
+			PGobject pgjsonObj = new PGobject();
+			JSONArray arr = new JSONArray(this.getProperties());
+			pgjsonObj.setType("json");
+			pgjsonObj.setValue(arr.toString());
+			
 			statement.setObject(1, this.getId());
 			statement.setString(2, this.getLabel());
 			statement.setString(3, this.getSecurityCode());
 			statement.setArray(4, connection.createArrayOf("UUID", this.getDataTagIds().toArray()));
+			statement.setObject(5, pgjsonObj);
 		}catch(SQLException err) { throw new ServiceErrorException("couldn't set storage statement object");}
 
 		return statement;
@@ -122,21 +152,15 @@ public class AgentTemplate extends ModuleObject {
 	
 	@Override
 	public String writeToJson() {
-		String tag_json = "";
-		for(UUID id : this.agentTemplate_dataTag_ids) {
-			tag_json += "\"" + id.toString() + "\",";
-		}
-		tag_json = tag_json.substring(0, tag_json.length()-1);
+		JSONObject json_result = new JSONObject();
+		json_result.put("id", this.getId());
+		json_result.put("type", this.getModuleObjectType());
+		json_result.put("agentTemplate_label", this.getLabel());
+		json_result.put("agentTemplate_security", this.getSecurityCode());
+		json_result.put("agentTemplate_dataTag_ids", this.getDataTagIds());
+		json_result.put("agentTemplate_properties", this.getProperties());
 		
-		String result = "{" +
-				"\"id\":\"" + this.getId().toString() + "\"," +
-				"\"type\":\"" + this.getModuleObjectType() + "\"," +
-				"\"agentTemplate_label\":\"" + this.getLabel() + "\"," +
-				"\"agentTemplate_security\":\"" + this.getSecurityCode() + "\"," +
-				"\"agentTemplate_dataTag_ids\":" + "[" + tag_json + "]" +					
-				"}";
-
-		return result;
+		return json_result.toString();
 	}
 
 }

@@ -25,15 +25,17 @@ CREATE OR REPLACE PROCEDURE agency.create_agentTemplate (
   id UUID,
   label TEXT,
   security CHAR(4),
-  dataTags UUID[] )
+  dataTags UUID[],
+  properties JSON )
 LANGUAGE sql
 AS $procedure$
   INSERT INTO agency.agentTemplates (
     id,
     agentTemplate_label,
     agentTemplate_security,
-    agentTemplate_dataTag_ids )
-  VALUES ( id, label, security, dataTags );
+    agentTemplate_dataTag_ids,
+    agentTemplate_properties)
+  VALUES ( id, label, security, dataTags, properties );
 $procedure$;
 
 
@@ -43,8 +45,9 @@ CREATE OR REPLACE PROCEDURE agency.create_structuralNode (
   id UUID,
   label TEXT,
   parentId UUID,
-  agentAssignments TEXT,
-  dataTagIds UUID[] )
+  agentAssignments JSON,
+  dataTagIds UUID[],
+  properties JSON )
 LANGUAGE sql
 AS $procedure$
   INSERT INTO agency.structuralNodes (
@@ -52,8 +55,9 @@ AS $procedure$
     structuralNode_label,
     structuralNode_parent_id,
     agent_assignments,
-    structuralNode_dataTag_ids )
-  VALUES (id, label, parentId, agentAssignments, dataTagIds);
+    structuralNode_dataTag_ids,
+    structuralNode_properties )
+  VALUES (id, label, parentId, agentAssignments, dataTagIds, properties);
 $procedure$;
 
 
@@ -62,15 +66,19 @@ $procedure$;
 CREATE OR REPLACE PROCEDURE agency.create_dataTag (
   id UUID,
   label TEXT,
-  tagForAgent BOOLEAN )
+  tagType TEXT,
+  properties JSON,
+  typeObjects JSON )
 LANGUAGE sql
 AS $procedure$
   INSERT INTO agency.dataTags (
     id,
     dataTag_label,
-    dataTag_for_agent
+    dataTag_tagType,
+    dataTag_properties,
+    dataTag_typeObjects
   )
-  VALUES ( id, label, tagForAgent );
+  VALUES ( id, label, tagType, properties, typeObjects );
 $procedure$;
 
 

@@ -22,8 +22,14 @@ const NavigationWrapper = styled.div`
     left: 0;
     padding: 1rem;
     background: ${colors.two};
-    min-width: 98%;
-    max-width: 98%;
+    min-width: 100%;
+    max-width: 100%;
+    @media(min-width: 500px){
+      min-width: 50%;
+    }
+    @media(min-width: 700px){
+      min-width: 30%;
+    }
     min-height: 30%;
     max-height: 100%;
     margin: auto;

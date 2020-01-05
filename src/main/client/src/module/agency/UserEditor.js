@@ -1,60 +1,35 @@
 import React from 'react'
-import { EditorWrapper } from '../moduleStyles'
 
-import styled from 'styled-components'
+import { EditorWrapper } from '../moduleStyles'
+import AgencyObjectDataBuilder from './moduleComponents/AgencyObjectDataBuilder'
+import EditorActions from './moduleComponents/EditorActions'
 
 
 
 export default class UserEditor extends React.Component {
   constructor(props){
     super(props)
-    this.state = {
-      id: this.props.user.id,
-      type: "user",
-      username: this.props.user.username ? this.props.user.username : "",
-      label: this.props.user.label ? this.props.user.label : ""
-    }
+    this.state = { user: this.props.user }
   }
 
-  updateUsername(event){
-    this.setState({
-      label: event.target.value,
-      username: event.target.value
-    })
+  updateProperty(property, value){
+    this.setState({ user: this.state.user.update({[`${property}`]: value})})
   }
 
   render() {
     return  <EditorWrapper>
-              <div className="editor-item">
-                <div className="editor-item-label">UserId:</div>
-                <input type="text" disabled value={this.state.id} />
-              </div>
 
-              <div className="editor-item">
-                <div className="editor-item-label">Username:</div>
-                <input type="text" value={this.state.username}
-                        onChange={() => this.updateUsername(event)} />
-              </div>
+              <AgencyObjectDataBuilder
+                  sections={[
+                    {title: "User Id", inputType: "text-disabled", value: this.state.user.id, propertyName: "id"},
+                    {title: "Username", inputType: "text", value: this.state.user.username, propertyName: "username"},
+                    {title: "Password", inputType: "text", value: this.state.user.password, propertyName: "password"}
+                  ]}
+                  handleValueChange={this.updateProperty.bind(this)} />
 
-              <div className="editor-item">
-                <div className="editor-item-label">First Name:</div>
-                <input type="text" value="first name" />
-                <div className="editor-item-label">Last Name:</div>
-                <input type="text" value="last name" />
-              </div>
-
-
-              {
-                !this.props.buttons ? null :
-                  <div className="editor-buttons">
-                    { this.props.buttons.map(button =>
-                        <button
-                            onClick={() => button.handler(this.state)}
-                            key={`user_editor_button_${button.label}_${this.state.id}`} >
-                        {button.label}</button>)
-                    }
-                  </div>
-              }
+              <EditorActions {...this.props}
+                  object={this.state.user}
+                  type="user" />
 
             </EditorWrapper>
   }

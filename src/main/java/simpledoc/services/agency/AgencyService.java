@@ -91,7 +91,7 @@ public class AgencyService<T extends ModuleObject> implements ServiceModule {
 
 			storage.update(working_data);
 
-			return response.setResponse("Successfully updated objects.", 200);
+			return response.setResponse("\"Successfully updated objects.\"", 200);
 
 		});
 
@@ -114,7 +114,7 @@ public class AgencyService<T extends ModuleObject> implements ServiceModule {
 
 			storage.delete(working_data);
 
-			return response.setResponse("All objects successfully removed from storage", 200);
+			return response.setResponse("\"All objects successfully removed from storage\"", 200);
 
 		});
 

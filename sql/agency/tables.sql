@@ -14,7 +14,8 @@ CREATE TABLE agency.agentTemplates (
   id UUID,
   agentTemplate_label TEXT,
   agentTemplate_security CHAR(4),
-  agentTemplate_dataTag_ids UUID[]
+  agentTemplate_dataTag_ids UUID[],
+  agentTemplate_properties JSON
 );
 
 
@@ -24,8 +25,9 @@ CREATE TABLE agency.structuralNodes (
   id UUID,
   structuralNode_label TEXT,
   structuralNode_parent_id UUID,
-  agent_assignments TEXT,
-  structuralNode_dataTag_ids UUID[]
+  agent_assignments JSON,
+  structuralNode_dataTag_ids UUID[],
+  structuralNode_properties JSON
 );
 
 
@@ -34,7 +36,9 @@ CREATE TABLE agency.structuralNodes (
 CREATE TABLE agency.dataTags (
   id UUID,
   dataTag_label TEXT,
-  dataTag_for_agent BOOLEAN
+  dataTag_tagType TEXT,
+  dataTag_properties JSON,
+  dataTag_typeObjects JSON
 );
 
 

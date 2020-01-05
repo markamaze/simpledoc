@@ -8,6 +8,9 @@ import java.sql.SQLException;
 import simpledoc.exceptions.ServiceErrorException;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.json.JSONObject;
+
 import java.util.UUID;
 
 import simpledoc.services.ModuleObject;
@@ -92,13 +95,13 @@ public class User extends ModuleObject {
 		
 	@Override
 	public String writeToJson() {
-		String result = "{" +
-				"\"id\":\"" + this.getId().toString() + "\"," +
-				"\"type\":\"" + this.getModuleObjectType() + "\"," +
-				"\"username\":\"" + this.getUsername() + "\"," +
-				"}";
-
-		return result;
+		JSONObject json_result = new JSONObject();
+		json_result.put("id", this.getId());
+		json_result.put("type", this.getModuleObjectType());
+		json_result.put("username", this.getUsername());
+		json_result.put("password", this.getPassword());
+		
+		return json_result.toString();
 	}
 	
 }

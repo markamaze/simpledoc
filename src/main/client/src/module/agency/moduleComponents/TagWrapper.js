@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 
 const Wrapper = styled.span`
-  background: lightgreen;
+  /* background: lightgreen; */
   font-size: x-small;
   border-radius: .3rem;
   margin: .3rem;

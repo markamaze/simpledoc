@@ -1,75 +1,80 @@
 import React from 'react'
 
 import { EditorWrapper } from '../moduleStyles'
-import TagWrapper from '../../components/TagWrapper'
+import PropertyBuilder from './moduleComponents/PropertyBuilder'
+import DataTagSetBuilder from './moduleComponents/DataTagSetBuilder'
+import AgencyObjectDataBuilder from './moduleComponents/AgencyObjectDataBuilder'
+import EditorActions from './moduleComponents/EditorActions'
+import AgentRoleBuilder from './moduleComponents/AgentRoleBuilder'
 
 
-
-
-
-export default class AgentEditor extends React.Component {
+export default class AgentTemplateEditor extends React.Component {
   constructor(props){
     super(props)
-    this.state = {
-      data: {
-        id: this.props.agent.id,
-        type: "agentTemplate",
-        label: this.props.agent.label ? this.props.agent.label : "",
-        dataTags: this.props.agent.dataTags ? this.props.agent.dataTags : []
-      },
-      openDataTagSetting: false
-    }
+    this.state = { agentTemplate: props.agentTemplate }
   }
 
-  updateLabel(value){ this.setState({ data: Object.assign({}, this.state.data, {label: value}) }) }
+  updateProperty(property, value){
+    this.setState({
+      agentTemplate: this.state.agentTemplate.update({[`${property}`]: value})
+    })
+  }
 
-  toggleDataTags(id){
-    let currentTags = Object.assign([], this.state.data.dataTags)
+  getProperties(){
+    return this.state.agentTemplate.agentTemplate_properties === undefined ? [] : this.state.agentTemplate.agentTemplate_properties
+  }
 
-    this.setState({ data: Object.assign({}, this.state.data, {dataTags:
-      currentTags.includes(id) ?
-        currentTags.filter( tagId => tagId !== id )
-        : Object.assign([], currentTags.concat(id))
-    })})
+  getActiveTags(){
+    return this.state.agentTemplate.agentTemplate_dataTag_ids === undefined ? [] : this.state.agentTemplate.agentTemplate_dataTag_ids
+  }
+
+  getTypeData(){ return {security: this.state.agentTemplate.agentTemplate_security} }
+
+  getInheritedData(type){
+    let inheritedData = [], propName, tags
+
+    tags = this.getActiveTags().map( tagId => this.props.dataTags.find(tag => tag.id === tagId))
+
+    if(type === "properties") propName = "dataTag_properties"
+    else if(type === "roles") propName = "dataTag_typeObjects"
+
+    tags.forEach( tag => {
+      inheritedData.push({ inheritedFrom: tag.dataTag_label, data: tag[propName] })
+    })
+
+    return inheritedData
   }
 
   render() {
     return  <EditorWrapper>
-              <div className="editor-item">
-                <div className="editor-item-label">Agent Id</div>
-                <input type="text" value={this.state.data.id} disabled />
-              </div>
 
-              <div className="editor-item">
-                <div className="editor-item-label">Agent Label</div>
-                <input type="text" value={this.state.data.label}
-                    onChange={() => this.updateLabel(event.target.value)} />
-              </div>
+              <AgencyObjectDataBuilder
+                  sections={[{title: "AgentTemplate Id", inputType: "text-disabled", value: this.state.agentTemplate.id, propertyName: "id"},
+                            {title: "AgentTemplate Label", inputType: "text", value: this.state.agentTemplate.agentTemplate_label, propertyName: "agentTemplate_label"}]}
+                  handleValueChange={this.updateProperty.bind(this)} />
 
-              <div className="editor-item">
-                <div className="editor-item-label">Set Tags</div>
-                <div className="editor-item-tags">
-                  {
-                    this.props.dataTags.filter(dataTag => dataTag.tagFor === "agent")
-                                       .map( agentTag =>  <TagWrapper className={`tag${this.state.data.dataTags.includes(agentTag.id) ? "-included" : ""}`}
-                                                              onClick={() => this.toggleDataTags(agentTag.id)}>
-                                                            {agentTag.label}
-                                                          </TagWrapper>)
-                  }
-                </div>
-              </div>
+              <AgentRoleBuilder
+                  agentRole={this.getTypeData()}
+                  updateRole={(prop, value) => this.updateProperty(prop, value.security)} //agent role returns an object containing a security property, extract only the value to update
+                  propertyName={"agentTemplate_security"}
+                  inheritedRoles={this.getInheritedData("roles")} />
 
-              {
-                !this.props.buttons ? null :
-                  <div className="editor-buttons">
-                    { this.props.buttons.map(button =>
-                        <button
-                            onClick={() => button.handler(this.state.data)}
-                            key={`user_editor_button_${button.label}_${this.state.data.id}`} >
-                        {button.label}</button>)
-                    }
-                  </div>
-              }
+              <DataTagSetBuilder
+                  availableTags={this.props.dataTags.filter(dataTag => dataTag.dataTag_tagType === "agent")}
+                  activeTags={this.getActiveTags()}
+                  updateTagSet={this.updateProperty.bind(this)}
+                  tagPropertyName="agentTemplate_dataTag_ids" />
+
+              <PropertyBuilder
+                  updatePropertiesSet={this.updateProperty.bind(this)}
+                  propertiesSet={this.getProperties()}
+                  propertyKey="agentTemplate_properties"
+                  inheritedProperties={this.getInheritedData("properties")} />
+
+              <EditorActions {...this.props}
+                  object={this.state.agentTemplate}
+                  type="agentTemplate" />
+
             </EditorWrapper>
   }
 }

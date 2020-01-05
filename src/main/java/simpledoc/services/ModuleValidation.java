@@ -46,7 +46,7 @@ public abstract class ModuleValidation {
       if(security.length != 4) return false;
       for(char i: security ){
         Integer asint = Integer.parseInt(Character.toString(i));
-        if(asint < 1 || asint > 4) return false;
+        if(asint < 0 || asint > 4) return false;
       }
       return true;
     }

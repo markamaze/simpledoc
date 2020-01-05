@@ -1,58 +1,64 @@
 import React from 'react'
+
 import { EditorWrapper } from '../moduleStyles'
+import PropertyBuilder from './moduleComponents/PropertyBuilder'
+import AgencyObjectDataBuilder from './moduleComponents/AgencyObjectDataBuilder'
+import EditorActions from './moduleComponents/EditorActions'
+import AgentAssignmentBuilder from './moduleComponents/AgentAssignmentBuilder'
+import AgentRoleBuilder from './moduleComponents/AgentRoleBuilder'
 
 
 export default class DataTagEditor extends React.Component {
   constructor(props){
     super(props)
-    this.state = {
-      id: this.props.dataTag.id,
-      type: "dataTag",
-      label: this.props.dataTag.label ? this.props.dataTag.label : "",
-      tagFor: this.props.dataTag.tagFor ? this.props.dataTag.tagFor : ""
+    this.state = { dataTag: props.dataTag }
+  }
+
+  updateProperty(property, value){
+    this.setState({ dataTag: this.state.dataTag.update({[`${property}`]: value})})
+  }
+
+  getTypeSpecificTools(){
+    let type = this.state.dataTag.dataTag_tagType
+
+    switch(type){
+      case "agent":
+        return  <AgentRoleBuilder
+                    agentRole={this.state.dataTag.dataTag_typeObjects}
+                    updateRole={(prop, value) => this.updateProperty(prop, [value])} //there should only be one role in a tag, but dataTag_typeObjects uses an array, so wrap the value as an array of size 1
+                    propertyName={"dataTag_typeObjects"} />
+        break
+      case "structuralNode":
+        return  <AgentAssignmentBuilder {...this.props}
+                    agentAssignments={this.state.dataTag.dataTag_typeObjects}
+                    updateAssignments={this.updateProperty.bind(this)}
+                    propertyName="dataTag_typeObjects" />
+        break
     }
   }
 
-  updateLabel(value){ this.setState({ label: value })}
-
-  setTagForType(tagFor){
-    this.setState({ tagFor: tagFor })
-  }
-
   render() {
+
     return  <EditorWrapper>
-              <div className="editor-item">
-                <div className="editor-item-label">Id</div>
-                <input type="text" value={this.state.id} disabled />
-              </div>
 
-              <div className="editor-item">
-                <div className="editor-item-label">Label</div>
-                <input type="text" value={this.state.label}
-                    onChange={() => this.updateLabel(event.target.value)} />
-              </div>
+              <AgencyObjectDataBuilder
+                  sections={[
+                    {title: "DataTag Id", inputType: "text-disabled", value: this.state.dataTag.id, propertyName: "id"},
+                    {title: "Label", inputType: "text", value: this.state.dataTag.dataTag_label, propertyName: "dataTag_label"},
+                    {title: "DataTag Type", inputType: "select", selectOptions: [{key: "Agent", value: "agent"}, {key: "Structural", value: "structuralNode"}], value: this.state.dataTag.dataTag_tagType, propertyName: "dataTag_tagType"}
+                  ]}
+                  handleValueChange={this.updateProperty.bind(this)} />
 
-              <div className="editor-item">
-                <div className="editor-item-label">Type</div>
-                <select className="editor-selector" value={this.state.tagFor}
-                    onChange={() => this.setTagForType(event.target.value)} >
-                  <option value="">Set DataTag Type</option>
-                  <option value="agent">Agent</option>
-                  <option value="structural">Structural</option>
-                </select>
-              </div>
+              { this.getTypeSpecificTools() }
 
-              {
-                !this.props.buttons ? null :
-                  <div className="editor-buttons">
-                    { this.props.buttons.map(button =>
-                        <button
-                            onClick={() => button.handler(this.state)}
-                            key={`dataTag_editor_button_${button.label}_${this.state.id}`} >
-                        {button.label}</button>)
-                    }
-                  </div>
-              }
+              <PropertyBuilder
+                  updatePropertiesSet={this.updateProperty.bind(this)}
+                  propertiesSet={this.state.dataTag.dataTag_properties}
+                  propertyKey="dataTag_properties" />
+
+              <EditorActions {...this.props}
+                  object={this.state.dataTag}
+                  type="dataTag" />
 
             </EditorWrapper>
   }

@@ -8,18 +8,26 @@ export const EditorWrapper = styled.div`
 
   .editor-item {
     display: flex;
+    width: 100%;
     flex-direction: row;
     border: none;
     height: 1.5rem;
-    padding: 1rem;
+    padding: .1rem;
     flex-wrap: wrap;
     height: auto;
   }
 
-  .editor-selector {
-    height: 1.5rem;
+  .editor-item-input {
+    display: inline-flex;
     width: 65%;
-    background: white;
+    font-size: smaller;
+  }
+
+  .editor-container {
+    flex-direction: column;
+    width: 95%;
+    margin: .5rem auto;
+    border: solid thin black;
   }
 
   input {
@@ -29,10 +37,11 @@ export const EditorWrapper = styled.div`
   }
 
   .editor-item-label {
-    display: flex;
+    display: inline-flex;
     width: 30%;
+    font-size: smaller;
     height: 100%;
-    padding: auto 0;
+    padding: 0;
     margin: 0 .5rem 0 auto;
     /* border: 1px solid black; */
     justify-content: flex-end;

@@ -19,7 +19,8 @@ export function post(url, data, callback, error) {
 
   xmlhttp.open('POST', url, true)
   xmlhttp.setRequestHeader("Content-Type", "application/json")
-  xmlhttp.send(JSON.stringify(data))
+  console.log(data.toJSON())
+  xmlhttp.send(`{\"data\":[${data.toJSON()}]}`)
 }
 
 export function put(url, data, callback, error) {
@@ -32,11 +33,21 @@ export function put(url, data, callback, error) {
 
   xmlhttp.open('PUT', url, true)
   xmlhttp.setRequestHeader("Content-Type", "application/json")
-  xmlhttp.send(JSON.stringify(data))
+  let json_data = data.toJSON()
+  xmlhttp.send(`{\"data\":[${json_data}]}`)
 
 }
 
 export function remove(url, data, callback, error) {
-  console.log("ajax request DELETE called")
+  let xmlhttp = new XMLHttpRequest()
+
+  xmlhttp.onreadystatechange = function() {
+    if(this.readyState === 4 && this.status === 200) callback(this)
+    if(this.readyState === 4 && this.status === 404) error()
+  }
+
+  xmlhttp.open('DELETE', url, true)
+  xmlhttp.setRequestHeader("Content-Type", "application/json")
+  xmlhttp.send(`{\"data\":[${data.toJSON()}]}`)
 
 }
