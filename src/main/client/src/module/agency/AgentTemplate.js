@@ -8,7 +8,7 @@ import EditorActions from './moduleComponents/EditorActions'
 import AgentRoleBuilder from './moduleComponents/AgentRoleBuilder'
 
 
-export default class AgentTemplateEditor extends React.Component {
+export default class AgentTemplate extends React.Component {
   constructor(props){
     super(props)
     this.state = { agentTemplate: props.agentTemplate }

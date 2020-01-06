@@ -1,33 +1,33 @@
-import UserEditor from './UserEditor'
-import TagEditor from './TagEditor'
-import StructuralNodeEditor from './StructuralNodeEditor'
+import User from './User'
+import DataTag from './DataTag'
+import StructuralNode from './StructuralNode'
 import React from 'react'
 
 
 export const dataControl = {
   user: {
-    builder: props => <UserEditor builder {...props} />,
-    editor: props => <UserEditor editor {...props} />,
-    card: props => <UserEditor card {...props} />
+    builder: props => <User builder {...props} />,
+    editor: props => <User editor {...props} />,
+    card: props => <User card {...props} />
   },
   tag: {
-    builder: props => <TagEditor builder {...props} />,
-    editor: props => <TagEditor editor {...props} />,
-    card: props => <TagEditor card {...props} />
+    builder: props => <DataTag builder {...props} />,
+    editor: props => <DataTag editor {...props} />,
+    card: props => <DataTag card {...props} />
   },
   node: {
-    builder: props => <StructuralNodeEditor builder {...props} />,
-    editor: props => <StructuralNodeEditor editor {...props} />,
-    card: props => <StructuralNodeEditor card {...props} />
+    builder: props => <StructuralNode builder {...props} />,
+    editor: props => <StructuralNode editor {...props} />,
+    card: props => <StructuralNode card {...props} />
   },
   template: {
-    builder: props => <AgentTemplateEditor builder {...props} />,
-    editor: props => <AgentTemplateEditor editor {...props} />,
-    card: props => <AgentTemplateEditor card {...props} />
+    builder: props => <AgentTemplate builder {...props} />,
+    editor: props => <AgentTemplate editor {...props} />,
+    card: props => <AgentTemplate card {...props} />
   },
   agent: {
-    builder: props => <AgentEditor builder {...props} />,
-    editor: props => <AgentEditor editor {...props} />,
-    card: props => <AgentEditor card {...props} />
+    builder: props => <Agent builder {...props} />,
+    editor: props => <Agent editor {...props} />,
+    card: props => <Agent card {...props} />
   }
 }

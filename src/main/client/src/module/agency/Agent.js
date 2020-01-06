@@ -3,7 +3,7 @@ import React from 'react'
 import { EditorWrapper } from '../moduleStyles'
 
 
-export default class AgentEditor extends React.Component {
+export default class Agent extends React.Component {
   constructor(props){
     super(props)
     this.state = { agent: this.props.agent }

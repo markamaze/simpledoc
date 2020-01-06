@@ -8,7 +8,7 @@ import AgentAssignmentBuilder from './moduleComponents/AgentAssignmentBuilder'
 import AgentRoleBuilder from './moduleComponents/AgentRoleBuilder'
 
 
-export default class DataTagEditor extends React.Component {
+export default class DataDataTag extends React.Component {
   constructor(props){
     super(props)
     this.state = { dataTag: props.dataTag }

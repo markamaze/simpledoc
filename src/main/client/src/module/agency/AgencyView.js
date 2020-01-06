@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import TagWrapper from './moduleComponents/TagWrapper'
-import StructuralNodeEditor from './StructuralNodeEditor'
+import StructuralNode from './StructuralNode'
 import Overlay from '../../components/Overlay'
 
 
@@ -52,7 +52,7 @@ export default class AgencyView extends React.Component {
                   <Overlay
                             closeOverlay={() => this.setState({ showOverlay: false })}
                             header="StructuralNode"
-                            content={<StructuralNodeEditor {...this.props} structuralNode={node} disableEditing={true} />} />
+                            content={<StructuralNode {...this.props} structuralNode={node} disableEditing={true} />} />
               }
               {
                 childrenNodes.length > 0 ? childrenNodes.map( child => this.loadListDisplay(child, depthIndex)) : null
@@ -72,7 +72,7 @@ export default class AgencyView extends React.Component {
                   <div onClick={() => this.upDateActiveNode(this.state.activeNode.structuralNode_parent_id)}>Parent</div>
                 </div>
                 {
-                  this.state.activeNode ? <StructuralNodeEditor {...this.props} structuralNode={this.state.activeNode} disableEditing={true} /> : null
+                  this.state.activeNode ? <StructuralNode {...this.props} structuralNode={this.state.activeNode} disableEditing={true} /> : null
                 }
                 <div>
                   <div>Children:</div>

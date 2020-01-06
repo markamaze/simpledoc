@@ -9,7 +9,7 @@ import EditorActions from './moduleComponents/EditorActions'
 
 
 
-export default class StructuralNodeEditor extends React.Component {
+export default class StructuralNode extends React.Component {
 
   constructor(props){
     super(props)

@@ -7,11 +7,11 @@ import { connect } from 'react-redux'
 import Agency from './Agency'
 import Overlay from '../../components/Overlay'
 import DataTableWrapper from '../../components/DataTableWrapper'
-import AgentEditor from './AgentEditor'
-import AgentTemplateEditor from './AgentTemplateEditor'
-import StructuralNodeEditor from './StructuralNodeEditor'
-import DataTagEditor from './TagEditor'
-import UserEditor from './UserEditor'
+import Agent from './Agent'
+import AgentTemplate from './AgentTemplate'
+import StructuralNode from './StructuralNode'
+import DataDataTag from './DataTag'
+import User from './User'
 import * as workspace_actions from '../workspace/workspace_actions'
 import * as agency_actions from './module_actions'
 import * as agencyObjects from './data/agencyObjects'
@@ -145,23 +145,23 @@ class AgencyModule extends React.Component {
     switch(this.state.overlayData.type){
       case "AGENCY.AGENT":
         header = "Modify Agent"
-        component = <AgentEditor {...this.props} agent={this.state.overlayData} />
+        component = <Agent {...this.props} agent={this.state.overlayData} />
         break
       case "AGENCY.AGENTTEMPLATE":
         header = "Modify Agent Template"
-        component = <AgentTemplateEditor {...this.props} agentTemplate={this.state.overlayData} />
+        component = <AgentTemplate {...this.props} agentTemplate={this.state.overlayData} />
         break
       case "AGENCY.STRUCTURALNODE":
         header = "Modify StructuralNode"
-        component = <StructuralNodeEditor {...this.props} structuralNode={this.state.overlayData} />
+        component = <StructuralNode {...this.props} structuralNode={this.state.overlayData} />
         break
       case "AGENCY.DATATAG":
         header = "Modify DataTag"
-        component = <DataTagEditor {...this.props} dataTag={this.state.overlayData} />
+        component = <DataDataTag {...this.props} dataTag={this.state.overlayData} />
         break
       case "AGENCY.USER":
         header = "Modify User"
-        component = <UserEditor {...this.props} user={this.state.overlayData} />
+        component = <User {...this.props} user={this.state.overlayData} />
         break
     }
     return  <Overlay

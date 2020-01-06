@@ -6,7 +6,7 @@ import EditorActions from './moduleComponents/EditorActions'
 
 
 
-export default class UserEditor extends React.Component {
+export default class User extends React.Component {
   constructor(props){
     super(props)
     this.state = { user: this.props.user }
