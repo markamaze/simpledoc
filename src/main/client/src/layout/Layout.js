@@ -5,7 +5,6 @@ import styled from 'styled-components'
 import Footer from './Footer'
 import Header from './Header'
 import Navigation from './Navigation'
-import { modules, linkdata } from '../module/moduleData'
 
 
 import colors from '../colors'
@@ -51,23 +50,25 @@ const BodyViewport = styled.div`
 
 
 
-const modulesRoutes = () =>
+const modulesRoutes = modules =>
   <Switch>
     {
-      modules.map(route =>
-        <Route exact={route.exact} path={route.path} render={()=> route.render} />)
+      modules.map(module =>
+        <Route key={`module-route-${module.title}`} exact path={module.path} render={()=> module.component} />)
     }
   </Switch>
+
+const moduleLinks = modules => modules.map( module => ({title: module.title, to: module.path}) )
 
 export default class Layout extends React.Component {
 
   render() {
-    return  <BrowserRouter history={history}>
+    return  <BrowserRouter>
               <BodyWrapper >
                 <Header >
-                  <Navigation links={linkdata} />
+                  <Navigation links={ moduleLinks(this.props.modules) } />
                 </Header>
-                <BodyViewport>{ modulesRoutes() }</BodyViewport>
+                <BodyViewport>{ modulesRoutes(this.props.modules) }</BodyViewport>
                 <Footer />
               </BodyWrapper>
             </BrowserRouter>
