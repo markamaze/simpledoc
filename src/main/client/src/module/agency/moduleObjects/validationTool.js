@@ -1,3 +1,18 @@
+
+
+/*
+    purpose:
+        validate individual value formats of agency objects
+          - id's, strings, property structures?
+*/
+
+/*
+    todo:
+      - need to rebuild validation in agencyObjects and may just pull into it id & string validation and ditch this
+*/
+
+
+
 const validationObject = { isInvalid: false, value: undefined }
 
 export const id = id => {
