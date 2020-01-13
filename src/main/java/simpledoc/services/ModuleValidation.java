@@ -30,7 +30,6 @@ public abstract class ModuleValidation {
     	if(test_string.length() > max_len) return false;
     	char[] test_chars = test_string.toCharArray();
     	for(char character : test_chars) {
-    		System.out.println(character);
     		if(!allow_spaces) {
     			if(character == ' ') return false;  		
     		}
