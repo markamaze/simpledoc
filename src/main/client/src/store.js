@@ -1,16 +1,20 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
-import logger from 'redux-logger'
 import { composeWithDevTools } from 'redux-devtools-extension'
+import modules from './module/index'
 
-import workspaceReducer from './module/workspace/workspace_reducer'
-import agencyReducer from './module/agency/module_reducer'
 
 var middleware = composeWithDevTools(applyMiddleware(thunk))
 
-var reducers = combineReducers({ workspace: workspaceReducer,
-																 agency: agencyReducer
-															  })
+var reducers = () => {
+	let reducersList = modules.map(module => module.reducer)
+	let reducers = {}
+	modules.forEach( module => { module.onLoad() })
 
+	reducersList.forEach(reducer => {
+		reducers = {...reducers, ...reducer}
+	})
+	return combineReducers(reducers)
+}
 
-export default createStore(reducers, middleware)
+export default createStore(reducers(), middleware)
