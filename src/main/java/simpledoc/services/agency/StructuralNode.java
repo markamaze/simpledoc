@@ -28,6 +28,7 @@ public class StructuralNode extends ModuleObject {
 	private String structuralNode_label;
 	private UUID structuralNode_parent_id;
 	private List<Object> agent_assignments;
+	private List<Object> agent_assignments_implemented;
 	private Set<UUID> structuralNode_dataTag_ids;
 	private List<Object> structuralNode_properties;
 	
@@ -38,6 +39,7 @@ public class StructuralNode extends ModuleObject {
 		setLabel(data.get("structuralNode_label").toString());
 		setParentId(data.get("structuralNode_parent_id"));
 		setAgentAssignments(data.get("agent_assignments"));
+		setAgentAssignmentsImplemented(data.get("agent_assignments_implemented"));
 		setDataTags(data.get("structuralNode_dataTag_ids"));
 		setProperties(data.get("structuralNode_properties"));
 	}
@@ -74,6 +76,17 @@ public class StructuralNode extends ModuleObject {
 		
 
 	}
+	private void setAgentAssignmentsImplemented(Object assgnImpldata) throws ServiceErrorException {
+		List<Object> assignmentsImplemented = new ArrayList<Object>();
+		
+		if(assgnImpldata instanceof ArrayList) this.agent_assignments = (List<Object>) assgnImpldata;
+		else if(assgnImpldata instanceof String) System.out.println("setAgentAssignments arg is a string");
+		else if( assgnImpldata == null) this.agent_assignments_implemented = assignmentsImplemented;
+		else if(assgnImpldata instanceof PGobject) this.agent_assignments_implemented = new JSONArray(((PGobject)assgnImpldata).getValue()).toList();
+		else throw new ServiceErrorException("invalid agent assignment implementation list");
+		
+
+	}
 	private void setDataTags(Object tagdata) throws ServiceErrorException {
 		List<UUID> tags = new ArrayList<UUID>();
 		
@@ -96,6 +109,7 @@ public class StructuralNode extends ModuleObject {
 	public String getLabel() { return this.structuralNode_label; }
 	public UUID getParentId() { return this.structuralNode_parent_id; }
 	public List<Object> getAgentAssignments() { return this.agent_assignments; }
+	public List<Object> getAgentAssignmentsImplemented() { return this.agent_assignments_implemented; }
 	public Set<UUID> getDataTagIds() { return this.structuralNode_dataTag_ids; }
 	public List<Object> getProperties() { return this.structuralNode_properties; }
 
@@ -113,6 +127,9 @@ public class StructuralNode extends ModuleObject {
 				case "agent_assignments":
 					setAgentAssignments(entry.getValue());
 					break;
+				case "agent_assignments_implemented":
+					setAgentAssignmentsImplemented(entry.getValue());
+					break;
 				case "structuralNode_dataTag_ids":
 					setDataTags(entry.getValue());
 					break;
@@ -129,6 +146,7 @@ public class StructuralNode extends ModuleObject {
 		setLabel(rs.getString("structuralNode_label"));
 		setParentId(rs.getObject("structuralNode_parent_id"));
 		setAgentAssignments(rs.getObject("agent_assignments"));
+		setAgentAssignmentsImplemented(rs.getObject("agent_assignments_implemented"));
 		setDataTags(rs.getArray("structuralNode_dataTag_ids").getArray());
 		setProperties(rs.getObject("structuralNode_properties"));
 		return true;
@@ -139,10 +157,10 @@ public class StructuralNode extends ModuleObject {
 		try {
 			switch(type) {
 			case "create":
-				statement = connection.prepareStatement("call agency.create_structuralNode(?,?,?,?,?,?)");
+				statement = connection.prepareStatement("call agency.create_structuralNode(?,?,?,?,?,?,?)");
 				break;
 			case "update":
-				statement = connection.prepareStatement("call agency.update_structuralnode(?,?,?,?,?,?)");
+				statement = connection.prepareStatement("call agency.update_structuralnode(?,?,?,?,?,?,?)");
 				break;
 			}
 			
@@ -156,12 +174,18 @@ public class StructuralNode extends ModuleObject {
 			assignmentsPG.setType("json");
 			assignmentsPG.setValue(asgnArr.toString());
 			
+			PGobject assignmentsImplementedPG = new PGobject();
+			JSONArray asgnImplArr = new JSONArray(this.getAgentAssignmentsImplemented());
+			assignmentsImplementedPG.setType("json");
+			assignmentsImplementedPG.setValue(asgnImplArr.toString());
+			
 			statement.setObject(1, this.getId());
 			statement.setString(2, this.getLabel());
 			statement.setObject(3, this.getParentId());
 			statement.setObject(4, assignmentsPG);
-			statement.setArray(5, connection.createArrayOf("UUID", this.getDataTagIds().toArray()));
-			statement.setObject(6, propertiesPG);
+			statement.setObject(5, assignmentsImplementedPG);
+			statement.setArray(6, connection.createArrayOf("UUID", this.getDataTagIds().toArray()));
+			statement.setObject(7, propertiesPG);
 		} catch(SQLException err) { throw new ServiceErrorException("could not create storage statement" + err.getMessage()); }
 		
 		
@@ -177,6 +201,7 @@ public class StructuralNode extends ModuleObject {
 		json_result.put("structuralNode_label", this.getLabel());
 		json_result.put("structuralNode_parent_id", this.getParentId());
 		json_result.put("agent_assignments", this.getAgentAssignments());
+		json_result.put("agent_assignments_implemented", this.getAgentAssignmentsImplemented());
 		json_result.put("structuralNode_dataTag_ids", this.getDataTagIds());
 		json_result.put("structuralNode_properties", this.getProperties());
 		
