@@ -24,11 +24,10 @@ const OverlayWrapper = styled.div`
     right: 0;
     bottom: 0;
     left: 0;
-    padding: 1rem 0;
+    padding: 1rem;
     margin: 0 auto;
     height: 100%;
     max-height: 100%;
-    width: 100%;
 
     @media (min-width: 500px) {
       width: 500px;
@@ -59,6 +58,7 @@ const OverlayWrapper = styled.div`
     color: ${colors.two};
     display: flex;
     max-height: 92%;
+    padding: .5rem;
   }
   .content {
     margin: 0 auto;
