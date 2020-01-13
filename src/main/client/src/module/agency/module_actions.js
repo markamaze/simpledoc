@@ -1,7 +1,5 @@
 import store from '../../store'
 import { put, get, post, remove } from '../../utility/ajax'
-import objectId from 'bson-objectid'
-import sampleData from '../../sample_data'
 
 
 
