@@ -121,7 +121,7 @@ export default class Navigation extends React.Component {
                   {
                     this.state.collapsed ? null
                       : this.props.links.map(link =>
-                        <div className={`link`}>
+                        <div className={`link`} key={`module-link-${link.title}`}>
                           <Link
                               className={ activepath === link.to ? "active" : ""}
                               to={link.to}
@@ -129,6 +129,7 @@ export default class Navigation extends React.Component {
                             { link.title } </Link>
                             { link.links ? <Navigation
                                               subnav
+                                              key={`module-sublink-${link.title}`}
                                               links={link.links}
                                               toggleparent={this.toggleMenuState.bind(this)} />
                                           : null }
