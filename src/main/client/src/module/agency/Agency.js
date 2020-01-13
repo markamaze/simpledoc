@@ -1,149 +1,157 @@
 import React from 'react'
-import styled from 'styled-components'
-import AgencyView from './AgencyView'
-import colors from '../../colors'
-import DisplayCard from './DisplayCard'
 
-const StyleWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
+import Overlay from '../../components/Overlay'
+import DataTableWrapper from '../../components/DataTableWrapper'
+import { user } from './moduleObjects/user'
+import { dataTag } from './moduleObjects/dataTag'
+import { structuralNode } from './moduleObjects/structuralNode'
+import { agentTemplate } from './moduleObjects/agentTemplate'
+import { agent } from './moduleObjects/agent'
 
+/*
+  purpose:
+      controller for module view and tools
+        - loads module tools for user to perform crud ops
+        -
+*/
 
-  #view-type-selector {
-    display: flex;
-    flex-direction: row;
-    height: 2rem;
-    width: 100%;
-    background: ${colors.two};
-    color: ${colors.one};
-
-    .view-option {
-      display: flex;
-      flex-grow: 0;
-      width: 8rem;
-      background: ${colors.one};
-      color: ${colors.two};
-      border-right: thin solid black;
-    }
-
-  }
-  .view-container {
-    display: flex;
-    flex-direction: column;
-
-    @media( min-width: 500px){
-      flex-direction: row;
-    }
-  }
-  .mainview {
-    background: ${colors.three};
-    color: ${colors.four};
-    display: flex;
-    height: 100%;
-    margin: .5rem auto;
-    padding: .5rem;
-  }
-  .cardview {
-    display: flex;
-    margin: .5rem auto;
-    padding: auto .5rem;
-  }
-
-  .tree-node-label-active {
-    background: purple
-  }
-`
-
-
-export default class Agency extends React.Component{
+export default class Agency extends React.Component {
   constructor(props){
     super(props)
-    this.state = { showView: "agencyTree", activeData: this.props.rootNode }
-  }
-
-  toggleView(){
-    this.setState({ showView: this.state.showView === "agencyTree" ? "chainOfCommand" : "agencyTree" })
-  }
-  setActiveItem(item){
-    this.setState({ activeData: item })
+    this.state = {
+      activeComponent: null,
+      activeView: "agency",
+      renderOverlay: false
+    }
   }
 
   agencyTree(id, depth){
+    if(!id) return <div className="empty-component">no node id identified</div>
+
     let _depth = ++depth
     let node = this.props.structuralNodes.find( node => node.id === id)
-    let children = this.props.structuralNodes.filter( node => node.structuralNode_parent_id === id && node.structuralNode_parent_id !== node.id )
 
-    return  <div className="tree-node" style={{paddingLeft: `${depth/2}rem`}} >
-              <div className={`tree-node-label${this.state.activeData.id === node.id ? "-active" : ""}`} onClick={()=>this.setActiveItem(node)}>{node.structuralNode_label}</div>
-              <div className="tree-node-children" style={{paddingLeft: `${depth/2 + 0.25}rem`}}>{ children.map( child => this.agencyTree(child.id, _depth) )}</div>
-            </div>
-  }
+    let children = node.getChildren(node.id, this.props.structuralNodes)
 
-  chainOfCommand(node_id, depth){
-    return <div>setup creation of Agents based on assignments in structuralNodes. Once agents are working this can be built</div>
-  }
+    return  <div className="tree-node" style={{paddingLeft: `${depth/2}rem`}} key={`tree-node-${node.id}`}>
+              <div className={`tree-node-header${this.state.activeComponent && this.state.activeComponent.id === node.id ? "-active" : ""}`} >
 
-  render(){
-    return  <StyleWrapper>
-              <div className="view-toggle" onClick={() => this.toggleView() }>Switch View</div>
-              <div className="view-container">
-                <div className="mainview">
-                  { this.state.showView === "agencyTree" ? this.agencyTree(this.props.rootNode.id, 0) : null }
-                  { this.state.showView === "chainOfCommand" ? this.chainOfCommand(this.props.rootNode.id, 0) : null }
-                </div>
+                <span className="tree-node-header-title" onClick={()=> this.openInOverlay(node, "card")} >
+                  { node.structuralNode_label }
+                </span>
+                <span className="tree-node-header-action" onClick={() => this.openInOverlay(node, "builder")} >
+                  build
+                </span>
+                <span className="tree-node-header-action" onClick={() => this.openInOverlay(node, "editor")}>
+                  edit
+                </span>
 
-                <div className="cardview">
-                  <DisplayCard data={this.state.activeData} {...this.props} />
-                </div>
               </div>
 
-            </StyleWrapper>
+              <div className="tree-node-children" style={{paddingLeft: `${depth/2 + 0.25}rem`}}>
+                { children.map( child => this.agencyTree(child.id, _depth) )}
+              </div>
+
+            </div>
+  }
+  objectList(type){
+    let columns, data, title
+
+    switch(type){
+      case "agentTemplate":
+        title = "Agent Templates"
+        data = this.props.agentTemplates
+        columns = [{ name: "Templates", selector: "agentTemplate_label"}]
+        break
+      case "dataTag":
+        title = "Agency Tags"
+        data = this.props.dataTags
+        columns = [{ name: "Tags", selector: "dataTag_label"}]
+        break
+      case "user":
+        title = "Users"
+        data = this.props.users
+        columns = [{ name: "Users", selector: "username"}]
+        break
+    }
+
+
+    const RowComponent = ({data}) =>{
+      let displayComponent = data.display({card: true, ...this.props})
+      return  <div>
+                <div onClick={() => this.openInOverlay(data, "builder")}>open builder</div>
+                { displayComponent }
+              </div>}
+
+    return  <DataTableWrapper
+                className="object-list"
+                title={title}
+                actions={[<div onClick={() => this.newObject(type)}>+</div>]}
+                fixedHeader noTableHead overflowY expandableRows
+                expandableRowsComponent={<RowComponent />}
+                columns={columns}
+                data={data} />
+  }
+
+
+  newObject(type){
+
+    let newObject
+
+    if(type === "user") newObject = user({id: "new_object"})
+    else if(type === "dataTag") newObject = dataTag({id: "new_object"})
+    else if(type === "agentTemplate") newObject = agentTemplate({id: "new_object"})
+    else if(type === "structuralNode") newObject = structuralNode({id: "new_object"})
+    else if(type === "agent") newObject = agent({id: "new_object"})
+    else throw "invalid object type"
+
+    this.setState({
+      activeComponent: newObject.display({builder: true, ...this.props}),
+      renderOverlay: true
+    })
+  }
+  openInOverlay(data, displayType){
+    this.setState({
+      activeComponent: data.display({[`${displayType}`]: true, ...this.props}),
+      renderOverlay: true
+    })
+  }
+
+
+  render() {
+    const activeView = (type, rootId) => {
+      switch(type){
+        case "agency": return this.agencyTree(rootId, 0)
+        case "agent": return this.chainOfCommand(rootId)
+        case "agentTemplate":
+        case "dataTag":
+        case "user": return this.objectList(type)
+      }
+    }
+
+    return  <div className="module">
+
+              <div className="module-toolbar">
+                <div className={`module-toolbar-item${this.state.activeView === "agency" ? "-active": ""}`}
+                      onClick={() => this.setState({activeView: "agency"})}>Agency</div>
+                <div className={`module-toolbar-item${this.state.activeView === "agentTemplate" ? "-active": ""}`}
+                      onClick={() => this.setState({activeView: "agentTemplate"})}>Templates</div>
+                <div className={`module-toolbar-item${this.state.activeView === "user" ? "-active": ""}`}
+                      onClick={() => this.setState({activeView: "user"})}>Users</div>
+                <div className={`module-toolbar-item${this.state.activeView === "dataTag" ? "-active": ""}`}
+                      onClick={() => this.setState({activeView: "dataTag"})}>Tags</div>
+              </div>
+
+              <div className="module-viewport">{ activeView(this.state.activeView, this.props.rootNodeId) }</div>
+
+              {
+                !this.state.renderOverlay ? null :
+                  <Overlay
+                      header=""
+                      content={this.state.activeComponent}
+                      closeOverlay={() => this.setState({renderOverlay: false, activeComponent: null})}/>
+              }
+
+            </div>
   }
 }
-
-
-
-//
-// export default class Agency extends React.Component{
-//   constructor(props){
-//     super(props)
-//     this.state = { viewTypeIndex: 1 }
-//   }
-//
-//   setViewType(typeIndex){
-//     this.setState({ viewTypeIndex: typeIndex })
-//   }
-//
-//   getRootDisplayNode(){
-//     return this.props.structuralNodes.find( node => node.id === node.structuralNode_parent_id)
-//   }
-//
-//   getDisplay(){
-//     let rootNode = this.getRootDisplayNode()
-//
-//     if(rootNode === undefined) return <div>Agency loading or not yet created</div>
-//
-//     switch(this.state.viewTypeIndex){
-//       case 1:
-//         return <AgencyView {...this.props} rootNode={rootNode} displayType="cards" />
-//       case 2:
-//         return <AgencyView {...this.props} rootNode={rootNode} displayType="list" />
-//       case 3:
-//         return <AgencyView {...this.props} rootNode={rootNode} displayType="chart" />
-//     }
-//   }
-//
-//   render() {
-//     return  <StyleWrapper>
-//               <div id="view-type-selector">
-//                 <div className="view-option" onClick={ ()=> this.setViewType(1)}>Card View</div>
-//                 <div className="view-option" onClick={ ()=> this.setViewType(2)}>List View</div>
-//                 <div className="view-option" onClick={ ()=> this.setViewType(3)}>Chart View</div>
-//               </div>
-//
-//               { this.getDisplay() }
-//             </StyleWrapper>
-//   }
-// }
