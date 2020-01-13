@@ -5,9 +5,13 @@ import { connect } from 'react-redux'
 import * as agency_actions from '../module_actions'
 
 
-function EditorActions(props) {
+function BuilderActions(props){
   return  <div className="editor-actions">
-            <button onClick={() => props.agency_actions.updateAgencyObject(props.type, props.object)}>Update</button>
+            {
+              props.object.id === "new_object" ?
+              <button onClick={() => props.agency_actions.createAgencyObject(props.type, props.object)}>Create</button>
+              : <button onClick={() => props.agency_actions.updateAgencyObject(props.type, props.object)}>Update</button>
+            }
             <button onClick={() => props.agency_actions.deleteAgencyObject(props.type, props.object)}>Delete</button>
           {/*
             <button onClick={() => props.workspace_actions.clearTempState(props.object.id)}>Revert</button>
@@ -17,7 +21,6 @@ function EditorActions(props) {
           </div>
 }
 
-
 const mapStateToProps = (state, ownProps) => ({
   // workspace_actions: workspace_actions,
   agency_actions: agency_actions,
@@ -25,4 +28,4 @@ const mapStateToProps = (state, ownProps) => ({
 })
 
 
-export default connect(mapStateToProps)(EditorActions)
+export default connect(mapStateToProps)(BuilderActions)
