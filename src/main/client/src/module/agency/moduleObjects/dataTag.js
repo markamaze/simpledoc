@@ -48,10 +48,13 @@ const dataTagPrototype = {
   displayProps: {
     builder: {
       agencyObjectData: {
-        sections: dataItem => ([
-          {title: "DataTag Id", inputType: "text-disabled", value: dataItem.id, propertyName: "id"},
-          {title: "Label", inputType: "text", value: dataItem.dataTag_label, propertyName: "dataTag_label"},
-          {title: "DataTag Type", inputType: "select", selectOptions: [{key: "Agent", value: "agent"}, {key: "Structural", value: "structuralNode"}], value: dataItem.dataTag_tagType, propertyName: "dataTag_tagType"}]) },
+        sections: function(){
+          return [
+            {title: "DataTag Id", inputType: "text-disabled", value: this.id, propertyName: "id"},
+            {title: "Label", inputType: "text", value: this.dataTag_label, propertyName: "dataTag_label"},
+            {title: "DataTag Type", inputType: "select", selectOptions: [{key: "Agent", value: "agent"}, {key: "Structural", value: "structuralNode"}], value: this.dataTag_tagType, propertyName: "dataTag_tagType"}
+        ]}
+      },
 
       propertyBuilder: {
         propertiesSet: dataItem => dataItem.dataTag_properties,
@@ -78,12 +81,12 @@ const dataTagPrototype = {
     },
     editor: {},
     card: {
-      header: function(){ return `Agent Template: ${dataItem.dataTag_label}` },
-      assignments: {},
-      properties: {},
-      agencyObjectData: {},
-      roleData: {},
-      tagData: {}}
+      header: function(){ return `Agent Template: ${this.dataTag_label}` },
+      assignments: function(){},
+      properties: function(){},
+      agencyObjectData: function(){},
+      roleData: function(){},
+      tagData: function(){}}
   },
 
   typeFunctions: {}

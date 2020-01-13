@@ -56,8 +56,8 @@ export default class Builder extends React.Component {
                 !propKeySet.includes("propertyBuilder") ? null :
                   <PropertyBuilder
                       updatePropertiesSet={(prop, value) => this.updateProperty(prop, value)}
-                      propertiesSet={this.props.propertyBuilder.propertiesSet(this.state.dataItem)}
-                      inheritedProperties={this.props.propertyBuilder.inheritedProperties(this.state.dataItem, this.props.dataTags)}
+                      propertiesSet={this.props.propertyBuilder.propertiesSet.call(this.state.dataItem)}
+                      inheritedProperties={this.props.propertyBuilder.inheritedProperties.call(this.state.dataItem, this.props)}
                       propertyKey={this.props.propertyBuilder.propertyKey} />
               }
               {
@@ -71,16 +71,16 @@ export default class Builder extends React.Component {
               {
                 !propKeySet.includes("roleBuilder") ? null :
                   <AgentRoleBuilder
-                      agentRole={this.props.roleBuilder.agentRole(this.state.dataItem)}
+                      agentRole={this.props.roleBuilder.agentRole.call(this.state.dataItem)}
                       updateRole={(prop, value) => this.updateProperty(prop, value.security)}
-                      inheritedRole={null} //TODO: this has not yet been build
+                      inheritedRole={null} //TODO:this has not yet been build
                       propertyName={this.props.roleBuilder.propertyName} />
               }
               {
                 !propKeySet.includes("dataTagSetBuilder") ? null :
                   <DataTagSetBuilder
-                      availableTags={this.props.dataTagSetBuilder.availableTags(this.props.dataTags)}
-                      activeTags={this.props.dataTagSetBuilder.activeTags(this.state.dataItem)}
+                      availableTags={this.props.dataTagSetBuilder.availableTags.call(this.props.dataTags, this.props)}
+                      activeTags={this.props.dataTagSetBuilder.activeTags.call(this.state.dataItem, this.props)}
                       updateTagSet={(prop, value) => this.updateProperty(prop, value)}
                       tagPropertyName={this.props.dataTagSetBuilder.tagPropertyName} />
               }

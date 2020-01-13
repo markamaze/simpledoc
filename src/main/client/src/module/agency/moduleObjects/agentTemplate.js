@@ -49,47 +49,42 @@ const agentTemplatePrototype = {
 
   displayProps: {
     builder: {
-      // dataItem: () => {
-      //   let label = agentTemplate.agentTemplate_label === undefined ? "" : agentTemplate.agentTemplate_label
-      //   let security = agentTemplate.agentTemplate_security === undefined ? "" : agentTemplate.agentTemplate_security
-      //   let tagIds = agentTemplate.agentTemplate_dataTag_ids === undefined ? [] : agentTemplate.agentTemplate_dataTag_ids
-      //   let properties = agentTemplate.agentTemplate_properties === undefined ? [] : agentTemplate.agentTemplate_properties
-      //
-      //   return agentTemplate.update({
-      //     agentTemplate_label: label,
-      //     agentTemplate_security: security,
-      //     agentTemplate_dataTag_ids: tagIds,
-      //     agentTemplate_properties: properties
-      //   })
-      // },
-
       agencyObjectData: {
-        sections: dataItem => ([
-          {title: "AgentTemplate Id", inputType: "text-disabled", value: dataItem.id, propertyName: "id"},
-          {title: "AgentTemplate Label", inputType: "text", value: dataItem.agentTemplate_label, propertyName: "agentTemplate_label"}
-        ])
+        sections: function(){
+          return [
+            {title: "AgentTemplate Id", inputType: "text-disabled", value: this.id, propertyName: "id"},
+            {title: "AgentTemplate Label", inputType: "text", value: this.agentTemplate_label, propertyName: "agentTemplate_label"}
+          ]}
       },
 
       propertyBuilder: {
-        propertiesSet: dataItem => dataItem.agentTemplate_properties,
-        propertyName: "agentTemplate_properties",
-        inheritedProperties: (dataItem, allTags) =>
-          allTags.filter( tag => dataItem.agentTemplate_dataTag_ids.includes(tag.id))
-            .map( tag => ({ inheritedFrom: tag.dataTag_label, data: tag.dataTag_properties})),
+        propertiesSet: function(){ return this.agentTemplate_properties },
+        propertyKey: "agentTemplate_properties",
+        inheritedProperties: function(props){
+          return props.dataTags.filter( tag => this.agentTemplate_dataTag_ids.includes(tag.id))
+            .map( tag => ({ inheritedFrom: tag.dataTag_label, data: tag.dataTag_properties}))
+        }
       },
 
       roleBuilder: {
         propertyName: "agentTemplate_security",
-        agentRole: dataItem => ({security: dataItem.agentTemplate_security}),
-        inheritedRole: (dataItem, allTags) =>
-          allTags.filter( tag => dataItem.agentTemplate_dataTag_ids.includes(tag.id))
+        agentRole: function(){
+          return {security: this.agentTemplate_security}
+        },
+        inheritedRole: function(props){
+          return props.dataTags.filter( tag => this.agentTemplate_dataTag_ids.includes(tag.id))
             .map( tag => ({inheritedFrom: tag.dataTag_label, data: tag.dataTag_typeObjects}))
+        }
       },
 
       dataTagSetBuilder: {
-        availableTags: allTags => allTags.filter( tag => tag.dataTag_tagType === "agent"),
+        availableTags: function(props){
+          return props.dataTags.filter( tag => tag.dataTag_tagType === "agent")
+        },
         tagPropertyName: "agentTemplate_dataTag_ids",
-        activeTags: dataItem => dataItem.agentTemplate_dataTag_ids
+        activeTags: function(props){
+          return this.agentTemplate_dataTag_ids
+        }
       }
     },
     editor: {},
