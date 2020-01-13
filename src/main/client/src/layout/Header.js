@@ -7,7 +7,7 @@ import colors from '../colors'
 const StyleWrapper = styled.div`
 
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   background: ${colors.three};
   color: ${colors.four};
 
@@ -30,8 +30,8 @@ const StyleWrapper = styled.div`
 export default class Header extends React.Component {
   render() {
     return  <StyleWrapper>
-              {this.props.children}
               <header>Simpledoc: AI Clerk</header>
+              {this.props.children}
             </StyleWrapper>
   }
 }
