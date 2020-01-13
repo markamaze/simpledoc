@@ -1,6 +1,8 @@
-import sampleData from '../../sample_data'
-import * as agencyObject from './data/agencyObjects'
-
+import { user } from './moduleObjects/user'
+import { dataTag } from './moduleObjects/dataTag'
+import { structuralNode } from './moduleObjects/structuralNode'
+import { agentTemplate } from './moduleObjects/agentTemplate'
+import { agent } from './moduleObjects/agent'
 
 const initialState = {
   structuralNodes: [],
@@ -11,7 +13,7 @@ const initialState = {
 }
 
 
-export default function agency_reducer (state=initialState, action) {
+export default function agency_reducer(state=initialState, action) {
   switch(action.type) {
     case "LOAD_AGENCY_STORE": {
       console.log("loading agency", action.payload)
@@ -24,8 +26,7 @@ export default function agency_reducer (state=initialState, action) {
             agents = entry[1].reduce( (agents, agentdata) => {
               if(!agents) return false
 
-              let newagent = Object.create(agencyObject.agent())
-              newagent = newagent.init(agentdata)
+              let newagent = agent(agentData)
 
               return !newagent ? false : [...agents, newagent]
             }, agents)
@@ -36,8 +37,7 @@ export default function agency_reducer (state=initialState, action) {
             agentTemplates = entry[1].reduce( (templates, templateData) => {
               if(!templates) return false
 
-              let newtemplate = Object.create(agencyObject.agentTemplate())
-              newtemplate = newtemplate.init(templateData)
+              let newtemplate = agentTemplate(templateData)
 
               return !newtemplate ? false : [...templates, newtemplate]
             }, agentTemplates)
@@ -48,8 +48,7 @@ export default function agency_reducer (state=initialState, action) {
             structuralNodes = entry[1].reduce( (structures, structureData) => {
               if(!structures) return false
 
-              let newstructure = Object.create(agencyObject.structuralNode())
-              newstructure = newstructure.init(structureData)
+              let newstructure = structuralNode(structureData)
 
               return !newstructure ? false : [...structures, newstructure]
 
@@ -61,8 +60,7 @@ export default function agency_reducer (state=initialState, action) {
             dataTags = entry[1].reduce( (tags, tagData) => {
               if(!tags) return false
 
-              let newtag = Object.create(agencyObject.dataTag())
-              newtag = newtag.init(tagData)
+              let newtag = dataTag(tagData)
 
               return !newtag ? false : [...tags, newtag]
 
@@ -73,8 +71,7 @@ export default function agency_reducer (state=initialState, action) {
             users = entry[1].reduce( (users, userData) => {
               if(!users) return false
 
-              let newuser = Object.create(agencyObject.user())
-              newuser = newuser.init(userData)
+              let newuser = user(userData)
 
               return !newuser ? false : [...users, newuser]
 
@@ -96,9 +93,14 @@ export default function agency_reducer (state=initialState, action) {
     case "CREATE_AGENCY_OBJECT": {
       try {
         let type = action.agencyObjectType
-        let newObject = Object.create(agencyObject[`${type}`]())
+        let newObject
+        if(type === "user") newObject = user(action.payload)
+        else if(type === "dataTag") newObject = dataTag(action.payload)
+        else if(type === "agentTemplate") newObject = agentTemplate(action.payload)
+        else if(type === "structuralNode") newObject = structuralNode(action.payload)
+        else if(type === "agent") newObject = agent(action.payload)
+        else throw "invalid object type"
 
-        newObject = newObject.init(action.payload)
 
         return Object.assign({}, state, { [`${type}s`]: [...state[`${type}s`], newObject] })
       }
@@ -113,8 +115,15 @@ export default function agency_reducer (state=initialState, action) {
     case "UPDATE_AGENCY_OBJECT": {
       try {
         let type = action.agencyObjectType
-        let updatedObject = Object.create(agencyObject[`${type}`]())
-        updatedObject = updatedObject.init(action.payload)
+        let updatedObject
+
+        if(type === "user") updatedObject = user(action.payload)
+        else if(type === "dataTag") updatedObject = dataTag(action.payload)
+        else if(type === "agentTemplate") updatedObject = agentTemplate(action.payload)
+        else if(type === "structuralNode") updatedObject = structuralNode(action.payload)
+        else if(type === "agent") updatedObject = agent(action.payload)
+        else throw "invalid object type"
+
         let updatedSet = [...state[`${type}s`] ]
         updatedSet = updatedSet.filter(item => updatedObject.id != item.id)
 
