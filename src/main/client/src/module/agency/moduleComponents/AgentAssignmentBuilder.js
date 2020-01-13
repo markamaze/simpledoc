@@ -7,8 +7,8 @@ export default class AgentAssignmentBuilder extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      agentAssignments: this.props.agentAssignments ? this.props.agentAssignments : [],
-      inheritedAssignments: this.props.inheritedAssignments ? this.props.inheritedAssignments : [],
+      agentAssignments: this.props.agentAssignments ? this.props.agentAssignments : [], //do I need this?
+      inheritedAssignments: this.props.inheritedAssignments ? this.props.inheritedAssignments : [], //do I need this?
       tempNewAssignment: {}
     }
   }
@@ -22,10 +22,17 @@ export default class AgentAssignmentBuilder extends React.Component {
 
     this.setState({
       agentAssignments: updatedAssignments,
-      tempNewAssignment: { agentTemplate_id: undefined, reports_to: undefined }
+      tempNewAssignment: {
+        assignment_id: undefined, //id for this assignment
+        agentTemplate_id: undefined, //template id to use for this assignment
+        assigned_user_id: undefined, //user assigned for this assignment
+        reports_to: undefined, //assignment_id this assignment will report to
+        oversees_structuralNode_id: undefined //id of the structuralNode this assignment oversees
+        }
     })
   }
 
+  //this isn't working right
   removeAssignment(dataRow){
     let updatedAssignments = this.state.agentAssignments.filter(asgn => asgn.agentTemplate_id !== dataRow.agentTemplate_id)
 
@@ -58,6 +65,8 @@ export default class AgentAssignmentBuilder extends React.Component {
               else
                 return this.getAgentTemplateLabel(row.agentTemplate_id)
           }},
+
+      //move to editor
       { name: "Reports To", ignoreRowClick: true, cell: row => {
               if(row.newAssignment)
                 return  <select value={this.state.tempNewAssignment.reports_to} onChange={() => this.updateTempNewAssignment("reports_to", event.target.value)}>
