@@ -3,7 +3,7 @@ import React from 'react'
 import AgencyModule from './AgencyModule'
 import agency_reducer from './module_reducer'
 import { loadAgencyStore } from './module_actions'
-
+import searchAgency from './services/searchAgency'
 
 
 export default module = {
@@ -11,7 +11,8 @@ export default module = {
   onLoad: loadAgencyStore,
   title: "Agency",
   path: "/Agency",
-  component: <AgencyModule />
+  component: <AgencyModule />,
+  services: [ searchAgency ]
 }
 
 
@@ -21,9 +22,12 @@ export default module = {
     store
     DataTableWrapper
     Overlay
-    ajax
     workspace actions
 
 
   I would like to figure out how to completly encapsulate the module w/o too much repitition of code
 */
+const externalActions = () => ({
+  testAction: { label: "external action", action: function(){console.log("success!")}}
+})
+export { externalActions }
