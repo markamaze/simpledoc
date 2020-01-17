@@ -1,112 +1,122 @@
 import React from 'react'
-import {moduleObjectPrototype} from './moduleObjectPrototype'
+import * as validationTool from './validationTool'
 
 
 
-const agentTemplatePrototype = {
+export const agentTemplatePrototype = (storageActions, importedActions) => ({
+  type: function(){ return "agentTemplate" },
   properties: {
     id: {
       setValue: function(id){
-        if(!agentTemplatePrototype.properties.id.validate(id)) return false
-        this.id = id
+        if(!id) throw `Missing required AGENTTEMPLATE property: id`
+        else if(!this.properties.id.validate(id)) throw `Invalid AGENTTEMPLATE property: id -> ${id}`
+        else this.id = id
         return true
       },
-      validate: id => { return true }
+      validate: id => {
+        if(id === "new_object" && typeof this === "undefined") return true
+        else if(validationTool.id(id)) return true
+        else return false
+      }
     },
     agentTemplate_label: {
       setValue: function(label){
-        if(!agentTemplatePrototype.properties.agentTemplate_label.validate(label)) return false
-        this.agentTemplate_label = label ? label : ""
+        if(!label && this.id === "new_object") this.agentTemplate_label = "new agentTemplate"
+        else if(!label) throw `Mising required AGENTTEMPLATE property: agentTemplate label`
+        else if(!this.properties.agentTemplate_label.validate(label)) throw `Invalid AGENTTEMPLATE property: label -> ${label}`
+        else this.agentTemplate_label = label
         return true
       },
-      validate: label => { return true }
+      validate: label => {
+        if(validationTool.string(label, {noSpaces: false, minLength: 1, maxLength: 48})) return true
+        return false
+      }
     },
     agentTemplate_security: {
       setValue: function(security){
-        if(!agentTemplatePrototype.properties.agentTemplate_security.validate(security)) return false
-        this.agentTemplate_security = security ? security : "0000"
+        if(!security) this.agentTemplate_security = "0000"
+        else if(!this.properties.agentTemplate_security.validate(security)) throw `Invalid AGENTTEMPLATE property: agentTemplate security -> ${security}`
+        else this.agentTemplate_security = security
         return true
       },
-      validate: security => { return true }
+      validate: security => {
+        if(validationTool.string(security, {noSpaces: true, minLength: 4, maxLength: 4})) return true
+        return false
+      }
     },
     agentTemplate_dataTag_ids: {
       setValue: function(tagIds){
-        if(!agentTemplatePrototype.properties.agentTemplate_dataTag_ids.validate(tagIds)) return false
-        this.agentTemplate_dataTag_ids = tagIds ? tagIds : []
+        if(!tagIds) this.agentTemplate_dataTag_ids = []
+        else if(!this.properties.agentTemplate_dataTag_ids.validate(tagIds)) throw `Invalid AGENTTEMPLATE property: dataTag id set`
+        else this.agentTemplate_dataTag_ids = tagIds
         return true
       },
-      validate: tagIds => { return true }
+      validate: tagIds => {
+        // TODO: finisih validating dataTag id set
+        return true
+      }
     },
     agentTemplate_properties: {
       setValue: function(templateProperties){
-        if(!agentTemplatePrototype.properties.agentTemplate_properties.validate(templateProperties)) return false
-        this.agentTemplate_properties = templateProperties ? templateProperties : []
+        if(!templateProperties) this.agentTemplate_properties = []
+        else if(!this.properties.agentTemplate_properties.validate(templateProperties)) throw `Invalid AGENTTEMPLATE property: properties set -> ${templateProperties}`
+        else this.agentTemplate_properties = templateProperties
         return true
       },
-      validate: templateProperties => { return true }
+      validate: templateProperties => {
+        // TODO: finish balidating properties set
+        return true
+      }
     }
   },
+  typeFunctions: {
 
+  },
   displayProps: {
-    builder: {
-      agencyObjectData: {
-        sections: function(){
-          return [
-            {title: "AgentTemplate Id", inputType: "text-disabled", value: this.id, propertyName: "id"},
-            {title: "AgentTemplate Label", inputType: "text", value: this.agentTemplate_label, propertyName: "agentTemplate_label"}
-          ]}
+    displayName: function(){ return this.agentTemplate_label },
+    actionCreators: {
+      saveInStorage: {
+        label: "Submit Changes",
+        key: function(){return `action-creater-save-agentTemplate-${this.id}`},
+        action: function(success, failure){
+                  try{
+                    if(this.id === "new_object") success(storageActions.createAgencyObject(this))
+                    else success(storageActions.updateAgencyObject(this))
+                  } catch(err){ failure(err) }}
       },
-
-      propertyBuilder: {
-        propertiesSet: function(){ return this.agentTemplate_properties },
-        propertyKey: "agentTemplate_properties",
-        inheritedProperties: function(props){
-          return props.dataTags.filter( tag => this.agentTemplate_dataTag_ids.includes(tag.id))
-            .map( tag => ({ inheritedFrom: tag.dataTag_label, data: tag.dataTag_properties}))
-        }
-      },
-
-      roleBuilder: {
-        propertyName: "agentTemplate_security",
-        agentRole: function(){
-          return {security: this.agentTemplate_security}
-        },
-        inheritedRole: function(props){
-          return props.dataTags.filter( tag => this.agentTemplate_dataTag_ids.includes(tag.id))
-            .map( tag => ({inheritedFrom: tag.dataTag_label, data: tag.dataTag_typeObjects}))
-        }
-      },
-
-      dataTagSetBuilder: {
-        availableTags: function(props){
-          return props.dataTags.filter( tag => tag.dataTag_tagType === "agent")
-        },
-        tagPropertyName: "agentTemplate_dataTag_ids",
-        activeTags: function(props){
-          return this.agentTemplate_dataTag_ids
-        }
+      deleteFromStorage: {
+        label: "Delete AgentTemplate",
+        key: function(){return `action-creater-delete-agentTemplate-${this.id}`},
+        action: function(success, failure){
+                  try{
+                    success(storageActions.deleteAgencyObject(this))
+                  } catch(err){ failure(err) }}
       }
     },
-    editor: {},
-    card: {
-      header: function(){
-        return `Agent Template: ${this.agentTemplate_label}`
-      },
-      assignments: function(props){},
-      properties: function(props){},
-      agencyObjectData: function(props){
-        return <div className={``}>{this.id}</div>
-      },
-      roleData: function(props){},
-      tags: function(props){}
+    objectData: {
+      builder: {},
+      editor: {},
+      card: {}
+    },
+    properties: {
+      builder: {},
+      editor: {},
+      card: {}
+    },
+    tags: {
+      builder: {},
+      editor: {},
+      card: {}
+    },
+    assignments: {
+      builder: {},
+      editor: {},
+      card: {}
+    },
+    roles: {
+      builder: {},
+      editor: {},
+      card: {}
     }
-  },
-
-  typeFunctions: {}
-}
-
-export const agentTemplate = state => {
-  let agentTemplate = Object.create(moduleObjectPrototype("agentTemplate", agentTemplatePrototype))
-  agentTemplate.init(state)
-  return agentTemplate
-}
+  }
+})

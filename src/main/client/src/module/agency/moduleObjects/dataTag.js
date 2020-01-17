@@ -1,100 +1,121 @@
 import React from 'react'
-import {moduleObjectPrototype} from './moduleObjectPrototype'
+import * as validationTool from './validationTool'
 
 
-const dataTagPrototype = {
+
+export const dataTagPrototype = (storageActions, importedActions) => ({
+  type: function(){ return "dataTag" },
   properties: {
     id: {
       setValue: function(id){
-        if(!dataTagPrototype.properties.id.validate(id)) return false
-        this.id = id
+        if(!id) throw `Missing required DATATAG property: id`
+        else if(!this.properties.id.validate(id)) throw `Invalid DATATAG property: id`
+        else this.id = id
         return true
       },
-      validate: id => { return true }
+      validate: id => {
+        if(id === "new_object" && typeof this === "undefined") return true
+        if(validationTool.id(id)) return true
+        return false
+      }
     },
     dataTag_label: {
       setValue: function(label){
-        if(!dataTagPrototype.properties.dataTag_label.validate(label)) return false
-        this.dataTag_label = label
+        if(!label && this.id === "new_object") this.dataTag_label = "new dataTag"
+        else if(!label) throw 'Missing required DATATAG property: dataTag label'  //I should use a custom error for this to add indicators on screen
+        else if(!this.properties.dataTag_label.validate(label)) throw `Invalid DATATAG property: dataTag label -> ${label}`
+        else this.dataTag_label = label
         return true
       },
-      validate: label => { return true }
+      validate: label => {
+        if(validationTool.string(label, {})) return true
+        else return false
+      }
     },
     dataTag_tagType: {
       setValue: function(tagType){
-        if(!dataTagPrototype.properties.dataTag_tagType.validate(tagType)) return false
-        this.dataTag_tagType = tagType
+        if(!tagType) this.dataTag_tagType = ""
+        else if(!this.properties.dataTag_tagType.validate(tagType)) throw `Invalid DATATAG property: dataTag tagType -> ${tagType}`
+        else this.dataTag_tagType = tagType
         return true
       },
-      validate: tagType => { return true }
+      validate: tagType => {
+        if(tagType === "agent") return true
+        else if(tagType === "structuralNode") return true
+        return false
+      }
     },
     dataTag_properties: {
       setValue: function(tagProperties){
-        if(!dataTagPrototype.properties.dataTag_properties.validate(tagProperties)) return false
-        this.dataTag_properties = tagProperties
+        if(!tagProperties) this.dataTag_properties = {}
+        else if(!this.properties.dataTag_properties.validate(tagProperties)) throw `Invalid DATATAG property: dataTag properties -> ${tagProperties}`
+        else this.dataTag_properties = tagProperties
         return true
       },
-      validate: properties => { return true }
+      validate: properties => {
+        // TODO: finish validating properties
+        return true
+      }
     },
     dataTag_typeObjects: {
       setValue: function(typeObjects){
-        if(!dataTagPrototype.properties.dataTag_typeObjects.validate(typeObjects)) return false
-        this.dataTag_typeObjects = typeObjects
+        if(!typeObjects) this.dataTag_typeObjects = []
+        else if(!this.properties.dataTag_typeObjects.validate(typeObjects)) throw `Invalid DATATAG property: dataTag typeObjects -> ${typeObjects}`
+        else this.dataTag_typeObjects = typeObjects
+        return true
       },
-      validate: typeObjects => { return true }
+      validate: typeObjects => {
+        // TODO: finish validating typeObjects
+        return true
+      }
     }
   },
-
+  typeFunctions: {},
   displayProps: {
-    builder: {
-      agencyObjectData: {
-        sections: function(){
-          return [
-            {title: "DataTag Id", inputType: "text-disabled", value: this.id, propertyName: "id"},
-            {title: "Label", inputType: "text", value: this.dataTag_label, propertyName: "dataTag_label"},
-            {title: "DataTag Type", inputType: "select", selectOptions: [{key: "Agent", value: "agent"}, {key: "Structural", value: "structuralNode"}], value: this.dataTag_tagType, propertyName: "dataTag_tagType"}
-        ]}
+    displayName: function(){ return this.dataTag_label },
+    actionCreators: {
+      saveInStorage: {
+        label: "Submit Changes",
+        key: function(){return `action-creater-save-dataTag-${this.id}`},
+        action: function(success, failure){
+                  try{
+                    if(this.id === "new_object") success(storageActions.createAgencyObject(this))
+                    else success(storageActions.updateAgencyObject(this))
+                  } catch(err){ failure(err) }}
       },
-
-      propertyBuilder: {
-        propertiesSet: dataItem => dataItem.dataTag_properties,
-        inheritedProperties: () => [],
-        propertyKey: "dataTag_properties" },
-
-      //   //this shouldn't be a function
-      // typeSpecificBuilder: type => {
-      //   if(type === "agent")
-      //     return {
-      //       roleBuilder: {
-      //         agentRole: dataItem => dataItem.dataTag_typeObjects,
-      //         inheritedRole: () => {},
-      //         propertyName: "dataTag_typeObjects"}
-      //     }
-      //   else if(type === "structuralNode")
-      //     return {
-      //       assignmentBuilder: {
-      //         agentAssignments: dataItem => dataItem.dataTag_typeObjects,
-      //         inheritedAssignments: () => [],
-      //         propertyName: "dataTag_typeObjects" }
-      //     }
-      // }
+      deleteFromStorage: {
+        label: "Delete DataTag",
+        key: function(){return `action-creater-delete-dataTag-${this.id}`},
+        action: function(success, failure){
+                  try{
+                    success(storageActions.deleteAgencyObject(this))
+                  } catch(err){ failure(err) }}
+      }
     },
-    editor: {},
-    card: {
-      header: function(){ return `Agent Template: ${this.dataTag_label}` },
-      assignments: function(){},
-      properties: function(){},
-      agencyObjectData: function(){},
-      roleData: function(){},
-      tagData: function(){}}
-  },
-
-  typeFunctions: {}
-}
-
-
-export const dataTag = state => {
-  let dataTag = Object.create(moduleObjectPrototype("dataTag", dataTagPrototype))
-  dataTag.init(state)
-  return dataTag
-}
+    objectData: {
+      builder: {},
+      editor: {},
+      card: {}
+    },
+    properties: {
+      builder: {},
+      editor: {},
+      card: {}
+    },
+    tags: {
+      builder: {},
+      editor: {},
+      card: {}
+    },
+    assignments: {
+      builder: {},
+      editor: {},
+      card: {}
+    },
+    roles: {
+      builder: {},
+      editor: {},
+      card: {}
+    }
+  }
+})

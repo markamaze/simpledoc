@@ -1,80 +1,100 @@
 import React from 'react'
-import {moduleObjectPrototype} from './moduleObjectPrototype'
+import * as validationTool from './validationTool'
 
 
-const userPrototype = {
+
+export const userPrototype = (storageActions, importedActions) => ({
+  type: function(){ return "user" },
   properties: {
     id: {
-    setValue: function(idString){
-      if(!userPrototype.properties.id.validate(idString)) return false
-      this.id = idString
-
-      return true
-    },
-    validate: id => { return true }
+      setValue: function(idString){
+        // throw "testing error path"
+        if(!idString) throw `Missing required USER property: id`
+        else if(!this.properties.id.validate(idString)) throw `Invalid USER property: id -> ${idString}`
+        else this.id = idString
+        return true
+      },
+      validate: id => {
+        if(id === "new_object" && typeof this === "undefined") return true
+        else if(validationTool.id(id)) return true
+        else return false
+      }
     },
     username: {
       setValue: function(username){
-        if(!userPrototype.properties.username.validate(username)) return false
-        this.username = username
-
+        if(!username && this.id === "new_object") this.username = "new user"
+        else if(!username) throw `Missing required USER property: username`
+        else if(!this.properties.username.validate(username)) throw `Invalid USER Property: username -> ${username}`
+        else this.username = username
         return true
       },
-      validate: username => { return true }
+      validate: username => {
+        if(validationTool.string(username, {noSpaces: true, maxLength: 24, minLength: 4})) return true
+        return false
+      }
     },
     password: {
       setValue: function(password){
-        if(!userPrototype.properties.username.validate(password)) return false
-        this.password = password
-
+        if(!password && this.id === "new_object") this.password = ""
+        else if(!password) throw `Missing required USER property: password`
+        else if(!this.properties.username.validate(password)) throw `Invalid USER Property: password -> ${password}`
+        else this.password = password
         return true
       },
-      validate: password => { return true }
+      validate: password => {
+        if(validationTool.string(password, {noSpaces: true, maxLength: 24, minLength: 8})) return true
+        return false
+      }
     }
   },
-
   typeFunctions: {
-      getAgents: props => {},
-},
-
+    getAgents: function(){}
+  },
   displayProps: {
-    builder: {
-      agencyObjectData: {
-        sections: function(){
-          return [
-          {title: "User Id", inputType: "text-disabled", value: this.id, propertyName: "id"},
-          {title: "Username", inputType: "text", value: this.username, propertyName: "username"},
-          {title: "Password", inputType: "text", value: this.password, propertyName: "password"}
-        ]}
+    displayName: function(){ return this.username },
+    actionCreators: {
+      saveInStorage: {
+        label: "Submit Changes",
+        key: function(){return `action-creater-save-user-${this.id}`},
+        action: function(success, failure){
+                  try{
+                    if(this.id === "new_object") success(storageActions.createAgencyObject(this))
+                    else success(storageActions.updateAgencyObject(this))
+                  } catch(err){ failure(err) }}
+      },
+      deleteFromStorage: {
+        label: "Delete User",
+        key: function(){return `action-creater-delete-user-${this.id}`},
+        action: function(success, failure){
+                  try{
+                    success(storageActions.deleteAgencyObject(this))
+                  } catch(err){ failure(err) }}
       }
     },
-    editor: {},
-    card: {
-        header: function(){
-          return `User Data`
-        },
-        agencyObjectData: function(props){
-          return  <div className={``}>
-                    <div>
-                      <span>Username:</span>
-                      <span>{this.username}</span>
-                    </div>
-                  </div>
-        },
-        objectLinks: function(props){
-          return  <div>
-                    <header>Assigned to Agents:</header>
-                    {
-                      //get all assignments with this user as assigned_user and return with a link 
-                    }
-                  </div>
-        }
-      }
+    objectData: {
+      builder: {},
+      editor: {},
+      card: {}
+    },
+    properties: {
+      builder: {},
+      editor: {},
+      card: {}
+    },
+    tags: {
+      builder: {},
+      editor: {},
+      card: {}
+    },
+    assignments: {
+      builder: {},
+      editor: {},
+      card: {}
+    },
+    roles: {
+      builder: {},
+      editor: {},
+      card: {}
+    }
   }
-}
-
-export const user = state => {
-  let user = Object.create(moduleObjectPrototype("user", userPrototype))
-  user.init(state)
-  return user
-}
+})

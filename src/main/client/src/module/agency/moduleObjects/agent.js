@@ -1,12 +1,13 @@
 import React from 'react'
-import {moduleObjectPrototype} from './moduleObjectPrototype'
+import * as validationTool from './validationTool'
 
 
-const agentPrototype = {
+export const agentPrototype = (storageActions, importedActions) => ({
+  type: function(){ return "agent" },
   properties: {
     id: {
       setValue: function(idString){
-        if(!agentPrototype.properties.id.validate(idString)) return false
+        if(!this.properties.id.validate(idString)) return false
         this.id = idString
 
         return true
@@ -15,7 +16,7 @@ const agentPrototype = {
     },
     structuralNode_link_id: {
       setValue: function(linkId){
-        if(!agentPrototype.properties.structuralNode_link_id.validate(linkId)) return false
+        if(!this.properties.structuralNode_link_id.validate(linkId)) return false
         this.structuralNode_link_id = linkId
 
         return true
@@ -24,7 +25,7 @@ const agentPrototype = {
     },
     agentTemplate_id: {
       setValue: function(templateId){
-        if(!agentPrototype.properties.agentTemplate_id.validate(templateId)) return false
+        if(!this.properties.agentTemplate_id.validate(templateId)) return false
         this.agentTemplate_id = templateId
 
         return true
@@ -33,7 +34,7 @@ const agentPrototype = {
     },
     assigned_user_id: {
       setValue: function(userId){
-        if(!agentPrototype.properties.assigned_user_id.validate(userId)) return false
+        if(!this.properties.assigned_user_id.validate(userId)) return false
         this.assigned_user_id = userId
 
         return true
@@ -42,7 +43,7 @@ const agentPrototype = {
     },
     agent_is_active: {
       setValue: function(isActive){
-        if(!agentPrototype.properties.agent_is_active.validate(isActive)) return false
+        if(!this.properties.agent_is_active.validate(isActive)) return false
         this.agent_is_active = isActive
 
         return true
@@ -51,7 +52,7 @@ const agentPrototype = {
     },
     agent_dataTag_ids: {
       setValue: function(tagIds){
-        if(!agentPrototype.properties.agent_dataTag_ids.validate(tagIds)) return false
+        if(!this.properties.agent_dataTag_ids.validate(tagIds)) return false
         this.agent_dataTag_ids = tagIds
 
         return true
@@ -59,26 +60,54 @@ const agentPrototype = {
       validate: tagIds => { return true }
     }
   },
+  typeFunctions: {
 
-  displayProps: {
-    builder: {},
-    editor: {},
-    card: {
-      header: dataItem => `Agent: ${dataItem.agent_label}`,
-      assignments: {},
-      properties: {},
-      agencyObjectData: {},
-      roleData: {},
-      tagData: {}
-    }
   },
-
-  typeFunctions: {}
-}
-
-
-export const agent = state => {
-  let agent = Object.create(moduleObjectPrototype("agent", agentPrototype))
-  agent.init(state)
-  return agent
-}
+  displayProps: {
+    displayName: function(){ return this.id },
+    actionCreators: {
+      saveInStorage: {
+        label: "Submit Changes",
+        key: function(){return `action-creater-save-agent-${this.id}`},
+        action: function(success, failure){
+                  try{
+                    if(this.id === "new_object") success(storageActions.createAgencyObject(this))
+                    else success(storageActions.updateAgencyObject(this))
+                  } catch(err){ failure(err) }}
+      },
+      deleteFromStorage: {
+        label: "Delete Agent",
+        key: function(){return `action-creater-delete-agent-${this.id}`},
+        action: function(success, failure){
+                  try{
+                    success(storageActions.deleteAgencyObject(this))
+                  } catch(err){ failure(err) }}
+      }
+    },
+    objectData: {
+      builder: {},
+      editor: {},
+      card: {}
+    },
+    properties: {
+      builder: {},
+      editor: {},
+      card: {}
+    },
+    tags: {
+      builder: {},
+      editor: {},
+      card: {}
+    },
+    assignments: {
+      builder: {},
+      editor: {},
+      card: {}
+    },
+    roles: {
+      builder: {},
+      editor: {},
+      card: {}
+    }
+  }
+})

@@ -1,161 +1,176 @@
 import React from 'react'
-import {moduleObjectPrototype} from './moduleObjectPrototype'
+import * as validationTool from './validationTool'
 
 
-const structuralNodePrototype = {
+export const structuralNodePrototype = (storageActions, importedActions) => ({
+  type: function(){ return "structuralNode" },
   properties: {
     id: {
       setValue: function(id){
-        if(!structuralNodePrototype.properties.id.validate(id)) return false
-        this.id = id
+        if(!id) throw `Missing required STRUCTURALNODE property: id`
+        else if(!this.properties.id.validate(id)) throw `Invalid STRUCTURALNODE property: id -> ${id}`
+        else this.id = id
         return true
       },
-      validate: id => { return true }
+      validate: id => {
+        if(id === "new_object" && typeof this === "undefined") return true
+        else if(validationTool.id(id)) return true
+        else return false
+      }
     },
     structuralNode_label: {
       setValue: function(label){
-        if(!structuralNodePrototype.properties.structuralNode_label.validate(label)) return false
-        this.structuralNode_label = label
+        if(!label && this.id === "new_object") this.structuralNode_label = "new structuralNode"
+        else if(!label) throw `Missing required STRUCTURALNODE property: structuralNode label`
+        else if(!this.properties.structuralNode_label.validate(label)) throw `Invalid STRUCTURALNODE property: structuralNode label -> ${label}`
+        else this.structuralNode_label = label
         return true
       },
-      validate: label => { return true }
+      validate: label => {
+        if(validationTool.string(label, {noSpaces: false, minLength: 1, maxLength: 48})) return true
+        return false
+      }
     },
     structuralNode_parent_id: {
       setValue: function(parentId){
-        if(!structuralNodePrototype.properties.structuralNode_parent_id.validate(parentId)) return false
-        this.structuralNode_parent_id = parentId
+        if(!parentId && this.id === "new_object") this.structuralNode_parent_id = ""
+        else if(!parentId) throw `Missing required STRUCTURALNODE property: parentId`
+        else if(!this.properties.structuralNode_parent_id.validate(parentId)) throw `Invalid STRUCTURALNODE property: parentId -> ${parentId}`
+        else this.structuralNode_parent_id = parentId
         return true
       },
-      validate: parentId => { return true }
+      validate: parentId => {
+        if(validationTool.id(parentId))
+          if(true) return true //TODO: replace conditional with a check that the parentId is an existing structural node
+        return false
+      }
     },
     structuralNode_supervisor_assignment: {
       setValue: function(supervisorAssignment){
-        if(!structuralNodePrototype.properties.structuralNode_supervisor_assignment.validate(supervisorAssignment)) return false
-        this.structuralNode_supervisor_assignment = supervisorAssignment
+        if(!supervisorAssignment && this.id === "new_object") this.structuralNode_supervisor_assignment = ""
+
+        //don't require at the moment for compiling
+        // else if(!supervisorAssignment) throw new Error(`Missing required STRUCTURALNODE property: supervisor assignment`)
+            else if(!supervisorAssignment) this.structuralNode_supervisor_assignment = {}
+
+
+        else if(!this.properties.structuralNode_supervisor_assignment.validate(supervisorAssignment)) throw `Invalid STRUCTURALNODE property: supervisor assignment -> ${supervisorAssignment}`
+        else this.structuralNode_supervisor_assignment = supervisorAssignment
         return true
       },
-      validate: supervisorAssignment => { return true }
+      validate: supervisorAssignment => {
+        // TODO: finish validating supervisor assignment
+        return true
+      }
     },
     agent_assignments: {
       setValue: function(assignments){
-        if(!structuralNodePrototype.properties.agent_assignments.validate(assignments)) return false
-        this.agent_assignments = assignments
+        if(!assignments && this.id === "new_object") this.agent_assignments = []
+        else if(!this.properties.agent_assignments.validate(assignments)) throw `Invalid STRUCTURALNODE property: agent assignments -> ${assignments}`
+        else this.agent_assignments = assignments
         return true
       },
-      validate: assignments => { return true }
+      validate: assignments => {
+        // TODO: finish validating assignments
+        return true
+      }
     },
     structuralNode_dataTag_ids: {
       setValue: function(dataTagIds){
-        if(!structuralNodePrototype.properties.structuralNode_dataTag_ids.validate(dataTagIds)) return false
-        this.structuralNode_dataTag_ids = dataTagIds
+        if(!dataTagIds && this.id === "new_object") this.structuralNode_dataTag_ids = []
+        else if(!this.properties.structuralNode_dataTag_ids.validate(dataTagIds)) throw `Invalid STRUCTURALNODE property: dataTagIds -> ${dataTagIds}`
+        else this.structuralNode_dataTag_ids = dataTagIds
         return true
       },
-      validate: dataTagIds => { return true }
+      validate: dataTagIds => {
+        //TODO: finish validating datatags
+        return true
+      }
     },
     structuralNode_properties: {
       setValue: function(nodeProperties){
-        if(!structuralNodePrototype.properties.structuralNode_properties.validate(nodeProperties)) return false
-        this.structuralNode_properties = nodeProperties
+        if(!nodeProperties && this.id === "new_object") this.structuralNode_properties = {}
+        else if(!this.properties.structuralNode_properties.validate(nodeProperties)) throw `Invalid STRUCTURALNODE property: structuralNode properties -> ${nodeProperties}`
+        else this.structuralNode_properties = nodeProperties
         return true
       },
-      validate: nodeProperties => { return true }
+      validate: nodeProperties => {
+        //TODO: finish validating node properties
+        return true
+      }
     },
     agent_assignments_implemented: {
       setValue: function(assignmentsImplemented){
-        if(!structuralNodePrototype.properties.agent_assignments_implemented.validate(assignmentsImplemented)) return false
-        this.agent_assignments_implemented = assignmentsImplemented
+        if(!assignmentsImplemented && this.id === "new_object") this.agent_assignments_implemented = []
+        else if(!this.properties.agent_assignments_implemented.validate(assignmentsImplemented)) throw `Invalid STRUCTURALNODE property: assignments implemented -> ${assignmentsImplemented}`
+        else this.agent_assignments_implemented = assignmentsImplemented
         return true
       },
-      validate: assignmentsImplemented => { return true }
+      validate: assignmentsImplemented => {
+        // TODO: finsih validating implemented assignments
+        return true
+      }
     }
   },
-
-  displayProps: {
-    builder: {
-
-      agencyObjectData: {
-        sections: (dataItem, allNodes) => (
-          [ {title: "StructuralNode Id", inputType: "text-disabled", value: dataItem.id, propertyName: "id"},
-            {title: "Label", inputType: "text", value: dataItem.structuralNode_label, propertyName: "structuralNode_label"},
-            {title: "Set Parent", inputType: "select",
-                selectOptions: allNodes.length === 0 ?
-                  [{key: "root", value: "root"}]
-                  : allNodes.map(node => ({key: node.structuralNode_label, value: node.id})),
-                value: dataItem.structuralNode_parent_id,
-                propertyName: "structuralNode_parent_id"}
-          ]) },
-
-      propertyBuilder: {
-        propertiesSet: dataItem => dataItem.structuralNode_properties,
-        propertyKey: "structuralNode_properties",
-        inheritedProperties: (dataItem, allTags) =>
-          dataItem.structuralNode_dataTag_ids === undefined ? [] :
-          allTags.filter( tag => dataItem.structuralNode_dataTag_ids.includes(tag.id))
-            .map( tag => ({ inheritedFrom: tag.dataTag_label, data: tag.dataTag_properties})) },
-
-      assignmentBuilder: {
-        agentAssignments: dataItem => dataItem.agent_assignments,
-        propertyName: "agent_assignments",
-        inheritedAssignments: (dataItem, allTags) =>
-          dataItem.structuralNode_dataTag_ids === undefined ? [] :
-          allTags.filter( tag => dataItem.structuralNode_dataTag_ids.includes(tag.id))
-            .map( tag => ({inheritedFrom: tag.dataTag_label, data: tag.dataTag_typeObjects})) },
-
-      dataTagSetBuilder: {
-        availableTags: allTags => allTags.filter( tag => tag.dataTag_tagType === "structuralNode"),
-        activeTags: dataItem => dataItem.structuralNode_dataTag_ids,
-        tagPropertyName: "structuralNode_dataTag_ids" }
+  typeFunctions: {
+    getChildren: function(props){
+      return props.structuralNodes.filter( node => node.structuralNode_parent_id === this.id && node.structuralNode_parent_id !== node.id )
     },
+    branch: function(id, allNodes){},
+    getNodeSupervisor: function(id, allNodes){}
+  },
+  displayProps: {
+      displayName: function(){ return this.structuralNode_label },
 
-    editor: {
-
-      dataItemInfo: (dataItem, props) => ([
-        {key: "label", value: dataItem.structuralNode_label},
-        {key: "subLabel", value: props.structuralNodes.find(node => node.id === dataItem.structuralNode_parent_id).label},
-        {key: "tags", value: props.dataTags.filter(tag => dataItem.structuralNode_dataTag_ids.includes(tag.id)).map(tag => tag.structuralNode_label)}
-      ]),
-
-      propertyEditor: {
-        propertyName: "structuralNode_property_values",
-        propertiesSet: dataItem => dataItem.structuralNode_properties,
-        inheritedProperties: (dataItem, props) => !dataItem.structuralNode_dataTag_ids ? [] :
-          props.dataTags.filter( tag => dataItem.structuralNode_dataTag_ids.includes(tag.id))
-                  .map( tag => ({ inheritedFrom: tag.dataTag_label, data: tag.dataTag_properties}))
+      actionCreators: {
+        saveInStorage: {
+          label: "Submit Changes",
+          key: function(){return `action-creater-save-structuralNode-${this.id}`},
+          action: function(success, failure){
+                    try{
+                      if(this.id === "new_object") success(storageActions.createAgencyObject(this))
+                      else success(storageActions.updateAgencyObject(this))
+                    } catch(err){ failure(err) }}
+        },
+        deleteFromStorage: {
+          label: "Delete StructuralNode",
+          key: function(){return `action-creater-delete-structuralNode-${this.id}`},
+          action: function(success, failure){
+                    try{
+                      success(storageActions.deleteAgencyObject(this))
+                    } catch(err){ failure(err) }}
+        }
       },
 
-      assignmentEditor: {
-        propertyName: "agent_assignments_implemented",
-        agentAssignments: dataItem => !dataItem.agent_assignments ? [] :
-          dataItem.agent_assignments,
-        inheritedAssignments: dataItem => !dataItem.structuralNode_dataTag_ids ? [] :
-          props.dataTags.filter( tag => dataItem.structuralNode_dataTag_ids.includes(tag.id))
-              .map( tag => ({ inheritedFrom: tag.dataTag_label, data: tag.dataTag_typeObjects})),
-        implementedAssignments: dataItem => !dataItem.agent_assignments_implemented ? [] : dataItem.agent_assignments_implemented
+      objectData: {
+        builder: {},
+        editor: {},
+        card: {}
+      },
+
+      properties: {
+        builder: {},
+        editor: {},
+        card: {}
+      },
+
+      tags: {
+        builder: {},
+        editor: {},
+        card: {}
+      },
+
+      assignments: {
+        builder: {},
+        editor: {},
+        card: {}
+      },
+
+      roles: {
+        builder: {},
+        editor: {},
+        card: {}
       }
-    },
 
-    card: {
-      header: dataItem => `StructuralNode: ${dataItem.structuralNode_label}`,
-      assignments: {},
-      properties: {},
-      agencyObjectData: {},
-      roleData: {},
-      tagData: {}
     }
-  },
-
-  typeFunctions: {
-    getChildren: function(id, allNodes){
-      return allNodes.filter( node => node.structuralNode_parent_id === id && node.structuralNode_parent_id !== node.id )
-    },
-
-    branch: function(id, allNodes){},
-
-    getNodeSupervisor: function(id, allNodes){}}
-}
-
-export const structuralNode = state => {
-  let structuralNode = Object.create(moduleObjectPrototype("structuralNode", structuralNodePrototype))
-  structuralNode.init(state)
-  return structuralNode
-}
+})

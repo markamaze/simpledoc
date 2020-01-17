@@ -1,8 +1,5 @@
 import { user } from './moduleObjects/user'
-import { dataTag } from './moduleObjects/dataTag'
-import { structuralNode } from './moduleObjects/structuralNode'
-import { agentTemplate } from './moduleObjects/agentTemplate'
-import { agent } from './moduleObjects/agent'
+import { agencyObject } from './moduleObjects/agencyObject'
 
 const initialState = {
   structuralNodes: [],
@@ -26,7 +23,7 @@ export default function agency_reducer(state=initialState, action) {
             agents = entry[1].reduce( (agents, agentdata) => {
               if(!agents) return false
 
-              let newagent = agent(agentData)
+              let newagent = agencyObject("agent", agentData, e => {throw `${e} <- create agent from reducer`})
 
               return !newagent ? false : [...agents, newagent]
             }, agents)
@@ -37,7 +34,7 @@ export default function agency_reducer(state=initialState, action) {
             agentTemplates = entry[1].reduce( (templates, templateData) => {
               if(!templates) return false
 
-              let newtemplate = agentTemplate(templateData)
+              let newtemplate = agencyObject("agentTemplate", templateData, e => {throw `${e} <- create agentTemplate from reducer`})
 
               return !newtemplate ? false : [...templates, newtemplate]
             }, agentTemplates)
@@ -48,7 +45,7 @@ export default function agency_reducer(state=initialState, action) {
             structuralNodes = entry[1].reduce( (structures, structureData) => {
               if(!structures) return false
 
-              let newstructure = structuralNode(structureData)
+              let newstructure = agencyObject("structuralNode", structureData, e => {throw `${e} <- create structuralNode from reducer`})
 
               return !newstructure ? false : [...structures, newstructure]
 
@@ -60,7 +57,7 @@ export default function agency_reducer(state=initialState, action) {
             dataTags = entry[1].reduce( (tags, tagData) => {
               if(!tags) return false
 
-              let newtag = dataTag(tagData)
+              let newtag = agencyObject("dataTag", tagData, e => {throw `${e} <- create dataTag from reducer`})
 
               return !newtag ? false : [...tags, newtag]
 
@@ -71,7 +68,7 @@ export default function agency_reducer(state=initialState, action) {
             users = entry[1].reduce( (users, userData) => {
               if(!users) return false
 
-              let newuser = user(userData)
+              let newuser = agencyObject("user",userData, e => {throw `${e} <- create user from reducer`})
 
               return !newuser ? false : [...users, newuser]
 
@@ -93,20 +90,12 @@ export default function agency_reducer(state=initialState, action) {
     case "CREATE_AGENCY_OBJECT": {
       try {
         let type = action.agencyObjectType
-        let newObject
-        if(type === "user") newObject = user(action.payload)
-        else if(type === "dataTag") newObject = dataTag(action.payload)
-        else if(type === "agentTemplate") newObject = agentTemplate(action.payload)
-        else if(type === "structuralNode") newObject = structuralNode(action.payload)
-        else if(type === "agent") newObject = agent(action.payload)
-        else throw "invalid object type"
-
-
-        return Object.assign({}, state, { [`${type}s`]: [...state[`${type}s`], newObject] })
+        let agencyObject = agencyObject(type, action.payload, error => {throw `${error}: failed to create agencyObject`})
+        return Object.assign({}, state, { [`${type}s`]: [...state[`${type}s`], agencyObject] })
       }
 
       catch(err) {
-        window.alert(err.toString())
+        window.alert(`Could not create agencyObject in reducer: ${err}`)
         return state
       }
     }
@@ -115,22 +104,13 @@ export default function agency_reducer(state=initialState, action) {
     case "UPDATE_AGENCY_OBJECT": {
       try {
         let type = action.agencyObjectType
-        let updatedObject
-
-        if(type === "user") updatedObject = user(action.payload)
-        else if(type === "dataTag") updatedObject = dataTag(action.payload)
-        else if(type === "agentTemplate") updatedObject = agentTemplate(action.payload)
-        else if(type === "structuralNode") updatedObject = structuralNode(action.payload)
-        else if(type === "agent") updatedObject = agent(action.payload)
-        else throw "invalid object type"
-
-        let updatedSet = [...state[`${type}s`] ]
-        updatedSet = updatedSet.filter(item => updatedObject.id != item.id)
+        let agencyObject = agencyObject(type, action.payload, error => {throw `${error}: failed to create agencyObject`})
+        let updatedSet = [...state[`${type}s`] ].filter(item => updatedObject.id != item.id)
 
         return Object.assign({}, state, { [`${type}s`]: [...updatedSet, updatedObject] })
       }
       catch(err) {
-        window.alert(err.toString())
+        window.alert(`Could not create agencyObject in reducer: ${err}`)
         return state
       }
     }
@@ -144,7 +124,7 @@ export default function agency_reducer(state=initialState, action) {
         return Object.assign({}, state, { [`${type}s`]: [...updatedSet] })
       }
       catch(err) {
-        window.alert(err.toString())
+        window.alert(`Could not create agencyObject in reducer: ${err}`)
         return state
       }
     }
