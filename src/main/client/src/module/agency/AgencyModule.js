@@ -3,21 +3,24 @@ import { connect } from 'react-redux'
 
 import { ModuleWrapper } from '../moduleStyles'
 import Agency from './Agency'
-
+import ErrorBoundary from './agencyUtils/ErrorBoundary'
 
 /*
   purpose:
       connect module data from redux store
       load module main view controller
+      provide error boundary
       wrap module with stylesheets
 */
 
+
 function AgencyModule(props) {
-  let agencyRootNode = props.structuralNodes.find( node =>
-        node.id === node.structuralNode_parent_id)
+  let agencyRootNode = props.structuralNodes.find( node => node.id === node.structuralNode_parent_id)
 
   return  <ModuleWrapper id="agency-module" className="module-wrapper">
-            <Agency {...props} rootNodeId={ agencyRootNode ? agencyRootNode.id : null } />
+            <ErrorBoundary displayName="AgencyModule" >
+              <Agency {...props} rootNode={ agencyRootNode } />
+            </ErrorBoundary>
           </ModuleWrapper>
 }
 
