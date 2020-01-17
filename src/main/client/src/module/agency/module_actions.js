@@ -1,5 +1,5 @@
 import store from '../../store'
-import { put, get, post, remove } from '../../utility/ajax'
+import { put, get, post, remove } from './agencyUtils/ajax'
 
 
 
