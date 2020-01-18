@@ -71,6 +71,22 @@ export const userPrototype = (storageActions, importedActions) => ({
                   } catch(err){ failure(err) }}
       }
     },
+
+    listProps: {
+      columns: function(type){
+        return {
+          limited: [
+            {label: "Username", selector: "username"}
+          ],
+          expanded: [
+            {label: "Username", selector: "username"},
+            {label: "Password", selector: "password"},
+            {label: "userId", selector: "id"}
+          ]
+        }
+      }
+    },
+
     objectData: {
       builder: {},
       editor: {},

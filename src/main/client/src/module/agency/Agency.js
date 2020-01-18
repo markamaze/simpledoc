@@ -2,7 +2,6 @@ import React from 'react'
 
 import Overlay from '../../components/Overlay'
 import { agencyObject } from './moduleObjects/agencyObject'
-import TreeDisplay from './moduleComponents/TreeDisplay'
 import List from './moduleComponents/List'
 
 /*
@@ -47,7 +46,9 @@ class Agency extends React.Component {
     })
   }
 
-  handleError(error){}
+  handleError(error){
+    throw new Error(`${error}`)
+  }
 
   render() {
     return  <div className="module">
@@ -64,6 +65,22 @@ class Agency extends React.Component {
               </div>
 
               <div className="module-viewport">
+              {
+                this.state.activeView !== "agency" ? null :
+                  <List
+                      treeRoot={this.props.structuralNodes.find( n=>n.id===n.structuralNode_parent_id)}
+                      rootIdKey="id"
+                      treeNodeKey="structuralNode_parent_id"
+                      dataSet={this.props.structuralNodes}
+                      columns={[
+                        {label: "", selector: "structuralNode_label"}
+                      ]}
+                      itemComponent={ item => item.display(this.props, this.handleError.bind(this))}
+                      itemActions={[
+                        {label: "+", action: item => this.newChildNode(item) }
+                      ]}
+                      headerComponent={"Agency Structure"} />
+              }
 
               {
                 this.state.activeView !== "user" ? null :
@@ -74,19 +91,9 @@ class Agency extends React.Component {
                         {label: "Password", selector: "password"},
                         {label: "userId", selector: "id"}
                       ]}
-                      itemComponent={ item => item.display(this.props, error => {throw new Error("error displaying AgencyObject")})}
+                      itemComponent={ item => item.display(this.props, this.handleError.bind(this))}
                       itemActions={[]}
-                      headerComponent={<div>Agency Users</div>}
-                      footerComponent={<div>footer</div>} />
-                  // <List
-                  //     title={"Users"}
-                  //     columns={[{ name: "Users", selector: "username"}]}
-                  //     data={this.props.users}
-                  //     headerActionCreators={[
-                  //       <div onClick={() => this.createObject("user")}>+</div>
-                  //     ]}
-                  //     rowActionCreators={[]}
-                  //     onError={error => this.handleError(error)} />
+                      headerComponent={"Manage Agency Users"} />
               }
               </div>
               {

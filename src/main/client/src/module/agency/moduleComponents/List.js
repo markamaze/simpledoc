@@ -4,6 +4,10 @@ import styled from 'styled-components'
 const Wrapper = styled.div`
   display: block;
 
+  header {
+    text-align: center;
+    background: burlywood;
+  }
   .list{
     display: flex;
     flex-direction: column;
@@ -32,7 +36,7 @@ const Wrapper = styled.div`
   .list-cell{
     display: flex;
     flex-grow: 1;
-    justify-content: center
+    justify-content: left;
     width: ${props => 100/props.columnCount}%;
   }
 
@@ -76,6 +80,14 @@ const Wrapper = styled.div`
 `
 
 
+/*
+  todo:
+      handle different options for selecting a row/cell
+      finish treeRows
+      build iconSet
+      apply constraint on itemComponent display -> overlay or below row
+
+*/
 function List(props){
 
   const [buildAsTree, setBuildAsTree] = React.useState(checkType())
@@ -92,18 +104,7 @@ function List(props){
     else return false
   }
 
-  function listRows(){
-    return  <div className="list-body">
-              {
-                props.dataSet.map( dataItem =>
-                  <div className="list-row-wrapper">
-                    { addRow(dataItem) }
-                    { dataItem === activeItem ? renderItemComponent(dataItem) : null }
-                  </div>)
-                }
-              </div>
-  }
-  function treeRows(){}
+
 
   function columnTitleRow(){
     let columnTitleRow = props.columns.map( column => column.label )
@@ -155,18 +156,86 @@ function List(props){
       props.columns.length
   }
 
-  // try{
-    return 	<Wrapper columnCount={getColumnCount()} >
-              <div className="list">
-                { props.headerComponent }
-                <div className="list-body">
-                  { columnTitleRow() }
-                  { buildAsTree ? treeRows() : listRows() }
-                </div>
-                { props.footerComponent }
+
+
+
+  function iconSet(){}
+
+
+
+  function listRows(){
+    return  <div className="list-body">
+              {
+                props.dataSet.map( dataItem =>
+                  <div className="list-row-wrapper">
+                    { addRow(dataItem) }
+                    { dataItem === activeItem ? renderItemComponent(dataItem) : null }
+                  </div>)
+                }
               </div>
+  }
+
+
+
+  function treeRows(root, depth){
+    let childrenSet = props.dataSet.filter( dataItem =>
+            dataItem[props.treeNodeKey] === root[props.rootIdKey]
+            && dataItem !== root )
+
+    let _depth = ++depth
+
+    return childrenSet && childrenSet.length > 0 ?
+
+      <div className="tree-body">
+        <div className="tree-row-wrapper">
+          <div className="tree-root">
+            { addRow(root) }
+            { root === activeItem ? renderItemComponent(root) : null }
+            <div className="tree-root-children-list"
+                  style={{paddingLeft: `${_depth}rem`}}>
+              { childrenSet.map( dataItem => treeRows(dataItem, _depth)) }
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      : <div className="tree-body">
+          <div className="tree-row-wrapper">
+            <div className="tree-leaf">{ addRow(root) }</div>
+            { root === activeItem ? renderItemComponent(root) : null }
+          </div>
+        </div>
+  }
+
+
+  function buildList(){
+      if(props.treeRoot && props.treeNodeKey)
+        return  <div className="tree-body">
+                  { columnTitleRow() }
+                  { treeRows(props.treeRoot, 0) }
+                </div>
+
+      else if(props.icon && props.iconComponent)
+        return  <div className="icon-set-body">
+                  { iconSet() }
+                </div>
+
+      else
+        return  <div className="list-body">
+                  { columnTitleRow() }
+                  { listRows() }
+                </div>
+    }
+
+  try{
+    return  <Wrapper columnCount={getColumnCount()} >
+              { !props.headerComponent ? null :
+                  <header onClick={() => setActiveItem(null)}>{props.headerComponent}</header>
+              }
+              { buildList() }
             </Wrapper>
-  // }catch(err){ return <div>{`Error: ${err}`}</div>}
+  }catch(error){ throw error}
 }
 
 
@@ -174,11 +243,13 @@ function List(props){
 // List.propTypes = {
 //   dataSet: undefined, //an array of objects
 //   columns: undefined, //array of objects defining column display properties
-//   heirarchyKey: undefined, //a key in each item of dataSet for building tree, if unset, will display as a list
+//   treeRoot: undefined
+//   treeNodeKey: undefined, //a key in each item of dataSet for building tree, if unset, will display as a list
 //   headerComponent: undefined, //optional header element
 //   footerComponent: undefined, //optional footer element
 //   onClickAction: undefined, //function acting on the row element
 //   itemActions: undefined //action handlers next to each item
+//
 //
 // }
 // List.defaultProps = {
