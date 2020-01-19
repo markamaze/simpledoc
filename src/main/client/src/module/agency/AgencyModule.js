@@ -18,10 +18,10 @@ function AgencyModule(props) {
   let agencyRootNode = props.structuralNodes.find( node => node.id === node.structuralNode_parent_id)
 
   return  <ModuleWrapper id="agency-module" className="module-wrapper">
-            <ErrorBoundary displayName="AgencyModule" >
               <Agency {...props} rootNode={ agencyRootNode } />
-            </ErrorBoundary>
           </ModuleWrapper>
+          // </ErrorBoundary>
+          // <ErrorBoundary displayName="AgencyModule" >
 }
 
 
