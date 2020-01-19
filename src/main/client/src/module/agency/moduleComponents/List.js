@@ -90,8 +90,9 @@ const Wrapper = styled.div`
 */
 function List(props){
 
-  const [buildAsTree, setBuildAsTree] = React.useState(checkType())
-  const [activeItem, setActiveItem] = React.useState(null)
+  const [buildAsTree, setBuildAsTree] = useState(checkType())
+  const [activeItem, setActiveItem] = useState(null)
+  const [overlayItem, setOverlayItem] = useState(null)
 
   function checkType(){
   	if(!props.heirarchyKey) return false
@@ -130,7 +131,7 @@ function List(props){
     return  <div className="list-cell action-cell">
               {
                 props.itemActions.map(itemAction =>
-                  <div className="list-row-action" onClick={() => itemAction.action(dataItem)}>
+                  <div className="list-row-action" onClick={() => setOverlayItem(itemAction.action(dataItem))}>
                     {itemAction.label}
                   </div>)
               }
@@ -139,7 +140,7 @@ function List(props){
   function renderItemComponent(dataItem){
     return React.cloneElement(
         props.itemComponent(dataItem),
-        {className: `list-row-component-wrapper`, displayName: "ListItemComponent"},
+        [{className: `list-row-component-wrapper`, displayName: "ListItemComponent"}],
         [ <div className="list-row-component-header">
             <div className="list-row-component-close"
                   onClick={() => setActiveItem(null)}>X</div>  //where'd it go?
@@ -234,6 +235,13 @@ function List(props){
                   <header onClick={() => setActiveItem(null)}>{props.headerComponent}</header>
               }
               { buildList() }
+              { overlayItem ?
+                  <div style={{position: "absolute", background: "rgb(0,0,0,.5)", color:"lightgray",top:"0",width:"100%",height:"100%"}}>
+                    <div onClick={()=> setOverlayItem(null)}>X</div>
+                    { overlayItem }
+                  </div>
+
+              : null }
             </Wrapper>
   }catch(error){ throw error}
 }
