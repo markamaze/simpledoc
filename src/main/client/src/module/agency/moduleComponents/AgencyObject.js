@@ -57,3 +57,5 @@ function Builder(props){
 
   return  <div className="agencyObject-builder"><div>in builder</div>{ tools }</div>
 }
+
+export default { Builder, Editor, Card }
