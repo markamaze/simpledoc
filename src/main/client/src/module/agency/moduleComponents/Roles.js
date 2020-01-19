@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 
 
+function Links(props){
 
-function Roles(props){
-
-  console.log(props)
-  return  <div>{`roles component in ${props.viewType} mode`}</div>
+  return <div>Links in Roles</div>
 }
-export default Roles
+function CreateRole(props){
+
+  return <div>CreateRole in Roles</div>
+}
+export default { Links, CreateRole }

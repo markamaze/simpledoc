@@ -2,9 +2,16 @@ import React, { useState } from 'react'
 
 
 
-function Assignments(props){
+function Links(props){
 
-  console.log(props)
-  return  <div>{`assignment component in ${props.viewType} mode`}</div>
+  return  <div>{`Links in Assignment`}</div>
 }
-export default Assignments
+function CreateAssignment(props){
+
+  return  <div>{`CreateAssignment in Assignment`}</div>
+}
+function ImplementAssignment(props){
+
+  return  <div>{`ImplementAssignment in Assignment`}</div>
+}
+export default { Links, CreateAssignment, ImplementAssignment }

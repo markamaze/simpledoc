@@ -2,9 +2,13 @@ import React, { useState } from 'react'
 
 
 
-function Properties(props){
-
-  console.log(props)
-  return  <div>{`properties component in ${props.viewType} mode`}</div>
+function ShowValues(props){
+  return  <div>{`ShowValues in Properties`}</div>
 }
-export default Properties
+function ModifyValues(props){
+  return  <div>{`ModifyValues in Properties`}</div>
+}
+function CreateProperties(props){
+  return  <div>{`CreateProperties in Properties`}</div>
+}
+export default { ShowValues, ModifyValues, CreateProperties }

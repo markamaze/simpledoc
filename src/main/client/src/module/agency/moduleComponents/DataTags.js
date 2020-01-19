@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 
 
+function ShowTags(props){
 
-function DataTags(props){
-
-  console.log(props)
-  return  <div>{`dataTags component in ${props.viewType} mode`}</div>
+  return  <div>{`ShowTags in DataTags`}</div>
 }
-export default DataTags
+function SelectTags(props){
+
+  return  <div>{`SelectTags in DataTags`}</div>
+}
+export default { ShowTags, SelectTags }

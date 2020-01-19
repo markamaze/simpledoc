@@ -28,6 +28,7 @@ const agencyPrototypes = {
   agent: agentPrototype(storageActions, importedActions)
 }
 
+
 const agencyObjectPrototype = (objectPrototype) => ({
   ...objectPrototype,
 
@@ -87,12 +88,20 @@ const agencyObjectPrototype = (objectPrototype) => ({
   },
 
   display: function(props, onError){
-      return  <AgencyObject {...props}
-                  viewType={props.builder ? "builder" : props.editor ? "editor" : "card"}
-                  displayProps={objectPrototype.displayProps}
+    return {
+      card: <AgencyObject.Card {...props} className="agencyObject-card"
+                displayProps={this.displayProps.card}
+                dataItem={this}
+                onError={onError} />,
+      editor: <AgencyObject.Editor {...props}
+                  displayProps={this.displayProps.editor}
                   dataItem={this}
-                  onError={onError} />
-  }
+                  onError={onError} />,
+      builder: <AgencyObject.Builder {...props}
+                    displayProps={this.displayProps.builder}
+                    dataItem={this}
+                    onError={onError} />
+    }}
 })
 
 

@@ -2,9 +2,16 @@ import React, { useState } from 'react'
 
 
 
-function ObjectData(props){
 
-  console.log(props)
-  return  <div>{`component in ${props.viewType} mode`}</div>
+
+function ShowValues(props){
+
+  return  <div>{`ShowValues in ObjectData`}</div>
 }
-export default ObjectData
+
+function Modify(props){
+
+  return  <div>{`Modify in ObjectData`}</div>
+}
+
+export default { ShowValues, Modify }
