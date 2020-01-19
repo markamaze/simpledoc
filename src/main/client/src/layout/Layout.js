@@ -1,10 +1,8 @@
 import React from 'react'
-import { BrowserRouter, Route, Switch, Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 import Footer from './Footer'
 import Header from './Header'
-import Navigation from './Navigation'
 
 
 import colors from '../colors'
@@ -50,27 +48,18 @@ const BodyViewport = styled.div`
 
 
 
-const modulesRoutes = modules =>
-  <Switch>
-    {
-      modules.map(module =>
-        <Route key={`module-route-${module.title}`} exact path={module.path} render={()=> module.component} />)
-    }
-  </Switch>
 
-const moduleLinks = modules => modules.map( module => ({title: module.title, to: module.path}) )
 
-export default class Layout extends React.Component {
+export default function Layout(props){
+  const [activeModule, setActiveModule] = React.useState("Agency")
 
-  render() {
-    return  <BrowserRouter>
-              <BodyWrapper >
-                <Header >
-                  <Navigation links={ moduleLinks(this.props.modules) } />
-                </Header>
-                <BodyViewport>{ modulesRoutes(this.props.modules) }</BodyViewport>
-                <Footer />
-              </BodyWrapper>
-            </BrowserRouter>
-  }
+
+
+  return  <BodyWrapper >
+              <Header links={ props.modules.map(module => module.title) }
+                      setActive={setActiveModule} active={activeModule}/>
+              <BodyViewport >{ props.modules.find(module => module.title === activeModule).component }</BodyViewport>
+              <Footer />
+            </BodyWrapper>
+
 }

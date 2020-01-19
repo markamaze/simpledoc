@@ -1,7 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { BrowserRouter } from 'react-router-dom'
 
 import Layout from './layout/Layout'
 import store from './store'
@@ -14,9 +13,7 @@ if (module.hot) {
 ReactDOM.render(
   (
     <Provider store={store}>
-      <BrowserRouter history={history}>
-        <Layout modules={appModules} />
-      </BrowserRouter>
+      <Layout modules={appModules} />
     </Provider>
   ),document.getElementById("app")
 )
