@@ -93,30 +93,27 @@ export const agentTemplatePrototype = (storageActions, importedActions) => ({
                   } catch(err){ failure(err) }}
       }
     },
-    objectData: {
-      builder: {},
-      editor: {},
-      card: {}
+
+    card: {
+      objectData: {key: "value"},
+      properties: {},
+      tags: {},
+      assignments: {},
+      roles: {}
     },
-    properties: {
-      builder: {},
-      editor: {},
-      card: {}
+    editor: {
+      objectData: {},
+      properties: {},
+      tags: {},
+      assignments: {},
+      roles: {}
     },
-    tags: {
-      builder: {},
-      editor: {},
-      card: {}
-    },
-    assignments: {
-      builder: {},
-      editor: {},
-      card: {}
-    },
-    roles: {
-      builder: {},
-      editor: {},
-      card: {}
+    builder: {
+      objectData: {key: "value"},
+      properties: {},
+      tags: {key: "value"},
+      assignments: {},
+      roles: {}
     }
   }
 })

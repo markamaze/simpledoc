@@ -121,7 +121,6 @@ export const structuralNodePrototype = (storageActions, importedActions) => ({
   },
   displayProps: {
       displayName: function(){ return this.structuralNode_label },
-
       actionCreators: {
         saveInStorage: {
           label: "Submit Changes",
@@ -142,34 +141,26 @@ export const structuralNodePrototype = (storageActions, importedActions) => ({
         }
       },
 
-      objectData: {
-        builder: {},
-        editor: {},
-        card: {}
+      card: {
+        objectData: {key: "value"},
+        properties: {},
+        tags: {},
+        assignments: {},
+        roles: {}
       },
-
-      properties: {
-        builder: {},
-        editor: {},
-        card: {}
+      editor: {
+        objectData: {},
+        properties: {},
+        tags: {},
+        assignments: {},
+        roles: {}
       },
-
-      tags: {
-        builder: {},
-        editor: {},
-        card: {}
-      },
-
-      assignments: {
-        builder: {},
-        editor: {},
-        card: {}
-      },
-
-      roles: {
-        builder: {},
-        editor: {},
-        card: {}
+      builder: {
+        objectData: {key: "value"},
+        properties: {},
+        tags: {key: "value"},
+        assignments: {},
+        roles: {}
       }
 
     }
