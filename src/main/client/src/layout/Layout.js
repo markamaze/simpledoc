@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import { createBrowserHistory } from 'history'
 
 import Footer from './Footer'
 import Header from './Header'
@@ -51,14 +52,31 @@ const BodyViewport = styled.div`
 
 
 export default function Layout(props){
-  const [activeModule, setActiveModule] = React.useState("Agency")
+  const history = createBrowserHistory()
+  const [location, setLocation] = React.useState(history.location)
 
+  const unlisten = history.listen((location, action) => {
+    setLocation(location)
+  })
 
+  const findRoute = (routes, path) => {
+    let foundRoute = routes.find(route => path.startsWith(route.path))
+
+    if(foundRoute.path === path && foundRoute.component) return foundRoute
+    else foundRoute = Object.values(foundRoute.routes).find(route => path === route.path)
+
+    if(foundRoute.component) return foundRoute
+    else console.log("error finding route")
+    }
 
   return  <BodyWrapper >
-              <Header links={ props.modules.map(module => module.title) }
-                      setActive={setActiveModule} active={activeModule}/>
-              <BodyViewport >{ props.modules.find(module => module.title === activeModule).component }</BodyViewport>
+              <Header routes={props.modules} pushHistory={(path, state)=> history.push(path, state) } location={location}/>
+
+              <BodyViewport >
+                {
+                  findRoute(props.modules, location.pathname).component(location.state)
+                }
+              </BodyViewport>
               <Footer />
             </BodyWrapper>
 
