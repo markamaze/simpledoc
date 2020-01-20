@@ -1,6 +1,7 @@
 import React from 'react'
 
 import AgencyModule from './AgencyModule'
+import { AgencyPage, UsersManagerPage, TemplatesManagerPage, DataTagsManagerPage } from './Agency'
 import agency_reducer from './module_reducer'
 import { loadAgencyStore } from './module_actions'
 import searchAgency from './services/searchAgency'
@@ -11,8 +12,13 @@ export default module = {
   onLoad: loadAgencyStore,
   title: "Agency",
   path: "/Agency",
-  component: <AgencyModule />,
-  services: [ searchAgency ]
+  services: [ searchAgency ],
+  routes: {
+    agency: { path: "/Agency", title: "Agency", component: state => <AgencyPage  />},
+    users: { path: "/Agency/users", title: "Users", component: state => <UsersManagerPage historyState={state} />},
+    templates: { path: "/Agency/templates", title: "Templates", component: state => <TemplatesManagerPage historyState={state} /> },
+    tags: { path: "/Agency/tags", title: "DataTags", component: state => <DataTagsManagerPage historyState={state}/> }
+  }
 }
 
 
