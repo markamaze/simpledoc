@@ -1,6 +1,5 @@
 import React from 'react'
 
-import AgencyModule from './AgencyModule'
 import { AgencyPage, UsersManagerPage, TemplatesManagerPage, DataTagsManagerPage } from './Agency'
 import agency_reducer from './module_reducer'
 import { loadAgencyStore } from './module_actions'
