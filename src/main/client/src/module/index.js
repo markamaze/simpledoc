@@ -11,8 +11,8 @@ export default module = [
     reducer: {home: {store: {} }},
     onLoad: ()=>console.log("Home loaded"),
     title: "Home",
-    path: "/Home",
-    component: <div>Hello Home</div>,
+    path: "/",
+    component: state => <div>Hello Home</div>,
     services: [ ]
   }
 ]
