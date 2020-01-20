@@ -110,7 +110,7 @@ function List(props){
   function columnTitleRow(){
     let columnTitleRow = props.columns.map( column => column.label )
 
-    props.itemActions.length > 0 ? columnTitleRow.push("") : null
+    props.itemActions && props.itemActions.length > 0 ? columnTitleRow.push("") : null
 
     return  <div className="list-head-row list-row">
               { columnTitleRow.map(columnTitle =>
@@ -124,7 +124,7 @@ function List(props){
                     {dataItem[column.selector]}
                   </div>) }
 
-              { props.itemActions.length > 0 ? addActionCell(dataItem) : null }
+              { props.itemActions && props.itemActions.length > 0 ? addActionCell(dataItem) : null }
             </div>
   }
   function addActionCell(dataItem){
@@ -138,7 +138,8 @@ function List(props){
             </div>
   }
   function renderItemComponent(dataItem){
-    return React.cloneElement(
+    return !props.itemComponent ? null :
+      React.cloneElement(
         props.itemComponent(dataItem),
         [{className: `list-row-component-wrapper`, displayName: "ListItemComponent"}],
         [ <div className="list-row-component-header">
@@ -152,7 +153,7 @@ function List(props){
         ])
   }
   function getColumnCount(){
-    return props.itemActions.length > 0 ?
+    return props.itemActions && props.itemActions.length > 0 ?
       props.columns.length + 1 :
       props.columns.length
   }
@@ -163,14 +164,20 @@ function List(props){
   function iconSet(){}
 
 
+function activeItemAction(item){
+  if(props.onItemClick) return props.onItemClick(item)
+
+  else return renderItemComponent(item)
+}
+
 
   function listRows(){
     return  <div className="list-body">
               {
                 props.dataSet.map( dataItem =>
-                  <div className="list-row-wrapper">
+                  <div className="list-row-wrapper" key={`list-row-${props.key}-${dataItem.id}`}>
                     { addRow(dataItem) }
-                    { dataItem === activeItem ? renderItemComponent(dataItem) : null }
+                    { dataItem === activeItem ? activeItemAction(dataItem) : null }
                   </div>)
                 }
               </div>
@@ -187,9 +194,9 @@ function List(props){
 
     return childrenSet && childrenSet.length > 0 ?
 
-      <div className="tree-body">
-        <div className="tree-row-wrapper">
-          <div className="tree-root">
+      <div className={`tree-body`} key={`tree-body-${root.id}`} >
+        <div className="tree-row-wrapper" key={`tree-row-wrapper-${root.id}`}>
+          <div className="tree-root" key={`tree-root-${root.id}`} >
             { addRow(root) }
             { root === activeItem ? renderItemComponent(root) : null }
             <div className="tree-root-children-list"
@@ -230,7 +237,7 @@ function List(props){
     }
 
   try{
-    return  <Wrapper columnCount={getColumnCount()} >
+    return  <Wrapper columnCount={getColumnCount()} style={props.style}>
               { !props.headerComponent ? null :
                   <header onClick={() => setActiveItem(null)}>{props.headerComponent}</header>
               }
