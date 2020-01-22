@@ -1,7 +1,7 @@
 import React from 'react'
 import List from './moduleComponents/List'
-import { useSelector, connect } from 'react-redux'
-import { ModuleWrapper } from '../moduleStyles'
+import { useSelector } from 'react-redux'
+import { AgencyPageWrapper } from './agencyStyles'
 import ErrorBoundary from './agencyUtils/ErrorBoundary'
 
 
@@ -25,9 +25,9 @@ function AgencyPage(props){
 
   try {
 
-  return  <ModuleWrapper id="agency-module" className="module-wrapper">
+  return  <AgencyPageWrapper id="agency-module" className="module-wrapper">
             <ErrorBoundary displayName="AgencyPage" >{dataSet()}</ErrorBoundary>
-            </ModuleWrapper>
+            </AgencyPageWrapper>
   } catch(err){ throw new Error(`${err}: eror in AgencyPage`)}
 }
 
@@ -48,9 +48,9 @@ function TemplatesManagerPage(props){
         ]}
         headerComponent={<div className="page-header">Manage Agency TemplatesManagerPage</div>} />
 
-  return  <ModuleWrapper id="agency-module-page-templateManager" className="module-wrapper">
+  return  <AgencyPageWrapper id="agency-module-page-templateManager" className="module-wrapper">
           <ErrorBoundary displayName="TemplatesManagerPage">{dataList()}</ErrorBoundary>
-          </ModuleWrapper>
+          </AgencyPageWrapper>
 }
 
 function DataTagsManagerPage(props){
@@ -66,9 +66,9 @@ function DataTagsManagerPage(props){
         ]}
         headerComponent={<div className="page-header">Manage Agency DataTagsManagerPage</div>} />
 
-  return  <ModuleWrapper id="agency-module-page-dataTagsManager" className="module-wrapper">
+  return  <AgencyPageWrapper id="agency-module-page-dataTagsManager" className="module-wrapper">
           <ErrorBoundary displayName="dataTagsManagerPage">{dataList()}</ErrorBoundary>
-          </ModuleWrapper>
+          </AgencyPageWrapper>
 }
 
 function UsersManagerPage(props){
@@ -84,9 +84,9 @@ function UsersManagerPage(props){
         ]}
         headerComponent={<div className="page-header">Manage Agency Users</div>} />
 
-  return  <ModuleWrapper id="agency-module-page-UsersManagerPage" className="module-wrapper">
+  return  <AgencyPageWrapper id="agency-module-page-UsersManagerPage" className="module-wrapper">
           <ErrorBoundary displayName="UsersManagerPage">{dataList()}</ErrorBoundary>
-          </ModuleWrapper>
+          </AgencyPageWrapper>
 
 }
 
