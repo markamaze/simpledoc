@@ -10,19 +10,19 @@ export default module = {
   reducer: {agency: agency_reducer},
   onLoad: loadAgencyStore,
   title: "Agency",
-  path: "/Agency",
+  path: "/agency",
   services: [ searchAgency ],
   routes: {
-    agency: { path: "/Agency", title: "Agency", component: state => <AgencyPage  />},
-    users: { path: "/Agency/users", title: "Users", component: state => <UsersManagerPage historyState={state} />},
-    templates: { path: "/Agency/templates", title: "Templates", component: state => <TemplatesManagerPage historyState={state} /> },
-    tags: { path: "/Agency/tags", title: "DataTags", component: state => <DataTagsManagerPage historyState={state}/> }
+    agency: { path: "/agency", default: true, title: "Agency", component: state => <AgencyPage  />},
+    users: { path: "/agency/users", title: "Users", component: state => <UsersManagerPage historyState={state} />},
+    templates: { path: "/agency/templates", title: "Templates", component: state => <TemplatesManagerPage historyState={state} /> },
+    tags: { path: "/agency/tags", title: "DataTags", component: state => <DataTagsManagerPage historyState={state}/> }
   }
 }
 
 
 /*
-  right now, within AgencyModule I am importing from outside the module:
+  right now, within agency module I am importing from outside the module:
     moduleStyles
     store
     DataTableWrapper
