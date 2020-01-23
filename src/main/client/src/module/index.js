@@ -5,14 +5,14 @@ import store from '../store'
 
 export const moduleStore = store
 
-export default module = [
-  agency,
-  {
+export default module = {
+  home: {
     reducer: {home: {store: {} }},
     onLoad: ()=>console.log("Home loaded"),
     title: "Home",
     path: "/",
     component: state => <div>Hello Home</div>,
     services: [ ]
-  }
-]
+  },
+  agency,
+}
