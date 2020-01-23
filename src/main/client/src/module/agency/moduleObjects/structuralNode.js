@@ -2,7 +2,7 @@ import React from 'react'
 import * as validationTool from './validationTool'
 
 
-export const structuralNodePrototype = (storageActions, importedActions) => ({
+const prototype = agencyState => ({
   type: function(){ return "structuralNode" },
   properties: {
     id: {
@@ -118,31 +118,22 @@ export const structuralNodePrototype = (storageActions, importedActions) => ({
     },
     branch: function(id, allNodes){},
     getNodeSupervisor: function(id, allNodes){}
-  },
-  displayProps: {
-      displayName: function(){ return this.structuralNode_label },
-      actionCreators: {
-        saveInStorage: {
-          label: "Submit Changes",
-          key: function(){return `action-creater-save-structuralNode-${this.id}`},
-          action: function(success, failure){
-                    try{
-                      if(this.id === "new_object") success(storageActions.createAgencyObject(this))
-                      else success(storageActions.updateAgencyObject(this))
-                    } catch(err){ failure(err) }}
-        },
-        deleteFromStorage: {
-          label: "Delete StructuralNode",
-          key: function(){return `action-creater-delete-structuralNode-${this.id}`},
-          action: function(success, failure){
-                    try{
-                      success(storageActions.deleteAgencyObject(this))
-                    } catch(err){ failure(err) }}
-        }
-      },
+  }
+})
 
+
+const displayProps = () => ({
+  displayKey: "structuralNode_label",
+  component: {
+    list: {
+      columns: {
+        limited: [],
+        expanded: []
+      }
+    },
+    agencyObject: {
       card: {
-        objectData: {key: "value"},
+        objectData: {},
         properties: {},
         tags: {},
         assignments: {},
@@ -156,12 +147,15 @@ export const structuralNodePrototype = (storageActions, importedActions) => ({
         roles: {}
       },
       builder: {
-        objectData: {key: "value"},
+        objectData: {},
         properties: {},
-        tags: {key: "value"},
+        tags: {},
         assignments: {},
         roles: {}
       }
-
     }
+  }
 })
+
+
+export { prototype, displayProps }

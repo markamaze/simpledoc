@@ -3,7 +3,7 @@ import * as validationTool from './validationTool'
 
 
 
-export const dataTagPrototype = (storageActions, importedActions) => ({
+const prototype = agencyState => ({
   type: function(){ return "dataTag" },
   properties: {
     id: {
@@ -70,49 +70,44 @@ export const dataTagPrototype = (storageActions, importedActions) => ({
       }
     }
   },
-  typeFunctions: {},
-  displayProps: {
-    displayName: function(){ return this.dataTag_label },
-    actionCreators: {
-      saveInStorage: {
-        label: "Submit Changes",
-        key: function(){return `action-creater-save-dataTag-${this.id}`},
-        action: function(success, failure){
-                  try{
-                    if(this.id === "new_object") success(storageActions.createAgencyObject(this))
-                    else success(storageActions.updateAgencyObject(this))
-                  } catch(err){ failure(err) }}
-      },
-      deleteFromStorage: {
-        label: "Delete DataTag",
-        key: function(){return `action-creater-delete-dataTag-${this.id}`},
-        action: function(success, failure){
-                  try{
-                    success(storageActions.deleteAgencyObject(this))
-                  } catch(err){ failure(err) }}
+  typeFunctions: {}
+})
+
+
+const displayProps = () => ({
+  displayKey: "dataTag_label",
+  component: {
+    list: {
+      columns: {
+        limited: [],
+        expanded: []
       }
     },
-
-    card: {
-      objectData: {key: "value"},
-      properties: {},
-      tags: {},
-      assignments: {},
-      roles: {}
-    },
-    editor: {
-      objectData: {},
-      properties: {},
-      tags: {},
-      assignments: {},
-      roles: {}
-    },
-    builder: {
-      objectData: {key: "value"},
-      properties: {},
-      tags: {key: "value"},
-      assignments: {},
-      roles: {}
+    agencyObject: {
+      card: {
+        objectData: {},
+        properties: {},
+        tags: {},
+        assignments: {},
+        roles: {}
+      },
+      editor: {
+        objectData: {},
+        properties: {},
+        tags: {},
+        assignments: {},
+        roles: {}
+      },
+      builder: {
+        objectData: {},
+        properties: {},
+        tags: {},
+        assignments: {},
+        roles: {}
+      }
     }
   }
 })
+
+
+export { prototype, displayProps }

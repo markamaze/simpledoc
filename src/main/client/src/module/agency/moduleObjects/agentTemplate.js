@@ -3,7 +3,7 @@ import * as validationTool from './validationTool'
 
 
 
-export const agentTemplatePrototype = (storageActions, importedActions) => ({
+const prototype = agencyState => ({
   type: function(){ return "agentTemplate" },
   properties: {
     id: {
@@ -69,51 +69,45 @@ export const agentTemplatePrototype = (storageActions, importedActions) => ({
       }
     }
   },
-  typeFunctions: {
+  typeFunctions: {}
+})
 
-  },
-  displayProps: {
-    displayName: function(){ return this.agentTemplate_label },
-    actionCreators: {
-      saveInStorage: {
-        label: "Submit Changes",
-        key: function(){return `action-creater-save-agentTemplate-${this.id}`},
-        action: function(success, failure){
-                  try{
-                    if(this.id === "new_object") success(storageActions.createAgencyObject(this))
-                    else success(storageActions.updateAgencyObject(this))
-                  } catch(err){ failure(err) }}
-      },
-      deleteFromStorage: {
-        label: "Delete AgentTemplate",
-        key: function(){return `action-creater-delete-agentTemplate-${this.id}`},
-        action: function(success, failure){
-                  try{
-                    success(storageActions.deleteAgencyObject(this))
-                  } catch(err){ failure(err) }}
+
+
+const displayProps = () => ({
+  displayKey: "agentTemplate_label",
+  component: {
+    list: {
+      columns: {
+        limited: [],
+        expanded: []
       }
     },
-
-    card: {
-      objectData: {key: "value"},
-      properties: {},
-      tags: {},
-      assignments: {},
-      roles: {}
-    },
-    editor: {
-      objectData: {},
-      properties: {},
-      tags: {},
-      assignments: {},
-      roles: {}
-    },
-    builder: {
-      objectData: {key: "value"},
-      properties: {},
-      tags: {key: "value"},
-      assignments: {},
-      roles: {}
+    agencyObject: {
+      card: {
+        objectData: {},
+        properties: {},
+        tags: {},
+        assignments: {},
+        roles: {}
+      },
+      editor: {
+        objectData: {},
+        properties: {},
+        tags: {},
+        assignments: {},
+        roles: {}
+      },
+      builder: {
+        objectData: {},
+        properties: {},
+        tags: {},
+        assignments: {},
+        roles: {}
+      }
     }
   }
 })
+
+
+export { prototype, displayProps }

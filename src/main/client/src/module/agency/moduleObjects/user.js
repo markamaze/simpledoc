@@ -3,7 +3,7 @@ import * as validationTool from './validationTool'
 
 
 
-export const userPrototype = (storageActions, importedActions) => ({
+const prototype = agencyState => ({
   type: function(){ return "user" },
   properties: {
     id: {
@@ -49,64 +49,48 @@ export const userPrototype = (storageActions, importedActions) => ({
   },
   typeFunctions: {
     getAgents: function(){}
-  },
-  displayProps: {
+  }
+})
 
-    displayName: function(){ return this.username },
-    actionCreators: {
-      saveInStorage: {
-        label: "Submit Changes",
-        key: function(){return `action-creater-save-user-${this.id}`},
-        action: function(success, failure){
-                  try{
-                    if(this.id === "new_object") success(storageActions.createAgencyObject(this))
-                    else success(storageActions.updateAgencyObject(this))
-                  } catch(err){ failure(err) }}
+
+const displayProps = () => ({
+  displayKey: "username",
+  component: {
+    list: {
+      columns: {
+        limited: [{label: "Username", selector: "username"}],
+        expanded: [
+          {label: "Username", selector: "username"},
+          {label: "Password", selector: "password"},
+          {label: "userId", selector: "id"}
+        ]
+      }
+    },
+    agencyObject: {
+      card: {
+        objectData: {},
+        properties: {},
+        tags: {},
+        assignments: {},
+        roles: {}
       },
-      deleteFromStorage: {
-        label: "Delete User",
-        key: function(){return `action-creater-delete-user-${this.id}`},
-        action: function(success, failure){
-                  try{
-                    success(storageActions.deleteAgencyObject(this))
-                  } catch(err){ failure(err) }}
+      editor: {
+        objectData: {},
+        properties: {},
+        tags: {},
+        assignments: {},
+        roles: {}
+      },
+      builder: {
+        objectData: {},
+        properties: {},
+        tags: {},
+        assignments: {},
+        roles: {}
       }
-    },
-    listProps: {
-      columns: function(type){
-        return {
-          limited: [
-            {label: "Username", selector: "username"}
-          ],
-          expanded: [
-            {label: "Username", selector: "username"},
-            {label: "Password", selector: "password"},
-            {label: "userId", selector: "id"}
-          ]
-        }
-      }
-    },
-
-    card: {
-      objectData: {key: "value"},
-      properties: {},
-      tags: {},
-      assignments: {},
-      roles: {}
-    },
-    editor: {
-      objectData: {},
-      properties: {},
-      tags: {},
-      assignments: {},
-      roles: {}
-    },
-    builder: {
-      objectData: {key: "value"},
-      properties: {},
-      tags: {key: "value"},
-      assignments: {},
-      roles: {}
     }
   }
 })
+
+
+export { prototype, displayProps }

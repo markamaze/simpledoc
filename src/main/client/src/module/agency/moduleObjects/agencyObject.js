@@ -1,33 +1,34 @@
 import React from 'react'
 import AgencyObject from '../moduleComponents/AgencyObject'
 
-import { userPrototype } from './user'
-import { dataTagPrototype } from './dataTag'
-import { structuralNodePrototype } from './structuralNode'
-import { agentTemplatePrototype } from './agentTemplate'
-import { agentPrototype } from './agent'
+import store from '../../../store' //modify setup to import from agency index
+import { createAgencyObject, updateAgencyObject, deleteAgencyObject }  from '../module_actions'
 
-import { externalActions } from '../index'
-import { createAgencyObject, updateAgencyObject, deleteAgencyObject } from '../module_actions'
+import * as user from './user'
+import * as dataTag from './dataTag'
+import * as structuralNode from './structuralNode'
+import * as agentTemplate from './agentTemplate'
+import * as agent from './agent'
 
 
 
-const storageActions = {
-  createAgencyObject,
-  updateAgencyObject,
-  deleteAgencyObject
-}
-
-const importedActions = { externalActions }
+const agencyState = () => store.getState().agency
 
 const agencyPrototypes = {
-  user: userPrototype(storageActions, importedActions),
-  dataTag: dataTagPrototype(storageActions, importedActions),
-  structuralNode: structuralNodePrototype(storageActions, importedActions),
-  agentTemplate: agentTemplatePrototype(storageActions, importedActions),
-  agent: agentPrototype(storageActions, importedActions)
+  user: user.prototype(agencyState),
+  dataTag: dataTag.prototype(agencyState),
+  structuralNode: structuralNode.prototype(agencyState),
+  agentTemplate: agentTemplate.prototype(agencyState),
+  agent: agent.prototype(agencyState)
 }
 
+const agencyDisplayProps = {
+  user: user.displayProps(),
+  dataTag: dataTag.displayProps(),
+  structuralNode: structuralNode.displayProps(),
+  agentTemplate: agentTemplate.displayProps(),
+  agent: agent.displayProps()
+}
 
 const agencyObjectPrototype = (objectPrototype) => ({
   ...objectPrototype,
@@ -89,23 +90,50 @@ const agencyObjectPrototype = (objectPrototype) => ({
 
   display: function(props, onError){
     return {
-      card: <AgencyObject.Card {...props} className="agencyObject-card"
-                displayProps={this.displayProps.card}
-                dataItem={this}
-                onError={onError} />,
-      editor: <AgencyObject.Editor {...props}
-                  displayProps={this.displayProps.editor}
-                  dataItem={this}
-                  onError={onError} />,
-      builder: <AgencyObject.Builder {...props}
-                    displayProps={this.displayProps.builder}
+      card:     <AgencyObject.Card className="agencyObject-card"
+                    displayProps={agencyDisplayProps[this.type()].component.agencyObject.card}
+                    dataItem={this}
+                    onError={onError} />,
+      editor:   <AgencyObject.Editor className="agencyObject-editor"
+                    displayProps={agencyDisplayProps[this.type()].component.agencyObject.editor}
+                    dataItem={this}
+                    onError={onError} />,
+      builder:  <AgencyObject.Builder className="agencyObject-builder"
+                    displayProps={agencyDisplayProps[this.type()].component.agencyObject.builder}
                     dataItem={this}
                     onError={onError} />
-    }}
+    }},
+
+  storage: {
+    save: {
+      label: "Submit",
+      key: function(){return `action-creater-save-${this.type()}-${this.id}`},
+      action: function(success, failure, confirm){
+                let result
+                try{
+                  if(!confirm || !confirm()) return false
+                  result = this.id === "new_object" ? storageActions.createAgencyObject(this, success, failure)
+                    : storageActions.updateAgencyObject(this, success, failure)
+
+                  result.error ? failure(result) : success(result)
+                } catch(err){ failure(err) }}
+    },
+    delete: {
+      label: "Delete",
+      key: function(){return `action-creater-delete-${this.type()}-${this.id}`},
+      action: function(success, failure, confirm){
+                let result
+                try{
+                  if(!confirm || !confirm()) return false
+                  result  = storageActions.deleteAgencyObject(this, success, failure)
+
+                  result.error ? failure(result) : success(result)
+                } catch(err){ failure(err) }}
+    }
+  }
 })
 
-
-export const agencyObject = (type, state, failure) => {
+const agencyObject = (type, state, failure) => {
   try {
     let _agencyObj = Object.create(agencyObjectPrototype(agencyPrototypes[type]))
     _agencyObj.init(state, failure)
@@ -113,3 +141,9 @@ export const agencyObject = (type, state, failure) => {
     return _agencyObj
   } catch(error){ failure(new Error(`${error}: failure to create agencyObject`)) }
 }
+
+
+const agencyTypeData = type => agencyDisplayProps[type]
+
+
+export { agencyObject, agencyTypeData }
