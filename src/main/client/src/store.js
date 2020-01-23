@@ -7,9 +7,9 @@ import modules from './module/index'
 var middleware = composeWithDevTools(applyMiddleware(thunk))
 
 var reducers = () => {
-	let reducersList = modules.map(module => module.reducer)
+	let reducersList = Object.values(modules).map(module => module.reducer)
 	let reducers = {}
-	modules.forEach( module => { module.onLoad() })
+	Object.values(modules).forEach( module => { module.onLoad() })
 
 	reducersList.forEach(reducer => {
 		reducers = {...reducers, ...reducer}
