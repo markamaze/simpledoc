@@ -1,83 +1,5 @@
-import React, { useState } from 'react'
-import styled from 'styled-components'
-
-const Wrapper = styled.div`
-  display: block;
-
-  header {
-    text-align: center;
-    background: burlywood;
-  }
-  .list{
-    display: flex;
-    flex-direction: column;
-  }
-
-  .list-body{
-    background: lightgray;
-    font-size: small;
-  }
-
-  .list-row{
-    display: flex;
-    border-bottom: thin solid gray
-  }
-
-  .list-head-row{
-    background: gray;
-  }
-
-  .list-head-item {
-    font-weight: bold;
-    font-style: italic;
-    flex-grow: 1;
-  }
-
-  .list-cell{
-    display: flex;
-    flex-grow: 1;
-    justify-content: left;
-    width: ${props => 100/props.columnCount}%;
-  }
-
-  .action-cell{
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .list-row-action {
-    font-size: small;
-    padding: 0 .3rem;
-  }
-
-  .action-cell :hover{
-    font-size: normal;
-    color: blue;
-  }
-
-  .list-row-component-wrapper{
-    display: flex;
-    flex-direction: column;
-    max-height: 100%;
-    min-height: 100%;
-    max-width: 100%;
-    min-width: 100%;
-    overflow: auto;
-    margin: 0 auto;
-    box-sizing: border-box;
-  }
-  .list-row-component-header{
-    display: flex;
-    background: lightgray;
-  }
-  .list-row-component-header .action-cell {
-    flex-direction: row;
-  }
-  .list-row-component {
-    background: white;
-    box-sizing: border-box;
-  }
-`
+import React from 'react'
+import { ListWrapper } from './styles'
 
 
 /*
@@ -88,11 +10,13 @@ const Wrapper = styled.div`
       apply constraint on itemComponent display -> overlay or below row
 
 */
+
+
 function List(props){
 
-  const [buildAsTree, setBuildAsTree] = useState(checkType())
-  const [activeItem, setActiveItem] = useState(null)
-  const [overlayItem, setOverlayItem] = useState(null)
+  const [buildAsTree, setBuildAsTree] = React.useState(checkType())
+  const [activeItem, setActiveItem] = React.useState(null)
+  const [overlayItem, setOverlayItem] = React.useState(null)
 
   function checkType(){
   	if(!props.heirarchyKey) return false
@@ -237,7 +161,7 @@ function activeItemAction(item){
     }
 
   try{
-    return  <Wrapper columnCount={getColumnCount()} style={props.style}>
+    return  <ListWrapper columnCount={getColumnCount()} style={props.style}>
               { !props.headerComponent ? null :
                   <header onClick={() => setActiveItem(null)}>{props.headerComponent}</header>
               }
@@ -249,7 +173,7 @@ function activeItemAction(item){
                   </div>
 
               : null }
-            </Wrapper>
+            </ListWrapper>
   }catch(error){ throw error}
 }
 
