@@ -1,8 +1,6 @@
-import sampleData from '../../sample_data'
 
 
-
-const initialState = sampleData.layout
+const initialState = []
 
 export default function layoutReducer (state=initialState, action) {
 
