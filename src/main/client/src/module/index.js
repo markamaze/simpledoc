@@ -1,5 +1,6 @@
 import React from 'react'
 import agency from './agency/index'
+import forms from './forms/index'
 import workspace from './workspace/index'
 import store from '../store'
 
@@ -15,4 +16,6 @@ export default module = {
     services: [ ]
   },
   agency,
+  forms,
+  workspace
 }
