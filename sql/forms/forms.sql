@@ -75,8 +75,8 @@ $function$;
 
 
 CREATE OR REPLACE FUNCTION forms.query_forms_resource( resource_id UUID )
-RETURNS forms.form
+RETURNS forms.forms
 LANGUAGE sql STABLE
 AS $function$
-  SELECT * FROM forms.form WHERE id=resource_id
+  SELECT * FROM forms.forms WHERE id=resource_id
 $function$;
