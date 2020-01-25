@@ -1,31 +1,35 @@
 import simpledoc.services.ModuleObject;
 
 
-public class FormSet extends ModuleObject {
+public class Section extends ModuleObject {
   private String label;
-  private Set<UUID> form_ids;
+  private UUID form_id;
+  private Set<UUID> layout_ids;
   private List<Object> completion_rules;
   private List<Object> security_settings;
 
-  FormSet(UUID id, String type) { super(id, type); }
-  FormSet(UUID id, String type, Map<String, Object> data) throws ServiceErrorException {
+  Section(UUID id, String type) { super(id, type); }
+  Section(UUID id, String type, Map<String, Object> data) throws ServiceErrorException {
     super(id, type);
     setLabel(data.get("label"));
-    setFormIds(data.get("form_ids"));
+    setFormId(data.get("form_id"));
+    setLayoutIds(data.get("layout_ids"));
     setCompletionRules(data.get("completion_rules"));
     setSecuritySettings(data.get("security_settings"));
   }
 
 
-  //TODO: finish writing property setters -> FormSet
+  //TODO: finish writing property setters -> Section
   private void setLabel(Object object) throws ServiceErrorException {}
-  private void setFormIds(Object object) throws ServiceErrorException {}
+  private void setFormId(Object object) throws ServiceErrorException {}
+  private void setLayoutIds(Object object) throws ServiceErrorException {}
   private void setCompletionRules(Object object) throws ServiceErrorException {}
   private void setSecuritySettings(Object object) throws ServiceErrorException {}
 
 
   public String getLabel() { return this.label; }
-  public Set<UUID> getFormIds() { return this.form_ids; }
+  public UUID getFormId() { return this.form_id; }
+  public Set<UUID> getLayoutIds() { return this.layout_ids; }
   public List<Object> getCompletionRules() { return this.completion_rules; }
   public List<Object> getSecuritySettings() { return this.security_settings; }
 
@@ -35,10 +39,11 @@ public class FormSet extends ModuleObject {
     for(Entry<String, Object> entry: data.entrySet()){
       Object key = entry.getKey();
       if(key == "label") setLabel(entry.getValue());
-      else if(key == "form_ids") setFormIds(entry.getValue());
+      else if(key == "form_id") setFormId(entry.getValue());
+      else if(key == "layout_ids") setLayoutIds(entry.getValue());
       else if(key == "completion_rules") setCompletionRules(entry.getValue());
       else if(key == "security_settings") setSecuritySettings(entry.getValue());
-      else throw new ServiceErrorException("unknown property in FormSet")
+      else throw new ServiceErrorException("unknown property in Section")
     }
     return true;
   }
@@ -48,10 +53,11 @@ public class FormSet extends ModuleObject {
   public boolean readStorageResult(ResultSet resultSet) throws ServiceErrorException {
     try {
       setLabel(resultSet.getString("label"));
-      setFormIds(resultSet.getArray("form_ids").getArray());
+      setFormId(resultSet.getObject("form_id"));
+      setLayoutIds(resultSet.getArray("layout_ids").getArray());
       setCompletionRules(resultSet.getObject("completion_rules"));
       setSecuritySettings(resultSet.getObject("security_settings"));
-    } catch(SQLException err) { throw new ServiceErrorException(err + "error reading storage result for FormSet"); }
+    } catch(SQLException err) { throw new ServiceErrorException(err + "could not read storage result for Section"); }
     return true;
   }
 
@@ -61,8 +67,8 @@ public class FormSet extends ModuleObject {
     PreparedStatement statement = null;
 
     try {
-      if(type == "create") statement = connection.prepareStatement("call forms.create_formSet(?,?,?,?,?)");
-      else if(type == "update") statement = connection.prepareStatement("call forms.update_formSet(?,?,?,?,?)");
+      if(type == "create") statement = connection.prepareStatement("call forms.create_section(?,?,?,?,?,?)");
+      else if(type == "update") statement = connection.prepareStatement("call forms.update_section(?,?,?,?,?,?)");
 
       PGobject completionRulesPGObj = new PGobject();
       completionRulesPGObj.setType("json");
@@ -74,11 +80,12 @@ public class FormSet extends ModuleObject {
 
 
       statement.setObject(1, this.getId());
-      statement.setObject(2, this.getLabel());
-      statement.setObject(3, this.getFormIds());
-      statement.setObject(4, completionRulesPGObj );
-      statement.setObject(5, securitySettingsPGObj);
-    } catch(SQLException err) { throw new ServiceErrorException(err + "error setting storage statement for FormSet"); }
+      statement.setString(2, this.getLabel());
+      statement.setObject(3, this.getFormId());
+      statement.setArray(4, connection.createArrayOf("UUID", this.getLayoutIds().toArray()));
+      statement.setObject(5, completionRulesPGObj );
+      statement.setObject(6, securitySettingsPGObj );
+    } catch(SQLException err) { throw new ServiceErrorException(err + "error setting storage statement for Section"); }
 
     return statement;
   }
@@ -90,7 +97,8 @@ public class FormSet extends ModuleObject {
     json_result.put("id", this.getId());
     json_result.put("type", this.getModuleObjectType());
     json_result.put("label", this.getLabel());
-    json_result.put("form_ids", this.getFormIds());
+    json_result.put("form_id", this.getFormId());
+    json_result.put("layout_ids", this.getLayoutIds());
     json_result.put("completion_rules", this.getCompletionRules());
     json_result.put("security_settings", this.getSecuritySettings());
 
