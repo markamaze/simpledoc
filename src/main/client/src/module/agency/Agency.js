@@ -1,91 +1,59 @@
 import React from 'react'
-import List from './moduleComponents/List'
+import List from '../../components/List'
 import { useSelector } from 'react-redux'
 import { AgencyPageWrapper } from './agencyStyles'
 import ErrorBoundary from './agencyUtils/ErrorBoundary'
-
+import { agencyTypeData } from './moduleObjects/agencyObject'
 
 function AgencyPage(props){
-  const structuralNodes = useSelector(state => (state.agency.structuralNodes))
 
-  const dataSet = () =>
-    <List className="page agency-page "
-        treeRoot={structuralNodes.find( n=>n.id===n.structuralNode_parent_id)}
-        rootIdKey="id"
-        treeNodeKey="structuralNode_parent_id"
-        dataSet={structuralNodes}
-        columns={[{label: "", selector: "structuralNode_label"}]}
-        itemComponent={ item => item.display.call(item, props, error=>{throw new Error(`${error}: handled by Agency`)}).card}
-        itemActions={[
-          {label: "+", action: item => this.newChildNode(item) },
-          {label: "restructure", action: item => item.display.call(item, props, error=>{throw new Error(`${error}: handled by Agency`)}).builder},
-          {label: "edit", action: item => item.display.call(item, props, error=>{throw new Error(`${error}: handled by Agency`)}).editor}
-        ]}
-        headerComponent={<div className="page-header">Agency Overview</div>} />
+  const agencyState = useSelector(state => (state.agency))
+  // const rootNode = structuralNodes.find( node => node.id === node.structuralNode_parent_id)
 
-  try {
+  // const addStructuralNode = () => {}
+  const displayProps = agencyTypeData("structuralNode", agencyState).component.list
+
 
   return  <AgencyPageWrapper id="agency-module" className="module-wrapper">
-            <ErrorBoundary displayName="AgencyPage" >{dataSet()}</ErrorBoundary>
+            <ErrorBoundary displayName="AgencyPage" >
+              <List {...displayProps} headerComponent={<div className="page-header">Agency Overview</div>}/>
+            </ErrorBoundary>
             </AgencyPageWrapper>
-  } catch(err){ throw new Error(`${err}: eror in AgencyPage`)}
 }
 
 function TemplatesManagerPage(props){
-  const agentTemplates = useSelector(state => state.agency.agentTemplates)
+  const agencyState = useSelector(state => state.agency)
+  const displayProps = agencyTypeData("agentTemplate", agencyState).component.list
 
-  const dataList = () =>
-    <List
-        dataSet={agentTemplates}
-        columns={[
-          {label: "label", selector: "agentTemplate_label"},
-          // {label: "Password", selector: "password"},
-          {label: "Id", selector: "id"}
-        ]}
-        itemComponent={ item => item.display.call(item, props, error => { throw new Error(`${error}: handled by Agency`)}).card}
-        itemActions={[
-          {label: "modify", action: item => item.display.call(item, props, error => { throw new Error(`${error}@UsersManagerPage@Agency`)}).builder}
-        ]}
-        headerComponent={<div className="page-header">Manage Agency TemplatesManagerPage</div>} />
 
   return  <AgencyPageWrapper id="agency-module-page-templateManager" className="module-wrapper">
-          <ErrorBoundary displayName="TemplatesManagerPage">{dataList()}</ErrorBoundary>
+          <ErrorBoundary displayName="TemplatesManagerPage">
+            <List {...displayProps} headerComponent={<div className="page-header">Manage Templates</div>} />
+          </ErrorBoundary>
           </AgencyPageWrapper>
 }
 
 function DataTagsManagerPage(props){
-  const dataTags = useSelector(state => state.agency.dataTags)
+  const agencyState = useSelector(state => (state.agency))
+  const displayProps = agencyTypeData("dataTag", agencyState).component.list
 
-  const dataList = () =>
-    <List
-        dataSet={dataTags}
-        columns={[{label: "label", selector: "dataTag_label"},{label: "Id", selector: "id"}]}
-        itemComponent={ item => item.display.call(item, props, error => { throw new Error(`${error}: handled by Agency`)}).card}
-        itemActions={[
-          {label: "modify", action: item => item.display.call(item, props, error => { throw new Error(`${error}@DataTagsManagerPage@Agency`)}).builder}
-        ]}
-        headerComponent={<div className="page-header">Manage Agency DataTagsManagerPage</div>} />
 
   return  <AgencyPageWrapper id="agency-module-page-dataTagsManager" className="module-wrapper">
-          <ErrorBoundary displayName="dataTagsManagerPage">{dataList()}</ErrorBoundary>
+          <ErrorBoundary displayName="dataTagsManagerPage">
+            <List {...displayProps} headerComponent={<div className="page-header">DataTags</div>}/>
+          </ErrorBoundary>
           </AgencyPageWrapper>
 }
 
 function UsersManagerPage(props){
-  const users = useSelector(state => state.agency.users)
+  const agencyState = useSelector(state => (state.agency))
+  const displayProps = agencyTypeData("user", agencyState).component.list
 
-  const dataList = () =>
-    <List
-        dataSet={users}
-        columns={[{label: "Username", selector: "username"},{label: "userId", selector: "id"}]}
-        itemComponent={ item => item.display.call(item, props, error => { throw new Error(`${error}: handled by Agency`)}).card}
-        itemActions={[
-          {label: "modify", action: item => item.display.call(item, props, error => { throw new Error(`${error}@UsersManagerPage@Agency`)}).builder}
-        ]}
-        headerComponent={<div className="page-header">Manage Agency Users</div>} />
 
   return  <AgencyPageWrapper id="agency-module-page-UsersManagerPage" className="module-wrapper">
-          <ErrorBoundary displayName="UsersManagerPage">{dataList()}</ErrorBoundary>
+          <ErrorBoundary displayName="UsersManagerPage">
+            <List {...displayProps} headerComponent={<div className="page-header">Manage Agency Users</div>} />
+          </ErrorBoundary>
           </AgencyPageWrapper>
 
 }
