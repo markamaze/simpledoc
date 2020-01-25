@@ -9,6 +9,16 @@ export const AgencyPageWrapper = styled.div`
   height: 100%;
   max-height: 100%;
   overflow: auto;
+  .dataTag {
+    display: flex;
+    font-size: x-small;
+    background: ${colors.two};
+    color: ${colors.one};
+    padding: .2rem;
+    margin: .2rem;
+    border-radius: .5rem;
+    justify-content: center;
+  }
 `
 
 export const CardWrapper = styled.div``
