@@ -66,7 +66,7 @@ const prototype = agencyState => ({
 })
 
 
-const displayProps = () => ({
+const displayProps = agencyState => ({
   displayKey: "agent_label",
   component: {
     list: {

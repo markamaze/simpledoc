@@ -74,14 +74,23 @@ const prototype = agencyState => ({
 
 
 
-const displayProps = () => ({
+const displayProps = agencyState => ({
   displayKey: "agentTemplate_label",
   component: {
     list: {
       columns: {
-        limited: [],
-        expanded: []
-      }
+        limited: [{label: "Template Name", selector: "agentTemplate_label"}],
+        expanded: [{label: "Template Name", selector: "agentTemplate_label"}]
+      },
+      tableData: agencyState.agentTemplates,
+      listActions: [{label: "New Template", action: ()=> console.log("fire action to create agentTemplate")}],
+      drawerComponents: [
+        {label: "card", component: item => item.display.call(item, agencyState, err=>{throw err}).card}
+      ],
+      overlayComponents: [
+        {label: "editor", component: item => item.display.call(item, agencyState, error=>{throw error}).editor},
+        {label: "builder", component: item => item.display.call(item, agencyState, error=>{throw error}).builder}
+      ]
     },
     agencyObject: {
       card: {

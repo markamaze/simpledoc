@@ -74,14 +74,24 @@ const prototype = agencyState => ({
 })
 
 
-const displayProps = () => ({
+const displayProps = agencyState => ({
   displayKey: "dataTag_label",
   component: {
     list: {
       columns: {
-        limited: [],
-        expanded: []
-      }
+        limited: [{label: "Tag Name", selector: "dataTag_label"}],
+        expanded: [
+          {label: "Tag Name", selector: "dataTag_label"},
+          {label: "Type", selector: "dataTag_tagType"}
+        ]
+      },
+      tableData: agencyState.dataTags,
+      listActions: [{label: "New DataTag", action: () => console.log("fire action to create dataTag")}],
+      drawerComponents: [{label: "card", component: item => item.display.call(item, agencyState, err=>{throw err}).card}],
+      overlayComponents: [
+        {label: "editor", component: item => item.display.call(item, agencyState, err=>{throw err}).editor},
+        {label: "builder", component: item => item.display.call(item, agencyState, err=>{throw err}).builder}
+      ]
     },
     agencyObject: {
       card: {

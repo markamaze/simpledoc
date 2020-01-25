@@ -113,8 +113,8 @@ const prototype = agencyState => ({
     }
   },
   typeFunctions: {
-    getChildren: function(props){
-      return props.structuralNodes.filter( node => node.structuralNode_parent_id === this.id && node.structuralNode_parent_id !== node.id )
+    getChildren: function(){
+      return agencyState().structuralNodes.filter( node => node.structuralNode_parent_id === this.id && node.structuralNode_parent_id !== node.id )
     },
     branch: function(id, allNodes){},
     getNodeSupervisor: function(id, allNodes){}
@@ -122,14 +122,30 @@ const prototype = agencyState => ({
 })
 
 
-const displayProps = () => ({
+const displayProps = agencyState => ({
   displayKey: "structuralNode_label",
   component: {
     list: {
+      root: agencyState.structuralNodes.find(node => node.id === node.structuralNode_parent_id),
+      nodeBranch: node => node.typeFunctions.getChildren.call(node),
       columns: {
-        limited: [],
-        expanded: []
-      }
+        limited: [{label: "", selector: "structuralNode_label"}],
+        expanded: [{label: "", selector: "structuralNode_label"}]
+      },
+      iconComponent: item =>
+        <div>
+          {item.structuralNode_label}
+          <div>{agencyState.dataTags.filter(tag => item.structuralNode_dataTag_ids.includes(tag.id)).map( tag=> <div className="dataTag">{tag.dataTag_label}</div>)}</div>
+        </div>,
+      listActions: [],
+      drawerComponents: [
+        {label: "card", component: item => item.display.call(item, agencyState, error=>{throw new Error(`${error}: handled by Agency`)}).card},
+      ],
+      overlayComponents: [
+        {label: "Add Branch", component: ()=>console.log("fire action to create branch node")},
+        {label: "editor", component: item => item.display.call(item, agencyState, error=>{throw new Error(`${error}: handled by Agency`)}).editor},
+        {label: "builder", component: item => item.display.call(item, agencyState, error=>{throw new Error(`${error}: handled by Agency`)}).builder},
+      ]
     },
     agencyObject: {
       card: {

@@ -53,7 +53,7 @@ const prototype = agencyState => ({
 })
 
 
-const displayProps = () => ({
+const displayProps = agencyState => ({
   displayKey: "username",
   component: {
     list: {
@@ -64,7 +64,18 @@ const displayProps = () => ({
           {label: "Password", selector: "password"},
           {label: "userId", selector: "id"}
         ]
-      }
+      },
+      tableData: agencyState.users,
+      listActions: [
+        {label: "New User", action: ()=> console.log("fire action to create user")}
+      ],
+      drawerComponents: [
+        {label: "card", component: item => item.display.call(item, agencyState, err=>{throw err}).card},
+      ],
+      overlayComponents: [
+        {label: "editor", component: item => item.display.call(item, agencyState, error=>{throw error}).editor},
+        {label: "builder", component: item => item.display.call(item, agencyState, error=>{throw error}).builder}
+      ]
     },
     agencyObject: {
       card: {
