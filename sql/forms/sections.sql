@@ -1,7 +1,8 @@
-CREATE TABLE forms.formsSets (
+CREATE TABLE forms.sections (
   id UUID,
   label TEXT,
-  form_ids UUID[],
+  form_id UUID,
+  layout_ids UUID[],
   completion_rules JSON,
   security_settings JSON
 )
