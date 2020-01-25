@@ -23,11 +23,11 @@ const agencyPrototypes = {
 }
 
 const agencyDisplayProps = {
-  user: user.displayProps(),
-  dataTag: dataTag.displayProps(),
-  structuralNode: structuralNode.displayProps(),
-  agentTemplate: agentTemplate.displayProps(),
-  agent: agent.displayProps()
+  user: agencyState => user.displayProps(agencyState),
+  dataTag: agencyState => dataTag.displayProps(agencyState),
+  structuralNode: agencyState => structuralNode.displayProps(agencyState),
+  agentTemplate: agencyState => agentTemplate.displayProps(agencyState),
+  agent: agencyState => agent.displayProps(agencyState)
 }
 
 const agencyObjectPrototype = (objectPrototype) => ({
@@ -88,18 +88,19 @@ const agencyObjectPrototype = (objectPrototype) => ({
     }`
   },
 
-  display: function(props, onError){
+  //remove arg "props"
+  display: function(agencyState, onError){
     return {
       card:     <AgencyObject.Card className="agencyObject-card"
-                    displayProps={agencyDisplayProps[this.type()].component.agencyObject.card}
+                    displayProps={agencyDisplayProps[this.type()](agencyState).component.agencyObject.card}
                     dataItem={this}
                     onError={onError} />,
       editor:   <AgencyObject.Editor className="agencyObject-editor"
-                    displayProps={agencyDisplayProps[this.type()].component.agencyObject.editor}
+                    displayProps={agencyDisplayProps[this.type()](agencyState).component.agencyObject.editor}
                     dataItem={this}
                     onError={onError} />,
       builder:  <AgencyObject.Builder className="agencyObject-builder"
-                    displayProps={agencyDisplayProps[this.type()].component.agencyObject.builder}
+                    displayProps={agencyDisplayProps[this.type()](agencyState).component.agencyObject.builder}
                     dataItem={this}
                     onError={onError} />
     }},
@@ -143,7 +144,7 @@ const agencyObject = (type, state, failure) => {
 }
 
 
-const agencyTypeData = type => agencyDisplayProps[type]
+const agencyTypeData = (type, agencyState) => agencyDisplayProps[type](agencyState)
 
 
 export { agencyObject, agencyTypeData }
