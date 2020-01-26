@@ -34,7 +34,6 @@ CREATE OR REPLACE PROCEDURE forms.update_layout (
   _element_ids UUID[],
   _completion_rules JSON,
   _display_settings JSON )
-)
 LANGUAGE sql
 AS $procedure$
   UPDATE

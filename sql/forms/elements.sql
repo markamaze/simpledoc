@@ -37,7 +37,6 @@ CREATE OR REPLACE PROCEDURE forms.update_element (
   _value_properties JSON,
   _completion_rules JSON,
   _security_settings JSON )
-)
 LANGUAGE sql
 AS $procedure$
   UPDATE

@@ -31,7 +31,6 @@ CREATE OR REPLACE PROCEDURE forms.update_section (
   _layout_ids UUID[],
   _completion_rules JSON,
   _security_settings JSON )
-)
 LANGUAGE sql
 AS $procedure$
   UPDATE
