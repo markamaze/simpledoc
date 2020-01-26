@@ -5,17 +5,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import simpledoc.services.agency.AgencyService;
-//import simpledoc.services.forms.FormsService;
+import simpledoc.services.forms.FormsService;
 
 
-
+//TODO: rework this with routes - handle unknown requests
 public class ServiceLoader {
 	private Map<String, Map<String, ServiceFunction>> services;
 
 	public ServiceLoader() {
 		services = new HashMap<String, Map<String, ServiceFunction>>();
 		services.put("Agency", new AgencyService<>().provideServices());
-//		services.put("Forms", new FormsService().provideServices());
+		services.put("Forms", new FormsService<>().provideServices());
 	}
 
 
