@@ -8,9 +8,6 @@ import { agencyTypeData } from './moduleObjects/agencyObject'
 function AgencyPage(props){
 
   const agencyState = useSelector(state => (state.agency))
-  // const rootNode = structuralNodes.find( node => node.id === node.structuralNode_parent_id)
-
-  // const addStructuralNode = () => {}
   const displayProps = agencyTypeData("structuralNode", agencyState).component.list
 
 
