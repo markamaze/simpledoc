@@ -1,3 +1,20 @@
+package simpledoc.services.forms;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.UUID;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.postgresql.util.PGobject;
+
+import simpledoc.exceptions.ServiceErrorException;
 import simpledoc.services.ModuleObject;
 
 
@@ -38,7 +55,7 @@ public class FormSet extends ModuleObject {
       else if(key == "form_ids") setFormIds(entry.getValue());
       else if(key == "completion_rules") setCompletionRules(entry.getValue());
       else if(key == "security_settings") setSecuritySettings(entry.getValue());
-      else throw new ServiceErrorException("unknown property in FormSet")
+      else throw new ServiceErrorException("unknown property in FormSet");
     }
     return true;
   }

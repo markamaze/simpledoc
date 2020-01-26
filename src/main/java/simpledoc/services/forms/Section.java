@@ -1,3 +1,21 @@
+package simpledoc.services.forms;
+
+import java.sql.SQLException;
+
+import simpledoc.exceptions.ServiceErrorException;
+import java.util.UUID;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.postgresql.util.PGobject;
+
+import java.util.Set;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.List;
 import simpledoc.services.ModuleObject;
 
 
@@ -43,7 +61,7 @@ public class Section extends ModuleObject {
       else if(key == "layout_ids") setLayoutIds(entry.getValue());
       else if(key == "completion_rules") setCompletionRules(entry.getValue());
       else if(key == "security_settings") setSecuritySettings(entry.getValue());
-      else throw new ServiceErrorException("unknown property in Section")
+      else throw new ServiceErrorException("unknown property in Section");
     }
     return true;
   }

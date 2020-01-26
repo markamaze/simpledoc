@@ -1,3 +1,21 @@
+package simpledoc.services.forms;
+
+import java.sql.SQLException;
+
+import simpledoc.exceptions.ServiceErrorException;
+import java.util.UUID;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.postgresql.util.PGobject;
+
+import java.util.Set;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.List;
 import simpledoc.services.ModuleObject;
 
 
@@ -31,8 +49,8 @@ public class Layout extends ModuleObject {
 
 
   public String getLabel() { return this.label; }
-  public String getFormId() { return this.form_id; }
-  public String getSectionId() { return this.section_id; }
+  public UUID getFormId() { return this.form_id; }
+  public UUID getSectionId() { return this.section_id; }
   public Set<UUID> getElementIds() { return this.element_ids; }
   public List<Object> getCompletionRules() { return this.completion_rules; }
   public List<Object> getDisplaySettings() { return this.display_settings; }
@@ -48,7 +66,7 @@ public class Layout extends ModuleObject {
       else if(key == "element_ids") setElementIds(entry.getValue());
       else if(key == "completion_rules") setCompletionRules(entry.getValue());
       else if(key == "display_settings") setDisplaySettings(entry.getValue());
-      else throw new ServiceErrorException("unknown property in Layout")
+      else throw new ServiceErrorException("unknown property in Layout");
     }
     return true;
   }
