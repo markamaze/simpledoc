@@ -3,14 +3,8 @@ import * as validationTool from './validationTool'
 
 
 const prototype = getFormState => ({
-  type: function() { return "formSet" },
-  properties: {
-    id: {
-      setValue: function(id){},
-      validate: id => {}
-    },
-    label: {},
-  },
+  type: function() { return "layout"; },
+  properties: {},
   typeFunctions: {}
 })
 
