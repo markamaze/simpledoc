@@ -1,7 +1,21 @@
+package simpledoc.services.forms;
+
+import java.sql.SQLException;
+
+import simpledoc.exceptions.ServiceErrorException;
+import java.util.UUID;
+
+import org.json.JSONObject;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Date;
 import simpledoc.services.ModuleObject;
 
 
-public class FormSubmission extends ModuleObject {
+public class Submission extends ModuleObject {
   private UUID form_id;
   private UUID section_id;
   private UUID layout_id;
@@ -10,8 +24,8 @@ public class FormSubmission extends ModuleObject {
   private Date submitted_on;
   private UUID submitted_by;
 
-  FormSubmission(UUID id, String type) { super(id, type); }
-  FormSubmission(UUID id, String type, Map<String, Object> data) throws ServiceErrorException {
+  Submission(UUID id, String type) { super(id, type); }
+  Submission(UUID id, String type, Map<String, Object> data) throws ServiceErrorException {
     super(id, type);
     setFormId(data.get("form_id"));
     setSectionId(data.get("section_id"));
@@ -23,7 +37,7 @@ public class FormSubmission extends ModuleObject {
   }
 
 
-  //TODO: finish writing property setters -> FormSubmission
+  //TODO: finish writing property setters -> Submission
   private void setFormId(Object object) throws ServiceErrorException {}
   private void setSectionId(Object object) throws ServiceErrorException {}
   private void setLayoutId(Object object) throws ServiceErrorException {}
@@ -52,7 +66,7 @@ public class FormSubmission extends ModuleObject {
       else if(key == "value") setElementValue(entry.getValue());
       else if(key == "submitted_on") setSubmittedOn(entry.getValue());
       else if(key == "submitted_by") setSubmittedBy(entry.getValue());
-      else throw new ServiceErrorException("unknown property in FormSubmission")
+      else throw new ServiceErrorException("unknown property in Submission");
     }
     return true;
   }
@@ -68,7 +82,7 @@ public class FormSubmission extends ModuleObject {
       setElementValue(resultSet.getString("value"));
       setSubmittedOn(resultSet.getObject("submitted_on"));
       setSubmittedBy(resultSet.getObject("submitted_by"));
-    } catch(SQLException err) { throw new ServiceErrorException(err + "error reading storage result for FormSubmission"); }
+    } catch(SQLException err) { throw new ServiceErrorException(err + "error reading storage result for Submission"); }
 
     return true;
   }
@@ -90,7 +104,7 @@ public class FormSubmission extends ModuleObject {
       statement.setString(6, this.getElementValue());
       statement.setObject(7, this.getSubmittedOn());
       statement.setObject(8, this.getSubmittedBy());
-    } catch(SQLException err) { throw new ServiceErrorException(err + "error setting storage statement for FormSubmission"); }
+    } catch(SQLException err) { throw new ServiceErrorException(err + "error setting storage statement for Submission"); }
 
     return statement;
   }
