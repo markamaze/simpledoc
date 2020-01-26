@@ -6,7 +6,7 @@ CREATE TABLE forms.layouts (
   element_ids UUID[],
   completion_rules JSON,
   display_settings JSON
-)
+);
 
 
 
@@ -18,7 +18,7 @@ CREATE OR REPLACE PROCEDURE forms.create_layout (
   _element_ids UUID[],
   _completion_rules JSON,
   _display_settings JSON )
-LANGUATE SQL
+LANGUAGE SQL
 AS $PROCEDURE$
   INSERT INTO forms.layouts( id, label, form_id, section_id, element_ids, completion_rules, display_settings )
   VALUES (_id, _label, _form_id, _section_id, _element_ids,_completion_rules, _display_settings);

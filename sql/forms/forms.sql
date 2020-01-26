@@ -13,9 +13,9 @@ CREATE OR REPLACE PROCEDURE forms.create_form (
   _label TEXT,
   _section_ids UUID[],
   _completion_rules JSON )
-LANGUATE SQL
+LANGUAGE SQL
 AS $PROCEDURE$
-  INSERT INTO forms.form(
+  INSERT INTO forms.forms(
     id, label, section_ids, completion_rules
   )
   VALUES (_id, _label, _section_ids, _completion_rules);
@@ -32,7 +32,7 @@ CREATE OR REPLACE PROCEDURE forms.update_form (
 LANGUAGE sql
 AS $procedure$
   UPDATE
-    forms.form
+    forms.forms
   SET
   id = _id,
   label = _label,
@@ -47,7 +47,7 @@ $procedure$;
 CREATE OR REPLACE PROCEDURE forms.delete_form (_id UUID)
 LANGUAGE sql
 AS $procedure$
-DELETE FROM forms.form
+DELETE FROM forms.forms
   WHERE id = _id;
 $procedure$;
 
@@ -68,7 +68,7 @@ AS $function$
 
   SELECT (
     id, label, section_ids, completion_rules
-  ) FROM forms.form
+  ) FROM forms.forms
 
 $function$;
 

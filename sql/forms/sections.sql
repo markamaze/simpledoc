@@ -5,7 +5,7 @@ CREATE TABLE forms.sections (
   layout_ids UUID[],
   completion_rules JSON,
   security_settings JSON
-)
+);
 
 
 
@@ -16,9 +16,9 @@ CREATE OR REPLACE PROCEDURE forms.create_section (
   _layout_ids UUID[],
   _completion_rules JSON,
   _security_settings JSON )
-LANGUATE SQL
+LANGUAGE SQL
 AS $PROCEDURE$
-  INSERT INTO forms.sections( id, label, form_id, layout_id, completion_rules, security_settings )
+  INSERT INTO forms.sections( id, label, form_id, layout_ids, completion_rules, security_settings )
   VALUES (_id, _label, _form_id, _layout_ids, _completion_rules, _security_settings);
 $PROCEDURE$;
 

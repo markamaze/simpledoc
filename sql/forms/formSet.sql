@@ -1,10 +1,10 @@
-CREATE TABLE forms.formsSets (
+CREATE TABLE forms.formSets (
   id UUID,
   label TEXT,
   form_ids UUID[],
   completion_rules JSON,
   security_settings JSON
-)
+);
 
 
 
@@ -14,7 +14,7 @@ CREATE OR REPLACE PROCEDURE forms.create_formSet (
   _form_ids UUID[],
   _completion_rules JSON,
   _security_settings JSON )
-LANGUATE SQL
+LANGUAGE SQL
 AS $PROCEDURE$
   INSERT INTO forms.formSets(
     id, label, form_ids, completion_rules, security_settings
@@ -50,7 +50,7 @@ $procedure$;
 CREATE OR REPLACE PROCEDURE forms.delete_formSet (_id UUID)
 LANGUAGE sql
 AS $procedure$
-DELETE FROM forms.formSet
+DELETE FROM forms.formSets
   WHERE id = _id;
 $procedure$;
 

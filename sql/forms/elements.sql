@@ -7,7 +7,7 @@ CREATE TABLE forms.elements (
   value_properties JSON,
   completion_rules JSON,
   security_settings JSON
-)
+);
 
 
 
@@ -20,7 +20,7 @@ CREATE OR REPLACE PROCEDURE forms.create_element (
   _value_properties JSON,
   _completion_rules JSON,
   _security_settings JSON )
-LANGUATE SQL
+LANGUAGE SQL
 AS $PROCEDURE$
   INSERT INTO forms.elements( id, form_id, section_id, layout_id, key, value_properties, completion_rules, security_settings )
   VALUES (_id, _form_id, _section_id, _layout_id, _key, _value_properties, _completion_rules, _security_settings);
@@ -83,7 +83,7 @@ LANGUAGE sql STABLE
 AS $function$
 
   SELECT (
-    id, form_id, section_id, layout_id, key, value_properties, completion_rules, secuirity_settings
+    id, form_id, section_id, layout_id, key, value_properties, completion_rules, security_settings
   ) FROM forms.elements
 
 $function$;

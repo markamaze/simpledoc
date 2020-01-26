@@ -7,7 +7,7 @@ CREATE TABLE forms.submissions (
   value TEXT,
   submitted_on DATE,
   submitted_by UUID
-)
+);
 
 
 
@@ -20,7 +20,7 @@ CREATE OR REPLACE PROCEDURE forms.create_submission (
   _value TEXT,
   _submitted_on DATE,
   _submitted_by UUID )
-LANGUATE SQL
+LANGUAGE SQL
 AS $PROCEDURE$
   INSERT INTO forms.submissions( id, form_id, section_id, layout_id, element_id, value, submitted_on, submitted_by )
   VALUES (_id, _form_id, _section_id, _layout_id, _element_id, _value, _submitted_on, _submitted_by);
