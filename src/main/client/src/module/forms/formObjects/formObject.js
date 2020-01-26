@@ -5,18 +5,20 @@ import store from '../../../store'
 import * as storageActions from '../actions'
 import * as form from './form'
 import * as formSet from './formSet'
-
+import * as submission from './submission'
 
 const formState = () => store.getState().forms
 
 const formPrototypes = {
   form: form.prototype(formState),
-  formSet: formSet.prototype(formState)
+  formSet: formSet.prototype(formState),
+  submissions: submission.prototype(formState)
 }
 
 const formDisplayProps = {
-  form: form.displayProps(),
-  formSet: formSet.displayProps()
+  form: form.displayProps(formState),
+  formSet: formSet.displayProps(formState),
+  submission: submission.displayProps(formState)
 }
 
 const formObjectPrototype = (objectPrototype) => ({
@@ -65,7 +67,11 @@ const formObjectPrototype = (objectPrototype) => ({
     let type = this.type()
     if(type === "form") type = "FORMS.FORM"
     else if(type === "formSet") type = "FORMS.FORMSET"
-    else
+    else if(type === "submission") type = "FORMS.SUBMISSION"
+    else if(type === "section") type = "FORMS.SECTION"
+    else if(type === "layout") type = "FORMS.LAYOUT"
+    else if(type === "element") type = "FORMS.ELEMENT"
+    else throw "invalid formObject"
 
     let objectData = Object.entries(this).filter(entry => entry[0] !== "id")
     return `{
