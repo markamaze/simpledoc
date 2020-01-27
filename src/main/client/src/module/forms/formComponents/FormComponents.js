@@ -1,11 +1,15 @@
 //TODO: write Form component for FormObject
 
 
-
-export default function Form(props){
-
+function Info(props){
   return  <div>
-            Form component
+            form info
+          </div>
+}
+
+function Form(props){
+  return  <div>
+
           </div>
 }
 
@@ -36,4 +40,5 @@ function Element(props){
           </div>
 }
 
-export { Section, Layout, Element }
+
+export { Info, Form, Section, Layout, Element }

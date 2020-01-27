@@ -1,9 +1,12 @@
 import React from 'react'
-import FormObject from '../components/FormObject'
+import FormDisplay from '../formComponents/FormDisplay'
 
 import store from '../../../store'
 import * as storageActions from '../actions'
 import * as form from './form'
+import * as section from './section'
+import * as layout from './layout'
+import * as element from './element'
 import * as formSet from './formSet'
 import * as submission from './submission'
 
@@ -83,16 +86,16 @@ const formObjectPrototype = (objectPrototype) => ({
 
   display: function(onError){
     return {
-      card:     <FormObject.Card className="formObject-card"
-                    displayProps={formDisplayProps[this.type()].component.formObject.card}
+      document: <FormDisplay.Document className="formObject-document"
+                    displayProps={formDisplayProps[this.type()].component.formDisplay.document}
                     dataItem={this}
                     onError={onError} />,
-      editor:   <FormObject.Editor className="formObject-editor"
-                    displayProps={formDisplayProps[this.type()].component.formObject.editor}
+      editor:   <FormDisplay.Editor className="formObject-editor"
+                    displayProps={formDisplayProps[this.type()].component.formDisplay.editor}
                     dataItem={this}
                     onError={onError} />,
-      builder:  <FormObject.Builder className="formObject-builder"
-                    displayProps={formDisplayProps[this.type()].component.formObject.builder}
+      creator:  <FormDisplay.Creator className="formObject-creator"
+                    displayProps={formDisplayProps[this.type()].component.formDisplay.creator}
                     dataItem={this}
                     onError={onError} />
 
@@ -134,7 +137,7 @@ const formObject = (type, state, failure) => {
 
     return _formObj
   } catch(error){ failure(new Error(`${error}: failure to create formObject`)) }
-}f
+}
 
 const formTypeData = type => formDisplayProps[type]
 

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import * as Form from './Forms'
+import * as Forms from './Forms'
 import reducer from './reducer'
 import * as formAction from './actions'
 
@@ -12,8 +12,10 @@ export default module = {
   path: "/forms",
   services: [],
   routes: {
-    forms: {path: "/forms", default: true, title: "Forms", component: state => <Form.Forms />},
-    sets: {path: "/forms/sets", title: "Sets", component: state => <Form.FormSets />}
+    forms: {path: "/forms", default: true, title: "Forms", component: state => <Forms.FormsPage />},
+    sets: {path: "/forms/sets", title: "Sets", component: state => <Forms.FormSetsPage />},
+    submissions: {path: "/forms/submissions", title: "Submission Records", component: state => <Forms.SubmissionsPage historyState={state} />},
+    monitoring: {path: "/forms/monitoring", title: "Check Store Status", component: state => <Forms.ComplianceCheckPage historyState={state} />}
   }
 }
 
@@ -22,8 +24,7 @@ export default module = {
   right now, within agency module I am importing from outside the module:
     moduleStyles
     store
-    DataTableWrapper
-    Overlay
+    List
     workspace actions
 
 

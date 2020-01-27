@@ -1,18 +1,43 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 import { FormPageWrapper } from './styles'
+import { formObject, formTypeData } from './formObjects/formObject'
+import List from '../../components/List'
 
 
+function FormsPage(props){
+  const formsState = useSelector(state => state.forms)
+  const displayProps = formTypeData("form", formsState).component.list
 
-function Forms(props){
   return  <FormPageWrapper >
             hello forms
           </FormPageWrapper>
 }
 
-function FormSets(props){
+function FormSetsPage(props){
+  const formsState = useSelector(state => state.forms)
+  const displayProps = formTypeData("formSet", formsState).component.list
+
   return  <FormPageWrapper >
             hello form sets
           </FormPageWrapper>
 }
 
-export { Forms, FormSets }
+function SubmissionsPage(props){
+  const formsState = useSelector(state => state.forms)
+  const displayProps = formTypeData("submission", formsState).component.list
+
+  return  <FormPageWrapper >
+            hello form submissions
+          </FormPageWrapper>
+}
+
+function ComplianceCheckPage(props){
+  const formsState = useSelector(state => state.forms)
+
+  return  <FormPageWrapper >
+            controls for monitoring compliance of subscribscriptions?
+          </FormPageWrapper>
+}
+
+export { FormsPage, FormSetsPage, SubmissionsPage, ComplianceCheckPage }

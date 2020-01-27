@@ -18,7 +18,21 @@ const prototype = getFormState => ({
 
 const displayProps = getFormState => ({
   displayKey: "",
-  component: {}
+  component: {
+    list: {},
+    formDisplay: {
+      document: {
+        formInfo: form => {},
+        sections: form => {},
+        layouts: section => {},
+        elements: layout => {},
+        completionRules: form => {},
+        securityRules: form => {}
+      },
+      editor: {},
+      creator: {}
+    }
+  }
 })
 
 
