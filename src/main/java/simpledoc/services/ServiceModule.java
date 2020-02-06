@@ -1,12 +1,12 @@
 package simpledoc.services;
 
-import java.util.Map;
+import java.util.List;
 
 import simpledoc.ServiceFunction;
+import simpledoc.exceptions.ServiceErrorException;
 
 
 public interface ServiceModule {
-
-	public abstract Map<String, ServiceFunction> provideServices();
-	public abstract String moduleTitle();
+	public String moduleTitle();
+	public ServiceFunction moduleRoutes(List<String> resource_path) throws ServiceErrorException;
 }
