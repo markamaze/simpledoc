@@ -1,14 +1,18 @@
 import React from 'react'
 import AgencyObject from '../moduleComponents/AgencyObject'
 
-import store from '../../../store' //modify setup to import from agency index
+import store from '../../../store'
 import { createAgencyObject, updateAgencyObject, deleteAgencyObject }  from '../module_actions'
+import uuidv4 from 'uuid/v4'
 
 import * as user from './user'
 import * as dataTag from './dataTag'
 import * as structuralNode from './structuralNode'
 import * as agentTemplate from './agentTemplate'
 import * as agent from './agent'
+import * as role from './role'
+import * as assignment from './assignment'
+import * as property from './property'
 
 
 
@@ -19,7 +23,10 @@ const agencyPrototypes = {
   dataTag: dataTag.prototype(agencyState),
   structuralNode: structuralNode.prototype(agencyState),
   agentTemplate: agentTemplate.prototype(agencyState),
-  agent: agent.prototype(agencyState)
+  agent: agent.prototype(agencyState),
+  role: role.prototype(agencyState),
+  assignment: assignment.prototype(agencyState),
+  property: property.prototype(agencyState)
 }
 
 const agencyDisplayProps = {
@@ -27,7 +34,10 @@ const agencyDisplayProps = {
   dataTag: agencyState => dataTag.displayProps(agencyState),
   structuralNode: agencyState => structuralNode.displayProps(agencyState),
   agentTemplate: agencyState => agentTemplate.displayProps(agencyState),
-  agent: agencyState => agent.displayProps(agencyState)
+  agent: agencyState => agent.displayProps(agencyState),
+  role: agencyState => role.displayProps(agencyState),
+  assignment: agencyState => assignment.displayProps(agencyState),
+  property: agencyState => property.displayProps(agencyState)
 }
 
 const agencyObjectPrototype = (objectPrototype) => ({
@@ -39,18 +49,18 @@ const agencyObjectPrototype = (objectPrototype) => ({
     let propObjects = Object.entries(objectPrototype.properties)
 
     if(state === null || state === undefined) success = false
+    else if(state.id === "new_object") state.id = uuidv4()
 
     while(success && index < propObjects.length){
       let property = propObjects[index]
       let key = property[0]
-
       if(!property[1].setValue.call(this, state[key])) success = false
       ++index
     }
 
 
     return success ? this : false
-  }catch(error){onError(error)}
+  }catch(error){onError(`${error}: failure initializing agencyObject with state: ${state}`)}
   },
 
   update: function(newState, onError){
@@ -79,6 +89,9 @@ const agencyObjectPrototype = (objectPrototype) => ({
     else if(type === "structuralNode") type = "AGENCY.STRUCTURALNODE"
     else if(type === "dataTag") type = "AGENCY.DATATAG"
     else if(type === "user") type = "AGENCY.USER"
+    else if(type === "assignment") type = "AGENCY.ASSIGNMENT"
+    else if(type === "role") type = "AGENCY.ROLE"
+    else throw "invalid operation"
 
     let objectData = Object.entries(this).filter(entry => entry[0] !== "id")
     return `{
