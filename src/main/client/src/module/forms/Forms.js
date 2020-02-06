@@ -3,14 +3,16 @@ import { useSelector } from 'react-redux'
 import { FormPageWrapper } from './styles'
 import { formObject, formTypeData } from './formObjects/formObject'
 import List from '../../components/List'
-
+import ErrorBoundary from './formUtils/ErrorBoundary'
 
 function FormsPage(props){
   const formsState = useSelector(state => state.forms)
   const displayProps = formTypeData("form", formsState).component.list
 
   return  <FormPageWrapper >
-            hello forms
+            <ErrorBoundary displayName="FormsPage" >
+              <List {...displayProps} headerComponent={<div className="page-header">Forms Manager</div>}/>
+            </ErrorBoundary>
           </FormPageWrapper>
 }
 
