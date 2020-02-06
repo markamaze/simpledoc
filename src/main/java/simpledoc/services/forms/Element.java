@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,6 +12,7 @@ import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.postgresql.jdbc.PgArray;
 import org.postgresql.util.PGobject;
 
 import simpledoc.exceptions.ServiceErrorException;
@@ -39,14 +41,87 @@ public class Element extends ModuleObject {
   }
 
 
-  //TODO: finish writing property setters -> Element
-  private void setFormId(Object object) throws ServiceErrorException {}
-  private void setSectionId(Object object) throws ServiceErrorException {}
-  private void setLayoutId(Object object) throws ServiceErrorException {}
-  private void setElementKey(Object object) throws ServiceErrorException {}
-  private void setValueProperties(Object object) throws ServiceErrorException {}
-  private void setCompletionRules(Object object) throws ServiceErrorException {}
-  private void setSecuritySettings(Object object) throws ServiceErrorException {}
+  private void setFormId(Object object) throws ServiceErrorException {
+	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Element.form_id");
+	  
+	  else if(object instanceof UUID) {
+		  if(FormsValidator.validateUUIDString(object)) this.form_id = (UUID) object;
+	  }
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.form_id");
+  }
+  private void setSectionId(Object object) throws ServiceErrorException {
+	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Element.section_id");
+	  
+	  else if(object instanceof UUID) {
+		  if(FormsValidator.validateUUIDString(object)) this.section_id = (UUID) object;
+	  }
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.section_id");
+  }
+  private void setLayoutId(Object object) throws ServiceErrorException {
+	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Element.section_id");
+	  
+	  else if(object instanceof UUID) {
+		  if(FormsValidator.validateUUIDString(object)) this.layout_id = (UUID) object;
+	  }
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.section_id");
+  }
+  private void setElementKey(Object object) throws ServiceErrorException {
+	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Element.key");
+	  
+	  else if(object instanceof String) {
+		  if(FormsValidator.validateString(object, 1, 24, true, true)) this.key = (String) object;
+	  }
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.key");
+  }
+  private void setValueProperties(Object object) throws ServiceErrorException {
+	  List<Object> valueProperties = new ArrayList<Object>();
+	  
+	  if(object == null) this.value_properties = valueProperties;
+	  
+	  else if(object instanceof PGobject) {
+		  System.out.println("is PGobject");
+	  }
+	  
+	  else if(object instanceof PgArray) {
+		  System.out.println("is PgArray");
+	  }
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.value_properties");
+  }
+  private void setCompletionRules(Object object) throws ServiceErrorException {
+	  List<Object> completionRules = new ArrayList<Object>();
+	  
+	  if(object == null) this.completion_rules = completionRules;
+	  
+	  else if(object instanceof PgArray) {
+		  System.out.println("is PGArray");
+	  }
+	  
+	  else if(object instanceof PGobject) {
+		  System.out.println("is PGobject");
+	  }
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.completion_rules");
+  }
+  private void setSecuritySettings(Object object) throws ServiceErrorException {
+	  List<Object> securitySettings = new ArrayList<Object>();
+	  
+	  if(object == null) this.security_settings = securitySettings;
+	  
+	  else if(object instanceof PgArray) {
+		  System.out.println("is PGArray");
+	  }
+	  
+	  else if(object instanceof PGobject) {
+		  System.out.println("is PGobject");
+	  }
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.security_settings");
+  }
 
 
   public UUID getFormId() { return this.form_id; }

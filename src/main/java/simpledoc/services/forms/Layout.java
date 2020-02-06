@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.postgresql.jdbc.PgArray;
 import org.postgresql.util.PGobject;
 
 import java.util.Set;
@@ -15,6 +16,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import simpledoc.services.ModuleObject;
 
@@ -39,13 +42,80 @@ public class Layout extends ModuleObject {
   }
 
 
-  //TODO: finish writing property setters -> Layout
-  private void setLabel(Object object) throws ServiceErrorException {}
-  private void setFormId(Object object) throws ServiceErrorException {}
-  private void setSectionId(Object object) throws ServiceErrorException {}
-  private void setElementIds(Object object) throws ServiceErrorException {}
-  private void setCompletionRules(Object object) throws ServiceErrorException {}
-  private void setDisplaySettings(Object object) throws ServiceErrorException {}
+  private void setLabel(Object object) throws ServiceErrorException {
+	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Layout.label");
+	  
+	  else if(object instanceof String) {
+		  if(FormsValidator.validateString(object, 1, 24, true, true)) this.label = (String) object;
+	  }
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Layout.label");
+  }
+  private void setFormId(Object object) throws ServiceErrorException {
+	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Layout.form_id");
+	  
+	  else if(object instanceof UUID) {
+		  if(FormsValidator.validateUUIDString(object)) this.form_id = (UUID) object;
+	  }
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Layout.form_id");
+  }
+  private void setSectionId(Object object) throws ServiceErrorException {
+	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Layout.section_id");
+	  
+	  else if(object instanceof UUID) {
+		  if(FormsValidator.validateUUIDString(object)) this.section_id = (UUID) object;
+	  }
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Layout.section_id");
+  }
+  private void setElementIds(Object object) throws ServiceErrorException {
+	  Set<UUID> elementIds = new HashSet<UUID>();
+	  
+	  if(object == null) this.element_ids = elementIds;
+	  
+	  else if(object instanceof PgArray) {
+		  System.out.println("is PGArray");
+	  }
+	  
+	  else if(object instanceof PGobject) {
+		  System.out.println("is PGobject");
+	  }
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Layout.element_ids");
+  }
+  private void setCompletionRules(Object object) throws ServiceErrorException {
+	  List<Object> completionRules = new ArrayList<Object>();
+	  
+	  if(object == null) this.completion_rules = completionRules;
+	  
+	  else if(object instanceof PgArray) {
+		  System.out.println("is PGArray");
+	  }
+	  
+	  else if(object instanceof PGobject) {
+		  System.out.println("is PGobject");
+	  }
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Layout.completion_rules");
+
+  }
+  private void setDisplaySettings(Object object) throws ServiceErrorException {
+	  List<Object> displaySettings = new ArrayList<Object>();
+	  
+	  if(object == null) this.display_settings = displaySettings;
+	  
+	  else if(object instanceof PgArray) {
+		  System.out.println("is PGArray");
+	  }
+	  
+	  else if(object instanceof PGobject) {
+		  System.out.println("is PGobject");
+	  }
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Layout.display_settings");
+
+  }
 
 
   public String getLabel() { return this.label; }

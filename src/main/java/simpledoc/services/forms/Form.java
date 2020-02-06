@@ -4,7 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.postgresql.jdbc.PgArray;
 import org.postgresql.util.PGobject;
 
 import simpledoc.exceptions.ServiceErrorException;
@@ -21,11 +23,11 @@ import simpledoc.services.ModuleObject;
 public class Form extends ModuleObject {
   private String label;
   private Set<UUID> section_ids;
-  private List<Object> completion_rules;
-  private List<Object> security_settings;
+  private Map<String, String> completion_rules;
+  private Map<String, String> security_settings;
 
   Form(UUID id, String type) { super(id, type); }
-  Form(UUID id, String type, Map<String, Object> data) throws ServiceErrorException {
+  Form(UUID id, String type, Map<String, Object> data) throws ServiceErrorException, SQLException {
     super(id, type);
     setLabel(data.get("label"));
     setSectionIds(data.get("section_ids"));
@@ -34,21 +36,79 @@ public class Form extends ModuleObject {
   }
 
 
-  //TODO: finish writing property setters -> Form
-  private void setLabel(Object object) throws ServiceErrorException {}
-  private void setSectionIds(Object object) throws ServiceErrorException {}
-  private void setCompletionRules(Object object) throws ServiceErrorException {}
-  private void setSecuritySettings(Object object) throws ServiceErrorException {}
+  private void setLabel(Object object) throws ServiceErrorException {
+	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Form.label");
+	  
+	  else if(object instanceof String) {
+		  if(FormsValidator.validateString(object, 1, 24, true, true)) this.label = (String) object;
+	  }
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Form.label");
+  }
+  private void setSectionIds(Object object) throws ServiceErrorException, SQLException {
+	  Set<UUID> sections = new HashSet<UUID>();
+		
+	  if(object == null) this.section_ids = sections; 
+		
+	  else if(object instanceof PgArray) {
+		  JSONObject asJson = new JSONObject(((PgArray) object).getArray());
+		  if(asJson.length() > 0)
+			  for(Entry<String, Object> entry : asJson.toMap().entrySet()) {
+				  if(!FormsValidator.validateUUIDString(entry.getValue())) throw new ServiceErrorException("invalid value for property: Forms.Form.section_ids");
+				  sections.add(UUID.fromString(entry.getValue().toString()));
+			  }
+		  this.section_ids = sections;
+	  }
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Form.section_ids");
+  }
+  private void setCompletionRules(Object object) throws ServiceErrorException {
+	 Map<String, String> rules = new HashMap<String, String>();
+	  
+	  if(object == null) this.completion_rules = rules;
+	  
+	  else if(object instanceof PGobject) {
+			if(((PGobject) object).getType() == "json") {
+				JSONObject asJSON = new JSONObject(((PGobject) object).getValue());
+				if(asJSON.length() > 0)
+					for(Entry<String, Object> entry : asJSON.toMap().entrySet()) {
+						if(!FormsValidator.validateCompletionRule(entry)) throw new ServiceErrorException("invalid property value: Forms.Form.completion_rule");
+						rules.put(entry.getKey(), (String) entry.getValue());
+					}
+				this.completion_rules = rules;
+			}
+	  }
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Form.completion_rules");
+  }
+  private void setSecuritySettings(Object object) throws ServiceErrorException {
+	  Map<String, String> securitySettings = new HashMap<String, String>();
+	  
+	  if(object == null) this.security_settings = securitySettings;
+	  
+	  else if(object instanceof PGobject) {
+			if(((PGobject) object).getType() == "json") {
+				JSONObject asJSON = new JSONObject(((PGobject) object).getValue());
+				if(asJSON.length() > 0)
+					for(Entry<String, Object> entry : asJSON.toMap().entrySet()) {
+						if(!FormsValidator.validateCompletionRule(entry)) throw new ServiceErrorException("invalid property value: Forms.Form.security_settings");
+						securitySettings.put(entry.getKey(), (String) entry.getValue());
+					}
+				this.security_settings = securitySettings;
+			}
+	  }
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Form.security_setting");
+  }
 
 
   public String getLabel() { return this.label; }
   public Set<UUID> getSectionIds() { return this.section_ids; }
-  public List<Object> getCompletionRules() { return this.completion_rules; }
-  public List<Object> getSecuritySettings() { return this.security_settings; }
+  public Map<String, String> getCompletionRules() { return this.completion_rules; }
+  public Map<String, String> getSecuritySettings() { return this.security_settings; }
 
 
   @Override
-  public boolean update(Map<String, Object> data) throws ServiceErrorException{
+  public boolean update(Map<String, Object> data) throws ServiceErrorException, SQLException{
     for(Entry<String, Object> entry: data.entrySet()){
       Object key = entry.getKey();
       if(key == "label") setLabel(entry.getValue());
@@ -65,7 +125,7 @@ public class Form extends ModuleObject {
   public boolean readStorageResult(ResultSet resultSet) throws SQLException, ServiceErrorException {
     try {
       setLabel(resultSet.getString("label"));
-      setSectionIds(resultSet.getArray("section_ids").getArray());
+      setSectionIds(resultSet.getArray("section_ids"));
       setCompletionRules(resultSet.getObject("completion_rules"));
       setSecuritySettings(resultSet.getObject("security_settings"));
     } catch(SQLException err) { throw new ServiceErrorException(err + "could not read storage result for Form"); }
