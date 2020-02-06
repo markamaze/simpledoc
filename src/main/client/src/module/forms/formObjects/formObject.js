@@ -1,5 +1,7 @@
 import React from 'react'
 import FormDisplay from '../formComponents/FormDisplay'
+import uuidv4 from 'uuid/v4'
+
 
 import store from '../../../store'
 import * as storageActions from '../actions'
@@ -10,18 +12,18 @@ import * as element from './element'
 import * as formSet from './formSet'
 import * as submission from './submission'
 
-const formState = () => store.getState().forms
+const getFormState = () => store.getState().forms
 
 const formPrototypes = {
-  form: form.prototype(formState),
-  formSet: formSet.prototype(formState),
-  submissions: submission.prototype(formState)
+  form: form.prototype(getFormState),
+  formSet: formSet.prototype(getFormState),
+  submissions: submission.prototype(getFormState)
 }
 
 const formDisplayProps = {
-  form: form.displayProps(formState),
-  formSet: formSet.displayProps(formState),
-  submission: submission.displayProps(formState)
+  form: formState => form.displayProps(formState),
+  formSet: formState => formSet.displayProps(formState),
+  submission: formState => submission.displayProps(formState)
 }
 
 const formObjectPrototype = (objectPrototype) => ({
@@ -33,6 +35,7 @@ const formObjectPrototype = (objectPrototype) => ({
     let propObjects = Object.entries(objectPrototype.properties)
 
     if(state === null || state === undefined) success = false
+    else if(state.id === "new_object") state.id = uuidv4()
 
     while(success && index < propObjects.length){
       let property = propObjects[index]
@@ -84,20 +87,20 @@ const formObjectPrototype = (objectPrototype) => ({
     }`
   },
 
-  display: function(onError){
+  display: function(formState, onError){
     return {
       document: <FormDisplay.Document className="formObject-document"
-                    displayProps={formDisplayProps[this.type()].component.formDisplay.document}
+                    displayProps={formDisplayProps[this.type()](formState).component.formDisplay.document}
                     dataItem={this}
-                    onError={onError} />,
+                    onError={onError} >document</FormDisplay.Document>,
       editor:   <FormDisplay.Editor className="formObject-editor"
-                    displayProps={formDisplayProps[this.type()].component.formDisplay.editor}
+                    displayProps={formDisplayProps[this.type()](formState).component.formDisplay.editor}
                     dataItem={this}
-                    onError={onError} />,
+                    onError={onError} >editor</FormDisplay.Editor>,
       creator:  <FormDisplay.Creator className="formObject-creator"
-                    displayProps={formDisplayProps[this.type()].component.formDisplay.creator}
+                    displayProps={formDisplayProps[this.type()](formState).component.formDisplay.creator}
                     dataItem={this}
-                    onError={onError} />
+                    onError={onError} >creator</FormDisplay.Creator>
 
   }},
 
@@ -139,6 +142,6 @@ const formObject = (type, state, failure) => {
   } catch(error){ failure(new Error(`${error}: failure to create formObject`)) }
 }
 
-const formTypeData = type => formDisplayProps[type]
+const formTypeData = (type, formState) => formDisplayProps[type](formState)
 
 export { formObject, formTypeData }
