@@ -1,47 +1,37 @@
-CREATE TABLE agency.agentTemplates (
+CREATE TABLE agency.agentTemplate (
   id UUID,
   agentTemplate_label TEXT,
-  agentTemplate_security CHAR(4),
-  agentTemplate_dataTag_ids UUID[],
-  agentTemplate_properties JSON
+  agentTemplate_dataTag_ids UUID[]
 );
 
 
 
 CREATE OR REPLACE PROCEDURE agency.create_agentTemplate (
-  id UUID,
-  label TEXT,
-  security CHAR(4),
-  dataTags UUID[],
-  properties JSON )
+  _id UUID,
+  _agentTemplate_label TEXT,
+  _agentTemplate_dataTag_ids UUID[] )
 LANGUAGE sql
 AS $procedure$
-  INSERT INTO agency.agentTemplates (
+  INSERT INTO agency.agentTemplate (
     id,
     agentTemplate_label,
-    agentTemplate_security,
-    agentTemplate_dataTag_ids,
-    agentTemplate_properties)
-  VALUES ( id, label, security, dataTags, properties );
+    agentTemplate_dataTag_ids )
+  VALUES ( _id, _agentTemplate_label, _agentTemplate_dataTag_ids );
 $procedure$;
 
 
 
 CREATE OR REPLACE PROCEDURE agency.update_agentTemplate (
   _id UUID,
-  _label TEXT,
-  _security CHAR(4),
-  _dataTags UUID[],
-  _properties JSON )
+  _agentTemplate_label TEXT,
+  _agentTemplate_dataTag_ids UUID[]  )
 LANGUAGE sql
 AS $procedure$
   UPDATE
-    agency.agentTemplates
+    agency.agentTemplate
   SET
-    agentTemplate_label = _label,
-    agentTemplate_security = _security,
-    agentTemplate_dataTag_ids = _dataTags,
-    agentTemplate_properties = _properties
+    agentTemplate_label = _agentTemplate_label,
+    agentTemplate_dataTag_ids = _agentTemplate_dataTag_ids
   WHERE
     id = _id;
 $procedure$;
@@ -51,7 +41,7 @@ $procedure$;
 CREATE OR REPLACE PROCEDURE agency.delete_agentTemplate (_id UUID)
 LANGUAGE sql
 AS $procedure$
-DELETE FROM agency.agentTemplates
+DELETE FROM agency.agentTemplate
   WHERE id = _id;
 $procedure$;
 
@@ -64,27 +54,23 @@ CREATE OR REPLACE FUNCTION agency.query_agentTemplate_collection(
 RETURNS TABLE(
   id UUID,
   agentTemplate_label TEXT,
-  agentTemplate_security CHAR(4),
-  agentTemplate_dataTag_ids UUID[],
-  agentTemplate_properties JSON )
+  agentTemplate_dataTag_ids UUID[] )
 LANGUAGE sql STABLE
 AS $function$
 
   SELECT (
     id,
     agentTemplate_label,
-    agentTemplate_security,
-    agentTemplate_dataTag_ids,
-    agentTemplate_properties
-  ) FROM agency.agentTemplates
+    agentTemplate_dataTag_ids
+  ) FROM agency.agentTemplate
 
 $function$;
 
 
 
 CREATE OR REPLACE FUNCTION agency.query_agentTemplate_resource( resource_id UUID )
-RETURNS agency.agentTemplates
+RETURNS agency.agentTemplate
 LANGUAGE sql STABLE
 AS $function$
-  SELECT * FROM agency.agentTemplates WHERE id=resource_id
+  SELECT * FROM agency.agentTemplate WHERE id=resource_id
 $function$;

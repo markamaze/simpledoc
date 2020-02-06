@@ -1,53 +1,53 @@
-CREATE TABLE agency.agents (
+CREATE TABLE agency.agent (
   id UUID,
-  structuralNode_link_id UUID,
-  agentTemplate_id UUID,
-  assigned_user_id UUID,
-  agent_is_active BOOLEAN,
-  agent_dataTag_ids UUID[]
+  agent_user_id UUID,
+  structuralNode_id UUID,
+  assignment_id UUID,
+  property_values JSON,
+  active_role_id UUID
 );
 
 
 
 CREATE OR REPLACE PROCEDURE agency.create_agent (
-  id UUID,
-  linkId UUID,
-  templateId UUID,
-  assigned_userId UUID,
-  isActive BOOLEAN,
-  dataTagIds UUID[]
+  _id UUID,
+  _agent_user_id UUID,
+  _structuralNode_id UUID,
+  _assignment_id UUID,
+  _property_values JSON,
+  _active_role_id UUID
 )
 LANGUAGE sql
 AS $procedure$
-  INSERT INTO agency.agents (
+  INSERT INTO agency.agent (
     id,
-    structuralNode_link_id,
-    agentTemplate_id,
-    assigned_user_id,
-    agent_is_active,
-    agent_dataTag_ids )
-  VALUES ( id, linkId, templateId, assigned_userId, isActive, dataTagIds );
+    agent_user_id,
+    structuralNode_id,
+    assignment_id,
+    property_values,
+    active_role_id )
+  VALUES ( _id, _agent_user_id, _structuralNode_id, _assignment_id, _property_values, _active_role_id );
 $procedure$;
 
 
 
 CREATE OR REPLACE PROCEDURE agency.update_agent (
   _id UUID,
-  _linkId UUID,
-  _templateId UUID,
-  _assigned_userId UUID,
-  _isActive BOOLEAN,
-  _dataTagIds UUID[] )
+  _agent_user_id UUID,
+  _structuralNode_id UUID,
+  _assignment_id UUID,
+  _property_values JSON,
+  _active_role_id UUID)
 LANGUAGE sql
 AS $procedure$
   UPDATE
-    agency.agents
+    agency.agent
   SET
-    structuralNode_link_id = _linkId,
-    agentTemplate_id = _templateId,
-    assigned_user_id = _assigned_userId,
-    agent_is_active = _isActive,
-    agent_dataTag_ids = _dataTagIds
+    agent_user_id = _agent_user_id,
+    structuralNode_id = _structuralNode_id,
+    assignment_id = _assignment_id,
+    property_values = _property_values,
+    active_role_id = _active_role_id
   WHERE
     id = _id;
 $procedure$;
@@ -57,7 +57,7 @@ $procedure$;
 CREATE OR REPLACE PROCEDURE agency.delete_agent (_id UUID)
 LANGUAGE sql
 AS $procedure$
-  DELETE FROM agency.agents
+  DELETE FROM agency.agent
     WHERE id = _id;
 $procedure$;
 
@@ -67,24 +67,24 @@ CREATE OR REPLACE FUNCTION agency.query_agent_collection(
   resource_path text[],
   query_keys text[],
   query_values text[] )
-RETURNS setof agency.agents
+RETURNS setof agency.agent
 LANGUAGE sql STABLE
 AS $function$
   SELECT
     id,
-    structuralNode_link_id,
-    agentTemplate_id,
-    assigned_user_id,
-    agent_is_active,
-    agent_dataTag_ids
-  FROM agency.agents
+    agent_user_id,
+    structuralNode_id,
+    assignment_id,
+    property_values,
+    active_role_id
+  FROM agency.agent
 $function$;
 
 
 
 CREATE OR REPLACE FUNCTION agency.query_agent_resource( resource_id UUID )
-RETURNS agency.agents
+RETURNS agency.agent
 LANGUAGE sql STABLE
 AS $function$
-  SELECT * FROM agency.agents WHERE id=resource_id
+  SELECT * FROM agency.agent WHERE id=resource_id
 $function$;

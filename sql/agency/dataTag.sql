@@ -1,48 +1,48 @@
-CREATE TABLE agency.dataTags (
+CREATE TABLE agency.dataTag (
   id UUID,
   dataTag_label TEXT,
   dataTag_tagType TEXT,
-  dataTag_properties JSON,
-  dataTag_typeObjects JSON
+  dataTag_property_ids UUID[],
+  dataTag_typeObject_ids UUID[]
 );
 
 
 
 CREATE OR REPLACE PROCEDURE agency.create_dataTag (
-  id UUID,
-  label TEXT,
-  tagType TEXT,
-  properties JSON,
-  typeObjects JSON )
+  _id UUID,
+  _dataTag_label TEXT,
+  _dataTag_tagType TEXT,
+  _dataTag_property_ids UUID[],
+  _dataTag_typeObject_ids UUID[] )
 LANGUAGE sql
 AS $procedure$
-  INSERT INTO agency.dataTags (
+  INSERT INTO agency.dataTag (
     id,
     dataTag_label,
     dataTag_tagType,
-    dataTag_properties,
-    dataTag_typeObjects
+    dataTag_property_ids,
+    dataTag_typeObject_ids
   )
-  VALUES ( id, label, tagType, properties, typeObjects );
+  VALUES ( _id, _dataTag_label, _dataTag_tagType, _dataTag_property_ids, _dataTag_typeObject_ids );
 $procedure$;
 
 
 
 CREATE OR REPLACE PROCEDURE agency.update_dataTag (
   _id UUID,
-  _label TEXT,
-  _tagType TEXT,
-  _properties JSON,
-  _typeObjects JSON )
+  _dataTag_label TEXT,
+  _dataTag_tagType TEXT,
+  _dataTag_property_ids UUID[],
+  _dataTag_typeObject_ids UUID[] )
 LANGUAGE sql
 AS $procedure$
   UPDATE
-    agency.dataTags
+    agency.dataTag
   SET
-    dataTag_label = _label,
-    dataTag_tagType = _tagType,
-    dataTag_properties = _properties,
-    dataTag_typeObjects = _typeObjects
+    dataTag_label = _dataTag_label,
+    dataTag_tagType = _dataTag_tagType,
+    dataTag_property_ids = _dataTag_property_ids,
+    dataTag_typeObject_ids = _dataTag_typeObject_ids
   WHERE
     id = _id;
 $procedure$;
@@ -52,7 +52,7 @@ $procedure$;
 CREATE OR REPLACE PROCEDURE agency.delete_dataTag (_id UUID)
 LANGUAGE sql
 AS $procedure$
-DELETE FROM agency.dataTags
+DELETE FROM agency.dataTag
   WHERE id = _id;
 $procedure$;
 
@@ -66,8 +66,8 @@ RETURNS TABLE(
   id UUID,
   dataTag_label TEXT,
   dataTag_tagType TEXT,
-  dataTag_properties JSON,
-  dataTag_typeObjects JSON )
+  dataTag_property_ids UUID[],
+  dataTag_typeObject_ids UUID[] )
 LANGUAGE sql STABLE
 AS $function$
 
@@ -75,17 +75,17 @@ AS $function$
     id,
     dataTag_label,
     dataTag_tagType,
-    dataTag_properties,
-    dataTag_typeObjects
-  ) FROM agency.dataTags
+    dataTag_property_ids,
+    dataTag_typeObject_ids
+  ) FROM agency.dataTag
 
 $function$;
 
 
 
 CREATE OR REPLACE FUNCTION agency.query_dataTag_resource( resource_id UUID )
-RETURNS agency.dataTags
+RETURNS agency.dataTag
 LANGUAGE sql STABLE
 AS $function$
-  SELECT * FROM agency.dataTags WHERE id=resource_id
+  SELECT * FROM agency.dataTag WHERE id=resource_id
 $function$;

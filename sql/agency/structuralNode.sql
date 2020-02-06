@@ -1,57 +1,52 @@
-CREATE TABLE agency.structuralNodes (
+CREATE TABLE agency.structuralNode (
   id UUID,
   structuralNode_label TEXT,
   structuralNode_parent_id UUID,
-  agent_assignments JSON,
-  agent_assignments_implemented JSON,
   structuralNode_dataTag_ids UUID[],
-  structuralNode_properties JSON
+  property_values JSON,
+  active_assignments JSON
 );
 
 
 
 CREATE OR REPLACE PROCEDURE agency.create_structuralNode (
-  id UUID,
-  label TEXT,
-  parentId UUID,
-  agentAssignments JSON,
-  agentAssignmentsImplemented JSON,
-  dataTagIds UUID[],
-  properties JSON )
+  _id UUID,
+  _structuralNode_label TEXT,
+  _structuralNode_parent_id UUID,
+  _structuralNode_dataTag_ids UUID[],
+  _property_values JSON,
+  _active_assignments JSON )
 LANGUAGE sql
 AS $procedure$
-  INSERT INTO agency.structuralNodes (
+  INSERT INTO agency.structuralNode (
     id,
     structuralNode_label,
     structuralNode_parent_id,
-    agent_assignments,
-    agent_assignments_implemented,
     structuralNode_dataTag_ids,
-    structuralNode_properties )
-  VALUES (id, label, parentId, agentAssignments, agentAssignmentsImplemented, dataTagIds, properties);
+    property_values,
+    active_assignments )
+  VALUES ( _id, _structuralNode_label, _structuralNode_parent_id, _structuralNode_dataTag_ids, _property_values, _active_assignments);
 $procedure$;
 
 
 
 CREATE OR REPLACE PROCEDURE agency.update_structuralNode (
   _id UUID,
-  _label TEXT,
-  _parentId UUID,
-  _agentAssignments JSON,
-  _agentAssignmentsImplemented JSON,
-  _dataTagIds UUID[],
-  _properties JSON )
+  _structuralNode_label TEXT,
+  _structuralNode_parent_id UUID,
+  _structuralNode_dataTag_ids UUID[],
+  _property_values JSON,
+  _active_assignments JSON )
 LANGUAGE sql
 AS $procedure$
   UPDATE
-    agency.structuralNodes
+    agency.structuralNode
   SET
-    structuralNode_label = _label,
-    structuralNode_parent_id = _parentId,
-    agent_assignments = _agentAssignments,
-    agent_assignments_implemented = _agentAssignmentsImplemented,
-    structuralNode_dataTag_ids = _dataTagIds,
-    structuralNode_properties = _properties
+    structuralNode_label = _structuralNode_label,
+    structuralNode_parent_id = _structuralNode_parent_id,
+    structuralNode_dataTag_ids = _structuralNode_dataTag_ids,
+    property_values = _property_values,
+    active_assignments = _active_assignments
   WHERE
     id = _id;
 $procedure$;
@@ -61,7 +56,7 @@ $procedure$;
 CREATE OR REPLACE PROCEDURE agency.delete_structuralNode (_id UUID)
 LANGUAGE sql
 AS $procedure$
-DELETE FROM agency.structuralNodes
+DELETE FROM agency.structuralNode
   WHERE id = _id;
 $procedure$;
 
@@ -75,10 +70,9 @@ RETURNS TABLE(
   id UUID,
   structuralNode_label TEXT,
   structuralNode_parent_id UUID,
-  agent_assignments JSON,
-  agent_assignments_implemented JSON,
   structuralNode_dataTag_ids UUID[],
-  structuralNode_properties JSON )
+  property_values JSON,
+  active_assignments JSON )
 LANGUAGE sql STABLE
 AS $function$
 
@@ -86,19 +80,18 @@ AS $function$
     id,
     structuralNode_label,
     structuralNode_parent_id,
-    agent_assignments,
-    agent_assignments_implemented,
     structuralNode_dataTag_ids,
-    structuralNode_properties
-  ) FROM agency.structuralNodes
+    property_values,
+    active_assignments
+  ) FROM agency.structuralNode
 
 $function$;
 
 
 
 CREATE OR REPLACE FUNCTION agency.query_structuralNode_resource( resource_id UUID )
-RETURNS agency.structuralNodes
+RETURNS agency.structuralNode
 LANGUAGE sql STABLE
 AS $function$
-  SELECT * FROM agency.structuralNodes WHERE id=resource_id
+  SELECT * FROM agency.structuralNode WHERE id=resource_id
 $function$;

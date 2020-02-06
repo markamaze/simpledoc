@@ -1,4 +1,4 @@
-CREATE TABLE agency.users (
+CREATE TABLE agency.user (
   id UUID,
   username text,
   password text
@@ -12,7 +12,7 @@ CREATE OR REPLACE PROCEDURE agency.create_user (
   password TEXT )
 LANGUAGE sql
 AS $procedure$
-  INSERT INTO agency.users (
+  INSERT INTO agency.user (
     id,
     username,
     password
@@ -29,7 +29,7 @@ CREATE OR REPLACE PROCEDURE agency.update_user (
 LANGUAGE sql
 AS $procedure$
 UPDATE
-  agency.users
+  agency.user
 SET
   username = _username,
   password = _password
@@ -42,7 +42,7 @@ $procedure$;
 CREATE OR REPLACE PROCEDURE agency.delete_user (_id UUID)
 LANGUAGE sql
 AS $procedure$
-DELETE FROM agency.users
+DELETE FROM agency.user
   WHERE id = _id;
 $procedure$;
 
@@ -63,15 +63,15 @@ AS $function$
     id,
     username,
     password
-  ) FROM agency.users
+  ) FROM agency.user
 
 $function$;
 
 
 
 CREATE OR REPLACE FUNCTION agency.query_user_resource( resource_id UUID )
-RETURNS agency.users
+RETURNS agency.user
 LANGUAGE sql STABLE
 AS $function$
-  SELECT * FROM agency.users WHERE id=resource_id
+  SELECT * FROM agency.user WHERE id=resource_id
 $function$;
