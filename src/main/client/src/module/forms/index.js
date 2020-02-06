@@ -1,13 +1,13 @@
 import React from 'react'
 
 import * as Forms from './Forms'
-import reducer from './reducer'
-import * as formAction from './actions'
+import form_reducer from './reducer'
+import { loadFormStore } from './actions'
 
 
 export default module = {
-  reducer: {forms: reducer},
-  onLoad: () => console.log("forms store loading not setup yet"),
+  reducer: {forms: form_reducer},
+  onLoad: loadFormStore,
   title: "Forms",
   path: "/forms",
   services: [],
@@ -18,19 +18,3 @@ export default module = {
     monitoring: {path: "/forms/monitoring", title: "Check Store Status", component: state => <Forms.ComplianceCheckPage historyState={state} />}
   }
 }
-
-
-/*
-  right now, within agency module I am importing from outside the module:
-    moduleStyles
-    store
-    List
-    workspace actions
-
-
-  I would like to figure out how to completly encapsulate the module w/o too much repitition of code
-*/
-const externalActions = () => ({
-  testAction: { label: "external action", action: function(){console.log("success!")}}
-})
-export { externalActions }
