@@ -5,111 +5,93 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Set;
 import simpledoc.exceptions.ServiceErrorException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+import org.postgresql.util.PGobject;
 
 import java.util.UUID;
 import simpledoc.services.ModuleObject;
 
 public class Agent extends ModuleObject {
 
-	UUID structuralNode_link_id;
-	UUID agentTemplate_id;
-	UUID assigned_user_id;
-	Boolean agent_is_active;
-	Set<UUID> agent_dataTag_ids;
+	UUID agent_user_id;
+	UUID structuralNode_id;
+	UUID assignment_id;
+	UUID active_role_id;
+	Map<UUID, String> property_values;
 	
 	Agent(UUID id, String type) { super(id, type); }
 	Agent(UUID agent_id, String type, Map<String, Object> data) throws ServiceErrorException {
 		super(agent_id, type);
-		setStructuralNodeLinkId(data.get("structuralNode_link_id"));
-		setAgentTemplateId(data.get("agentTemplate_id"));
-		setAssignedUserId(data.get("assigned_user_id"));
-		setAgentIsActive(data.get("agent_is_active"));
-		setAgentDataTagIds(data.get("agent_dataTag_ids"));
-	}
-
-
-	private void setAgentIsActive(Object object) throws ServiceErrorException {
-		if(object instanceof Boolean) {
-			this.agent_is_active = (Boolean)object;
-		} else throw new ServiceErrorException("invalid value for agentIsActive");
-	}
-	private void setAgentDataTagIds(Object object) throws ServiceErrorException {
-		List<UUID> tagsList = new ArrayList<UUID>();
-		if(object instanceof UUID[]) {
-			tagsList = Arrays.asList((UUID[]) object);
-			this.agent_dataTag_ids = new HashSet<UUID>(tagsList);
-		}
-		
-		else if(object instanceof ArrayList) {
-			for(Object id : (ArrayList<?>) object) {
-				if(AgencyValidator.validateUUIDString(id.toString()))
-					tagsList.add(UUID.fromString(id.toString()));
-				else throw new ServiceErrorException("invalid Id in dataTag list");
-			}
-			this.agent_dataTag_ids = new HashSet<UUID>(tagsList);
-		}
-		else throw new ServiceErrorException("invalid dataTag list format");
-
-	}
-	private void setAssignedUserId(Object object) throws ServiceErrorException {
-		String assignedUserIdString = object.toString();
-		if(AgencyValidator.validateUUIDString(assignedUserIdString)) 
-			this.assigned_user_id = UUID.fromString(assignedUserIdString);
-		else throw new ServiceErrorException("invalid id to assigned user");
-
-	}
-	private void setAgentTemplateId(Object object) throws ServiceErrorException {
-		String agentTemplateIdString = object.toString();
-		if(AgencyValidator.validateUUIDString(agentTemplateIdString)) 
-			this.agentTemplate_id = UUID.fromString(agentTemplateIdString);
-		else throw new ServiceErrorException("invalid id to agent template");
-
-	}
-	private void setStructuralNodeLinkId(Object object) throws ServiceErrorException {
-		String linkIdString = object.toString();
-		if(AgencyValidator.validateUUIDString(linkIdString)) 
-			this.structuralNode_link_id = UUID.fromString(linkIdString);
-		else throw new ServiceErrorException("invalid id to linked structural node");
+		setAgentUserId(data.get("agent_user_id"));
+		setStructuralNodeId(data.get("structuralNode_id"));
+		setAssignmentId(data.get("assignment_id"));
+		setActiveRoleId(data.get("active_role_id"));
+		setPropertyValues(data.get("property_values"));
 
 	}
 	
-	public UUID getStructuralNodeLinkId() { return this.structuralNode_link_id; }
-	public UUID getAgentTemplateId() { return this.agentTemplate_id;	}
-	public UUID getAssignedUserId() { return this.assigned_user_id; }
-	public Set<UUID> getDataTagIds() { return this.agent_dataTag_ids; }
-	public Boolean isAgentActive() { return this.agent_is_active; }
+	private void setAgentUserId(Object object) throws ServiceErrorException {
+		if(AgencyValidator.validateUUIDString(object))
+				this.agent_user_id = UUID.fromString(object.toString());
+		else throw new ServiceErrorException("invalid id set for Agent.agent_user_id");
+	}
+	private void setStructuralNodeId(Object object) throws ServiceErrorException {
+		if(AgencyValidator.validateUUIDString(object))
+			this.structuralNode_id = UUID.fromString(object.toString());
+		else throw new ServiceErrorException("invalid id set for Agent.structuralNode_id");
+	}
+	private void setAssignmentId(Object object) throws ServiceErrorException {
+		if(AgencyValidator.validateUUIDString(object))
+			this.assignment_id = UUID.fromString(object.toString());
+		else throw new ServiceErrorException("invalid id set for Agent.assignment_id");
+	}
+	private void setActiveRoleId(Object object) throws ServiceErrorException {
+		if(AgencyValidator.validateUUIDString(object))
+			this.active_role_id = UUID.fromString(object.toString());
+		else throw new ServiceErrorException("invalid id set for Agent.active_role_id");
+	}
+	private void setPropertyValues(Object object) throws ServiceErrorException {
+		//TODO: set Property values based on incoming Object type
+		if(object instanceof Map) this.property_values = (Map<UUID, String>) object;
+		else if(object instanceof PGobject) {
+			JSONObject asJson = new JSONObject(((PGobject)object).getValue());
+			Map<UUID, String> propertyValues = new HashMap<UUID, String>();
+			for(String uuid : asJson.keySet()) { 
+				if(!AgencyValidator.validateUUIDString(uuid)) 
+					throw new ServiceErrorException("invalid uuid found in Agent.property_values");
+				else 
+				propertyValues.put(UUID.fromString(uuid), asJson.get(uuid).toString());
+			};
+			this.property_values = propertyValues;
+		}
+	}
+	
+	public UUID getAgentUserId() { return this.agent_user_id; }
+	public UUID getStructuralNodeId() { return this.structuralNode_id; }
+	public UUID getAssignmentId() { return this.assignment_id; }
+	public UUID getActiveRoleId() { return this.active_role_id; }
+	public Map<UUID, String> getPropertyValues() { return this.property_values; }
+	
 
 	@Override
 	public boolean update(Map<String, Object> objectData) throws ServiceErrorException {
 		for(Entry<String, Object> entry: objectData.entrySet()) {
-			switch(entry.getKey()) {
-				case "structuralNode_link_id":
-					setStructuralNodeLinkId(entry.getValue());
-					break;
-				case "agentTemplate_id":
-					setAgentTemplateId(entry.getValue());
-					break;
-				case "assigned_user_id":
-					setAssignedUserId(entry.getValue());
-					break;
-				case "agent_is_active":
-					setAgentIsActive(entry.getValue());
-					break;
-				case "agent_dataTag_ids":
-					setAgentDataTagIds(entry.getValue());
-					break;
-			}
+			String key = entry.getKey();
+			Object value = entry.getValue();
+			
+			if(key.equals("agent_user_id")) setAgentUserId(value);
+			else if(key.equals("structuralNode_id")) setStructuralNodeId(value);
+			else if(key.equals("assignment_id")) setAssignmentId(value);
+			else if(key.equals("active_role_id")) setActiveRoleId(value);
+			else if(key.equals("property_values")) setPropertyValues(value);
 		}
 		return true;
 		
@@ -118,38 +100,31 @@ public class Agent extends ModuleObject {
 	
 	@Override
 	public boolean readStorageResult(ResultSet rs) throws ServiceErrorException, SQLException {
-		setStructuralNodeLinkId(rs.getObject("structuralNode_link_id"));
-		setAgentTemplateId(rs.getObject("agentTemplate_id"));
-		setAssignedUserId(rs.getObject("assigned_user_id"));
-		setAgentDataTagIds(rs.getArray("agent_dataTag_ids").getArray());
-		setAgentIsActive(rs.getBoolean("agent_is_active"));
+		setAgentUserId(rs.getObject("agent_user_id"));
+		setStructuralNodeId(rs.getObject("structuralNode_id"));
+		setAssignmentId(rs.getObject("assignment_id"));
+		setActiveRoleId(rs.getObject("active_role_id"));
+		setPropertyValues(rs.getObject("property_values"));
 		return true;
 	}
+	
+	
 	@Override
-	public PreparedStatement writeStorageStatement(String type, Connection connection) throws ServiceErrorException {
+	public PreparedStatement writeStorageStatement(String type, Connection connection) throws ServiceErrorException, SQLException {
 		PreparedStatement statement = null;
 		
-		try {
-			switch(type) {
-			case "create":
-				statement = connection.prepareCall("call agency.create_agent(?,?,?,?,?,?)");
-				break;
-			case "update":
-				statement = connection.prepareCall("call agency.update_agent(?,?,?,?,?,?)");
-				break;
-			}
+		if(type.equals("create")) statement = connection.prepareCall("call agency.create_agent(?,?,?,?,?,?)");
+		else if(type.equals("update")) statement = connection.prepareCall("call agency.update_agent(?,?,?,?,?,?)");
 			
-			statement.setObject(1, this.getId());
-			statement.setObject(2, this.getStructuralNodeLinkId());
-			statement.setObject(3, this.getAgentTemplateId());
-			statement.setObject(4, this.getAssignedUserId());
-			statement.setBoolean(5, this.isAgentActive());
-			statement.setArray(6, connection.createArrayOf("UUID", this.getDataTagIds().toArray()));
+		statement.setObject(1, this.getId());
+		statement.setObject(2, this.getAgentUserId());
+		statement.setObject(3, this.getStructuralNodeId());
+		statement.setObject(4, this.getAssignmentId());
+		statement.setObject(5, this.getActiveRoleId());
+		statement.setArray(6, null);
+		//TODO: set PGObject for property values
+//		statement.setArray(6, connection.createArrayOf("UUID", this.getDataTagIds().toArray()));
 			
-		} catch(SQLException err) { throw new ServiceErrorException("could not write object to storage statement");}
-
-		
-		
 		return statement;
 	}
 
@@ -159,11 +134,11 @@ public class Agent extends ModuleObject {
 		JSONObject json_result = new JSONObject();
 		json_result.put("id", this.getId());
 		json_result.put("type", this.getModuleObjectType());
-		json_result.put("structuralNode_link_id", this.getStructuralNodeLinkId());
-		json_result.put("agentTemplate_id", this.getAgentTemplateId());
-		json_result.put("assigned_user_id", this.getAssignedUserId());
-		json_result.put("agent_is_active", this.isAgentActive());
-		json_result.put("agent_dataTag_ids", this.getDataTagIds());
+		json_result.put("agent_user_id", this.getAgentUserId());
+		json_result.put("structuralNode_id", this.getStructuralNodeId());
+		json_result.put("assignment_id", this.getAssignmentId());
+		json_result.put("active_role_id", this.getActiveRoleId());
+		json_result.put("property_values", this.getPropertyValues());
 		
 		return json_result.toString();
 	

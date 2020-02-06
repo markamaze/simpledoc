@@ -7,16 +7,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import simpledoc.exceptions.ServiceErrorException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
-import org.postgresql.util.PGobject;
+import org.postgresql.jdbc.PgArray;
 
 import simpledoc.services.ModuleObject;
 
@@ -24,66 +24,54 @@ public class DataTag extends ModuleObject {
 
 	private String dataTag_label;
 	private String dataTag_tagType;
-	private List<Object> dataTag_properties;
-	private List<Object> dataTag_typeObjects;
+	private Set<UUID> dataTag_property_ids;
+	private Set<UUID> dataTag_typeObject_ids;
 
 	DataTag(UUID id, String type) {	super(id, type); }
-	DataTag(UUID tag_id, String type, Map<String, Object> data) throws ServiceErrorException {
+	DataTag(UUID tag_id, String type, Map<String, Object> data) throws ServiceErrorException, SQLException {
 		super(tag_id, type);
 		setDataTagLabel(data.get("dataTag_label").toString());
 		setDataTagType(data.get("dataTag_tagType"));
-		setDataTagProperties(data.get("dataTag_properties"));
-		setTypeObjects(data.get("dataTag_typeObjects"));
+		setDataTagPropertyIds(data.get("dataTag_property_ids"));
+		setTypeObjectIds(data.get("dataTag_typeObject_ids"));
 	}
 
-	private void setDataTagProperties(Object object) throws ServiceErrorException {	
-		if(object instanceof String) this.dataTag_properties = new JSONArray(object).toList();
-		else if(object instanceof List) this.dataTag_properties = (List<Object>) object;
-		else if(object instanceof PGobject) this.dataTag_properties = new JSONArray(((PGobject)object).getValue()).toList();
-		else if(object == null) this.dataTag_properties = new ArrayList<Object>();
-		else throw new ServiceErrorException("invalid format for datatag properties");
+	private void setDataTagLabel(Object object) throws ServiceErrorException {
+		if(AgencyValidator.validateString(object, 1, 48, true, true)) this.dataTag_label = object.toString();
+		else throw new ServiceErrorException("invalid label for DataTag.dataTag_label");
 	}
 	private void setDataTagType(Object object) throws ServiceErrorException {
 		if(object instanceof String) this.dataTag_tagType = object.toString();
-		else throw new ServiceErrorException("invalid arg for if tag is for an agent");
+		else throw new ServiceErrorException("invalid property for DataTag.dataTag_tagType");
 	}
-	private void setDataTagLabel(Object object) throws ServiceErrorException {
-		if(AgencyValidator.validateString(object.toString(), 1, 48, true, true)) 
-			this.dataTag_label = object.toString();
-		else throw new ServiceErrorException("invalid label for data tag");
-		
+	private void setDataTagPropertyIds(Object object) throws ServiceErrorException, SQLException {	
+		if(object instanceof Set) this.dataTag_property_ids = (Set<UUID>) object;
+		else if(object instanceof PgArray) this.dataTag_property_ids = new HashSet<UUID>(Arrays.asList((UUID[])((PgArray)object).getArray()));
+		else throw new ServiceErrorException("invalid property for DataTag.dataTag_property_ids");
 	}
-	private void setTypeObjects(Object object) throws ServiceErrorException {
-		
-		if(object instanceof PGobject) this.dataTag_typeObjects = new JSONArray(((PGobject) object).getValue()).toList();
-		else if(object instanceof List) this.dataTag_typeObjects = (List<Object>) object;
-		else if(object == null) this.dataTag_typeObjects = new ArrayList<>();
+	private void setTypeObjectIds(Object object) throws ServiceErrorException, SQLException {
+		if(object instanceof Set) this.dataTag_typeObject_ids = (Set<UUID>) object;
+		else if(object instanceof PgArray) this.dataTag_typeObject_ids = new HashSet<UUID>(Arrays.asList((UUID[])((PgArray)object).getArray()));
 		else throw new ServiceErrorException("invalid type object for data tag");
 	}
 
-	public String getLabel() { return this.dataTag_label; }
+	public String getDataTagLabel() { return this.dataTag_label; }
 	public String getDataTagType() { return this.dataTag_tagType; }
-	public List<Object> getDataTagProperties() { return this.dataTag_properties; }
-	public List<Object> getTypeObjects() { return this.dataTag_typeObjects; }
+	public Set<UUID> getDataTagPropertyIds() { return this.dataTag_property_ids; }
+	public Set<UUID> getTypeObjectIds() { return this.dataTag_typeObject_ids; }
+	
 	
 	@Override
-	public boolean update(Map<String, Object> objectData) throws ServiceErrorException {
+	public boolean update(Map<String, Object> objectData) throws ServiceErrorException, SQLException {
 		for(Entry<String, Object> entry : objectData.entrySet()) {
-			switch(entry.getKey()) {
-			case "dataTag_label":
-				setDataTagLabel(entry.getValue());
-				break;
-			case "dataTag_tagType":
-				setDataTagType(entry.getValue());
-				break;
-			case "dataTag_properties":
-				setDataTagProperties(entry.getValue());
-				break;
-			case "dataTag_typeObjects":
-				setTypeObjects(entry.getValue());
-			}
+			String key = entry.getKey();
+			Object value = entry.getValue();
+			
+			if(key.equals("dataTag_label")) setDataTagLabel(value);
+			else if(key.equals("dataTag_tagType")) setDataTagType(value);
+			else if(key.equals("dataTag_property_ids")) setDataTagPropertyIds(value);
+			else if(key.equals("dataTag_typeObject_ids")) setTypeObjectIds(value);
 		}
-		
 		return true;
 	}
 
@@ -92,41 +80,23 @@ public class DataTag extends ModuleObject {
 	public boolean readStorageResult(ResultSet rs) throws ServiceErrorException, SQLException {
 		setDataTagLabel(rs.getString("dataTag_label"));
 		setDataTagType(rs.getString("dataTag_tagtype"));
-		setDataTagProperties(rs.getObject("dataTag_properties"));
-		setTypeObjects(rs.getObject("dataTag_typeObjects"));
+		setDataTagPropertyIds(rs.getObject("dataTag_property_ids"));
+		setTypeObjectIds(rs.getObject("dataTag_typeObject_ids"));
 		return true;
 	}
+	
+	
 	@Override
-	public PreparedStatement writeStorageStatement(String type, Connection connection) throws ServiceErrorException {
+	public PreparedStatement writeStorageStatement(String type, Connection connection) throws ServiceErrorException, SQLException {
 		PreparedStatement statement = null;
-		try {
-			switch(type) {
-			case "create":
-				statement = connection.prepareStatement("call agency.create_dataTag(?,?,?,?,?)");
-				break;
-			case "update":
-				statement = connection.prepareStatement("call agency.update_dataTag(?,?,?,?,?)");
-				break;
-			}
+		if(type.equals("create")) statement = connection.prepareStatement("call agency.create_dataTag(?,?,?,?,?)");
+		else if(type.equals("update")) statement = connection.prepareStatement("call agency.update_dataTag(?,?,?,?,?)");
 			
-			PGobject propertiesPG = new PGobject();
-			JSONArray propertiesAR = new JSONArray(this.getDataTagProperties());
-			propertiesPG.setType("json");
-			propertiesPG.setValue(propertiesAR.toString());
-			
-			PGobject typeObjPG = new PGobject();
-			JSONArray typeObjectJSON = new JSONArray(this.getTypeObjects());
-			
-//			JSONObject typeObjectJSON = new JSONObject(this.getTypeObjects());
-			typeObjPG.setType("json");
-			typeObjPG.setValue(typeObjectJSON.toString());
-			
-			statement.setObject(1, this.getId());
-			statement.setString(2, this.getLabel());
-			statement.setString(3, this.getDataTagType());
-			statement.setObject(4, propertiesPG);
-			statement.setObject(5, typeObjPG);
-		} catch(SQLException err) { throw new ServiceErrorException("could not write storage statement"); }
+		statement.setObject(1, this.getId());
+		statement.setString(2, this.getDataTagLabel());
+		statement.setString(3, this.getDataTagType());
+		statement.setArray(4, connection.createArrayOf("UUID", this.getDataTagPropertyIds().toArray()));
+		statement.setObject(5, connection.createArrayOf("UUID", this.getTypeObjectIds().toArray()));
 		
 		return statement;
 	}
@@ -138,10 +108,10 @@ public class DataTag extends ModuleObject {
 		JSONObject json_result = new JSONObject();
 		json_result.put("id", this.getId());
 		json_result.put("type", this.getModuleObjectType());
-		json_result.put("dataTag_label", this.getLabel());
+		json_result.put("dataTag_label", this.getDataTagLabel());
 		json_result.put("dataTag_tagType", this.getDataTagType());
-		json_result.put("dataTag_properties", this.getDataTagProperties());
-		json_result.put("dataTag_typeObjects", this.getTypeObjects());
+		json_result.put("dataTag_property_ids", this.getDataTagPropertyIds());
+		json_result.put("dataTag_typeObject_ids", this.getTypeObjectIds());
 		
 		return json_result.toString();
 	}
