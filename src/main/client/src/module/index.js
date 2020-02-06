@@ -2,9 +2,8 @@ import React from 'react'
 import agency from './agency/index'
 import forms from './forms/index'
 import workspace from './workspace/index'
-import store from '../store'
 
-export const moduleStore = store
+
 
 export default module = {
   home: {
@@ -14,8 +13,4 @@ export default module = {
     path: "/",
     component: state => <div>Hello Home</div>,
     services: [ ]
-  },
-  agency,
-  forms,
-  workspace
-}
+  }, agency, forms, workspace }
