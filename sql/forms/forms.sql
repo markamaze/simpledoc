@@ -12,13 +12,14 @@ CREATE OR REPLACE PROCEDURE forms.create_form (
   _id UUID,
   _label TEXT,
   _section_ids UUID[],
-  _completion_rules JSON )
+  _completion_rules JSON,
+  _security_settings JSON)
 LANGUAGE SQL
 AS $PROCEDURE$
   INSERT INTO forms.forms(
-    id, label, section_ids, completion_rules
+    id, label, section_ids, completion_rules, security_settings
   )
-  VALUES (_id, _label, _section_ids, _completion_rules);
+  VALUES (_id, _label, _section_ids, _completion_rules, _security_settings);
 $PROCEDURE$;
 
 
@@ -27,7 +28,8 @@ CREATE OR REPLACE PROCEDURE forms.update_form (
   _id UUID,
   _label TEXT,
   _section_ids UUID[],
-  _completion_rules JSON
+  _completion_rules JSON,
+  _security_settings JSON
 )
 LANGUAGE sql
 AS $procedure$
@@ -37,7 +39,8 @@ AS $procedure$
   id = _id,
   label = _label,
   section_ids = _section_ids,
-  completion_rules = _completion_rules
+  completion_rules = _completion_rules,
+  security_settings = _security_settings
   WHERE
     id = _id;
 $procedure$;
@@ -61,13 +64,14 @@ RETURNS TABLE(
   id UUID,
   label TEXT,
   section_ids UUID[],
-  completion_rules JSON
+  completion_rules JSON,
+  security_settings JSON
 )
 LANGUAGE sql STABLE
 AS $function$
 
   SELECT (
-    id, label, section_ids, completion_rules
+    id, label, section_ids, completion_rules, security_settings
   ) FROM forms.forms
 
 $function$;
