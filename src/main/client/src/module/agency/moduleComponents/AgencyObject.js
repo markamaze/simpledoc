@@ -5,7 +5,7 @@ import Properties from './Properties'
 import DataTags from './DataTags'
 import Assignments from './Assignments'
 import Roles from './Roles'
-import { CardWrapper, EditorWrapper, BuilderWrapper } from '../agencyStyles'
+import { CardWrapper, EditorWrapper, BuilderWrapper } from '../module_styles'
 import ErrorBoundary from '../agencyUtils/ErrorBoundary'
 
 
