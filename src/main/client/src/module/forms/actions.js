@@ -2,16 +2,11 @@ import store from '../../store'
 import { put, get, post, remove } from './formUtils/ajax'
 
 
-export function loadFormsStore(){
-  get('/Forms/forms', function(request) {
-                      forms = JSON.parse(request.response).data
+export function loadFormStore(){
+  get('/Forms', function(request) {
                       store.dispatch({
-                        type: "LOAD_AGENCY_STORE",
-                        payload: {
-                          forms: forms,
-                          formSets: formSets,
-                          submissions: submissions
-                        }
+                        type: "LOAD_FORM_STORE",
+                        payload: JSON.parse(request.response).data
                       })
                     }, function() { console.log("error loading agency users")})
 }
