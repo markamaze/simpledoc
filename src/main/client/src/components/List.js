@@ -100,7 +100,7 @@ export default function List(props){
     <div className="list-actions">
       {
         props.listActions.map(item =>
-          <div className="action-handler" onClick={() => item.action()}>{item.label}</div> )
+          <div className="action-handler" onClick={() => setOverlay(item.action())}>{item.label}</div> )
       }
     </div>
 
