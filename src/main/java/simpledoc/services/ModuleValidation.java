@@ -13,30 +13,40 @@ public abstract class ModuleValidation {
     throws UnsupportedServiceRequest;
 
 
-    public static boolean validateUUIDString(String id_string) {
-      //TODO BUG: returning without throwing exception when what seems to be an invalid uuid sent in some occasions
-    	// got what's happening, UUID.fromString is just filling in leading zeros when missing a few digits
-      try{ UUID.fromString(id_string.toString()); } 
+    public static boolean validateUUIDString(Object id_object) {
+      try{ 
+    	  
+    	  if(id_object instanceof UUID) return true;
+    	  else if(id_object instanceof String) UUID.fromString((String)id_object);
+    	  else UUID.fromString(id_object.toString());
+    
+    	  } 
       catch (IllegalArgumentException err) { return false; }
+      catch(NullPointerException err) { return false; }
       return true;
     }
 
-    public static boolean validateString(String test_string, 
+    public static boolean validateString(Object test_string, 
     									int min_len, 
     									int max_len, 
     									boolean allow_spaces, 
     									boolean allow_special_chars) {
-    	if(test_string.length() < min_len) return false;
-    	if(test_string.length() > max_len) return false;
-    	char[] test_chars = test_string.toCharArray();
-    	for(char character : test_chars) {
-    		if(!allow_spaces) {
-    			if(character == ' ') return false;  		
-    		}
-    	}
+    	String string;
+    	if(test_string instanceof String) string = (String) test_string;
+    	else if(test_string instanceof Object) string = test_string.toString();
+    	else return false;
     	
-    	
-    	return true;
+        if(string.length() < min_len) return false;
+        else if(string.length() > max_len) return false;
+        	
+        char[] test_chars = string.toCharArray();
+        for(char character : test_chars) {
+        	if(!allow_spaces && character == ' ') return false;
+        	if(!allow_special_chars) {}; //TODO: handle identifying special chars
+        }
+        	
+        	
+        return true;    		
     }
 
     public static boolean validateSecurity(Object security_object) {
@@ -50,4 +60,8 @@ public abstract class ModuleValidation {
       return true;
     }
 
+    public static boolean validatePropertyValues() { return false; }
+    
+    public static boolean validateTagSet() { return false; }
+    
 }
