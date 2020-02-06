@@ -1,56 +1,45 @@
 import React from 'react'
-import * as validationTool from './validationTool'
+import { agencyObject } from './agencyObject'
 
 
 
 const prototype = agencyState => ({
-  type: function(){ return "user" },
+  type: () => "user",
   properties: {
     id: {
-      setValue: function(idString){
-        // throw "testing error path"
-        if(!idString) throw `Missing required USER property: id`
-        else if(!this.properties.id.validate(idString)) throw `Invalid USER property: id -> ${idString}`
-        else this.id = idString
+      setValue: function(id){
+        if(id === null || id === undefined) throw "missing required property: Agency.User.id"
+        else if(!this.properties.id.validate(id)) throw "invalid property: Agency.User.id"
+        else this.id = id
         return true
       },
-      validate: id => {
-        if(id === "new_object" && typeof this === "undefined") return true
-        else if(validationTool.id(id)) return true
-        else return false
-      }
+      getObject: function(){ return this.id },
+      validate: ()=>{ return true }
     },
     username: {
-      setValue: function(username){
-        if(!username && this.id === "new_object") this.username = "new user"
-        else if(!username) throw `Missing required USER property: username`
-        else if(!this.properties.username.validate(username)) throw `Invalid USER Property: username -> ${username}`
-        else this.username = username
+      setValue: function(uname){
+        if(uname === null || uname === undefined) throw "missing required property: Agency.User.username"
+        else if(!this.properties.username.validate(uname)) throw "invalid property: Agency.User.username"
+        else this.username = uname
         return true
       },
-      validate: username => {
-        if(validationTool.string(username, {noSpaces: true, maxLength: 24, minLength: 4})) return true
-        return false
-      }
+      getObject: function(){ return this.username },
+      validate: (uname)=>{ return true }
     },
     password: {
-      setValue: function(password){
-        if(!password && this.id === "new_object") this.password = ""
-        else if(!password) throw `Missing required USER property: password`
-        else if(!this.properties.username.validate(password)) throw `Invalid USER Property: password -> ${password}`
-        else this.password = password
+      setValue: function(pword){
+        if(pword === null || pword === undefined) throw "missing required property: Agency.User.password"
+        else if(!this.properties.password.validate(pword)) throw "invalid property: Agency.User.password"
+        else this.password = pword
         return true
       },
-      validate: password => {
-        if(validationTool.string(password, {noSpaces: true, maxLength: 24, minLength: 8})) return true
-        return false
-      }
+      getObject: function(){ return this.password },
+      validate: pword => { return true }
     }
-  },
-  typeFunctions: {
-    getAgents: function(){}
   }
+
 })
+
 
 
 const displayProps = agencyState => ({
@@ -65,9 +54,12 @@ const displayProps = agencyState => ({
           {label: "userId", selector: "id"}
         ]
       },
-      tableData: agencyState.users,
+      tableData: Object.values(agencyState.user),
       listActions: [
-        {label: "New User", action: ()=> console.log("fire action to create user")}
+        {label: "New User", action: () => {
+          let newUser = agencyObject("user", {}, null)
+          return newUser.display.call(newUser, agencyState, error=>{throw new Error(`${error}`)}).builder
+        }}
       ],
       drawerComponents: [
         {label: "card", component: item => item.display.call(item, agencyState, err=>{throw err}).card},

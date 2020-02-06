@@ -1,73 +1,78 @@
 import React from 'react'
-import * as validationTool from './validationTool'
+import uuidv4 from 'uuid/v4'
+import { agencyObject } from './agencyObject'
+
 
 
 const prototype = agencyState => ({
-  type: function(){ return "agent" },
+  type: () => "agent",
   properties: {
     id: {
-      setValue: function(idString){
-        if(!this.properties.id.validate(idString)) return false
-        this.id = idString
-
+      setValue: function(id){
+        if(id === null || id === undefined) throw "missing required property: Agency.Agent.id"
+        else if(!this.properties.id.validate(id)) throw "invalid property: Agency.Agent.id"
+        else this.id = id
         return true
       },
+      getObject: function(){ return this.id},
       validate: id => { return true }
     },
-    structuralNode_link_id: {
-      setValue: function(linkId){
-        if(!this.properties.structuralNode_link_id.validate(linkId)) return false
-        this.structuralNode_link_id = linkId
-
+    agent_user_id: {
+      setValue: function(id){
+        if(id === null || id === undefined) throw "missing required property: Agency.Agent.agent_user_id"
+        else if(!this.properties.agent_user_id.validate(id)) throw "invalid property: Agency.Agent.agent_user_id"
+        else this.agent_user_id = id
         return true
       },
-      validate: linkId => { return true }
+      getObject: function(){ return agencyState["user"][this.agent_user_id] },
+      validate: id => { return true }
     },
-    agentTemplate_id: {
-      setValue: function(templateId){
-        if(!this.properties.agentTemplate_id.validate(templateId)) return false
-        this.agentTemplate_id = templateId
-
+    structuralNode_id: {
+      setValue: function(id){
+        if(id === null || id === undefined) throw "missing required property: Agency.Agent.structuralNode_id"
+        else if(!this.properties.structuralNode_id.validate(id)) throw "invalid property: Agency.Agent.structuralNode_id"
+        else this.structuralNode_id = id
         return true
       },
-      validate: templateId => { return true }
+      getObject: function(){ return agencyState["structuralNode"][this.structuralNode_id] },
+      validate: ()=>{ return true }
     },
-    assigned_user_id: {
-      setValue: function(userId){
-        if(!this.properties.assigned_user_id.validate(userId)) return false
-        this.assigned_user_id = userId
-
+    assignment_id: {
+      setValue: function(id){
+        if(id === null || id === undefined) throw "missing required property: Agency.Agent.assignment_id"
+        else if(!this.properties.assignment_id.validate(id)) throw "invalid property: Agency.Agent.assignment_id"
+        else this.assignment_id = id
         return true
       },
-      validate: userId => { return true }
+      getObject: function(){ return agencyState["assignment"][this.assignment_id] },
+      validate: ()=>{ return true }
     },
-    agent_is_active: {
-      setValue: function(isActive){
-        if(!this.properties.agent_is_active.validate(isActive)) return false
-        this.agent_is_active = isActive
-
+    property_values: {
+      setValue: function(values){
+        if(values === null || values === undefined) this.property_values = {}
+        else if(!this.properties.property_values.validate(values)) throw "invalid property: Agency.Agent.property_values"
+        else this.property_values = values
         return true
       },
-      validate: isActive => { return true }
+      getObject: function(){ return agencyState["property"][this.property_values] },
+      validate: ()=>{ return true }
     },
-    agent_dataTag_ids: {
-      setValue: function(tagIds){
-        if(!this.properties.agent_dataTag_ids.validate(tagIds)) return false
-        this.agent_dataTag_ids = tagIds
-
+    active_role: {
+      setValue: function(role){
+        if(role === null || role === undefined) this.active_role = {}
+        else if(!this.properties.active_role.validate(role)) throw "invalid property: Agency.Agent.active_role"
+        else this.active_role = role
         return true
       },
-      validate: tagIds => { return true }
+      getObject: function(){ return agencyState["role"][this.active_role] },
+      validate: ()=>{ return true }
     }
-  },
-  typeFunctions: {
-
   }
 })
 
 
 const displayProps = agencyState => ({
-  displayKey: "agent_label",
+  displayKey: "",
   component: {
     list: {
       columns: {

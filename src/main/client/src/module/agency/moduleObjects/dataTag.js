@@ -1,5 +1,6 @@
 import React from 'react'
-import * as validationTool from './validationTool'
+import uuidv4 from 'uuid/v4'
+import { agencyObject } from './agencyObject'
 
 
 
@@ -8,70 +9,62 @@ const prototype = agencyState => ({
   properties: {
     id: {
       setValue: function(id){
-        if(!id) throw `Missing required DATATAG property: id`
-        else if(!this.properties.id.validate(id)) throw `Invalid DATATAG property: id`
+        if(id === null || id === undefined) throw "missing required property: Agency.DataTag.id"
+        else if(!this.properties.id.validate(id)) throw "invalid property: Agency.DataTag.id"
         else this.id = id
         return true
       },
-      validate: id => {
-        if(id === "new_object" && typeof this === "undefined") return true
-        if(validationTool.id(id)) return true
-        return false
-      }
+      getObject: function(){ return this.id },
+      validate: id => { return true }
     },
     dataTag_label: {
       setValue: function(label){
-        if(!label && this.id === "new_object") this.dataTag_label = "new dataTag"
-        else if(!label) throw 'Missing required DATATAG property: dataTag label'  //I should use a custom error for this to add indicators on screen
-        else if(!this.properties.dataTag_label.validate(label)) throw `Invalid DATATAG property: dataTag label -> ${label}`
+        if(label === null || label === undefined) throw "missing required property: Agency.DataTag.dataTag_label"
+        else if(!this.properties.dataTag_label.validate(label)) throw "invalid property: Agency.DataTag.dataTag_label"
         else this.dataTag_label = label
         return true
       },
-      validate: label => {
-        if(validationTool.string(label, {})) return true
-        else return false
-      }
+      getObject: function(){ return this.dataTag_label },
+      validate: ()=>{ return true }
     },
     dataTag_tagType: {
       setValue: function(tagType){
-        if(!tagType) this.dataTag_tagType = ""
-        else if(!this.properties.dataTag_tagType.validate(tagType)) throw `Invalid DATATAG property: dataTag tagType -> ${tagType}`
+        if(tagType === null || tagType === undefined) throw "missing required property: Agency.DataTag.dataTag_tagType"
+        else if(!this.properties.dataTag_tagType.validate(tagType)) throw "invalid property: Agency.DataTag.dataTag_tagType"
         else this.dataTag_tagType = tagType
         return true
       },
-      validate: tagType => {
-        if(tagType === "agent") return true
-        else if(tagType === "structuralNode") return true
-        return false
-      }
+      getObject: function(){ return this.datTag_tagType },
+      validate: ()=>{ return true }
     },
-    dataTag_properties: {
-      setValue: function(tagProperties){
-        if(!tagProperties) this.dataTag_properties = {}
-        else if(!this.properties.dataTag_properties.validate(tagProperties)) throw `Invalid DATATAG property: dataTag properties -> ${tagProperties}`
-        else this.dataTag_properties = tagProperties
+    dataTag_property_ids: {
+      setValue: function(ids){
+        if(ids === null || ids === undefined) this.dataTag_property_ids = []
+        else if(!this.properties.dataTag_property_ids.validate(ids)) throw "invalid property: Agency.DataTag.dataTag_property_ids"
+        else this.dataTag_property_ids = ids
         return true
       },
-      validate: properties => {
-        // TODO: finish validating properties
-        return true
-      }
+      getObject: function(){ return this.dataTag_property_ids.map(id => agencyState["property"][id] )},
+      validate: ()=>{ return true }
     },
-    dataTag_typeObjects: {
-      setValue: function(typeObjects){
-        if(!typeObjects) this.dataTag_typeObjects = []
-        else if(!this.properties.dataTag_typeObjects.validate(typeObjects)) throw `Invalid DATATAG property: dataTag typeObjects -> ${typeObjects}`
-        else this.dataTag_typeObjects = typeObjects
+    dataTag_typeObject_ids: {
+      setValue: function(ids){
+        if(ids === null || ids === undefined) this.dataTag_typeObject_ids = []
+        else if(!this.properties.dataTag_typeObject_ids.validate(ids)) throw "invalid property: Agency.DataTag.dataTag_typeObject_ids"
+        else this.dataTag_typeObject_ids = ids
         return true
+     },
+      getObject: function(){
+        if(this.dataTag_tagType === "agent") return agencyState["role"][this.dataTag_typeObject_ids]
+        else if(this.dataTag_tagType === "structural") return this.dataTag_typeObject_ids.map(id => agencyState["assignment"][id] )
+        else return null
       },
-      validate: typeObjects => {
-        // TODO: finish validating typeObjects
-        return true
-      }
+      validate: ()=>{ return true }
     }
   },
   typeFunctions: {}
 })
+
 
 
 const displayProps = agencyState => ({
@@ -85,8 +78,11 @@ const displayProps = agencyState => ({
           {label: "Type", selector: "dataTag_tagType"}
         ]
       },
-      tableData: agencyState.dataTags,
-      listActions: [{label: "New DataTag", action: () => console.log("fire action to create dataTag")}],
+      tableData: Object.values(agencyState.dataTag),
+      listActions: [{label: "New DataTag", action: () => {
+        let newDataTag = agencyObject("dataTag", {}, null)
+        return newDataTag.display.call(newDataTag, agencyState, error=>{throw new Error(`${error}`)}).builder
+      }}],
       drawerComponents: [{label: "card", component: item => item.display.call(item, agencyState, err=>{throw err}).card}],
       overlayComponents: [
         {label: "editor", component: item => item.display.call(item, agencyState, err=>{throw err}).editor},
