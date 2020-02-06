@@ -1,7 +1,6 @@
 package simpledoc;
 
 import simpledoc.exceptions.StorageErrorException;
-import simpledoc.exceptions.UnsupportedServiceRequest;
 import simpledoc.exceptions.ServiceErrorException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -9,13 +8,14 @@ import java.io.OutputStream;
 import com.sun.net.httpserver.HttpExchange;
 
 public class ClientThread extends Thread {
-
 	 private HttpExchange exchange;
-	 private ServiceLoader services;
+	 private StorageControl storage;
+	private ServiceLoader loader;
 
-	 public ClientThread(HttpExchange exchange, ServiceLoader loader) {
-	 	this.exchange = exchange;
-	 	this.services = loader;
+	 public ClientThread(HttpExchange exchange, StorageControl storage, ServiceLoader loader) {
+		this.storage = storage;
+		this.loader = loader;
+		this.exchange = exchange;
 	 	try { this.join(); }
 	 	catch (InterruptedException e) { e.printStackTrace(); }
 	 }
@@ -47,12 +47,10 @@ public class ClientThread extends Thread {
 	 									this.exchange.getRequestURI().getQuery(),
 	 									this.exchange.getRequestBody());
 
-			service = this.services.load(request.module(), request.method());
+			service = loader.load(request.resource(), request.method());
 
-			response = service.run(request);
+			response = service.run(request, storage);
 
-		} catch (UnsupportedServiceRequest err) {
-			response = new ResourceResponse(err.getMessage(), 501);
 		} catch (ServiceErrorException err) {
 			response = new ResourceResponse(err.getMessage(), 502);
 		} catch (StorageErrorException err) {
