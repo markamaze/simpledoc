@@ -83,6 +83,15 @@ public class AgencyValidator extends ModuleValidation {
     	case "AGENCY.USER":
     		fields = User.class.getDeclaredFields();
     		break;
+    	case "AGENCY.ASSIGNMENT":
+    		fields = Assignment.class.getDeclaredFields();
+    		break;
+    	case "AGENCY.ROLE":
+    		fields = Role.class.getDeclaredFields();
+    		break;
+    	case "AGENCY.PROPERTY":
+    		fields = Property.class.getDeclaredFields();
+    		break;
       default: return false;
 
     }
