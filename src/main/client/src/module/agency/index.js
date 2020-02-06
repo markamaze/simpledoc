@@ -1,9 +1,8 @@
 import React from 'react'
 
-import { AgencyPage, UsersManagerPage, TemplatesManagerPage, DataTagsManagerPage } from './Agency'
+import * as Agency from './Agency'
 import agency_reducer from './module_reducer'
 import { loadAgencyStore } from './module_actions'
-import searchAgency from './services/searchAgency'
 
 
 export default module = {
@@ -11,28 +10,13 @@ export default module = {
   onLoad: loadAgencyStore,
   title: "Agency",
   path: "/agency",
-  services: [ searchAgency ],
   routes: {
-    agency: { path: "/agency", default: true, title: "Agency", component: state => <AgencyPage  />},
-    users: { path: "/agency/users", title: "Users", component: state => <UsersManagerPage historyState={state} />},
-    templates: { path: "/agency/templates", title: "Templates", component: state => <TemplatesManagerPage historyState={state} /> },
-    tags: { path: "/agency/tags", title: "DataTags", component: state => <DataTagsManagerPage historyState={state}/> }
+    agency: { path: "/agency", default: true, title: "Agency", component: state => <Agency.AgencyPage  />},
+    users: { path: "/agency/users", title: "Users", component: state => <Agency.UsersManagerPage historyState={state} />},
+    templates: { path: "/agency/templates", title: "Templates", component: state => <Agency.TemplatesManagerPage historyState={state} /> },
+    tags: { path: "/agency/tags", title: "DataTags", component: state => <Agency.DataTagsManagerPage historyState={state}/> },
+    roles: { path: "/agency/roles", title: "Roles", component: state => <Agency.RoleManagerPage historyState={state}/> },
+    assignments: { path: "/agency/assignments", title: "Assignments", component: state => <Agency.AssignmentManagerPage historyState={state} />},
+    properties: { path: "/agency/properties", title: "Properties", component: state => <Agency.PropertyManagerPage historyState={state} />}
   }
 }
-
-
-/*
-  right now, within agency module I am importing from outside the module:
-    moduleStyles
-    store
-    DataTableWrapper
-    Overlay
-    workspace actions
-
-
-  I would like to figure out how to completly encapsulate the module w/o too much repitition of code
-*/
-const externalActions = () => ({
-  testAction: { label: "external action", action: function(){console.log("success!")}}
-})
-export { externalActions }
