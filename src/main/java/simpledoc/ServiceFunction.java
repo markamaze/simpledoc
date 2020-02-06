@@ -1,9 +1,8 @@
 package simpledoc;
 
-import simpledoc.exceptions.UnsupportedServiceRequest;
-import simpledoc.exceptions.StorageErrorException;
 import simpledoc.exceptions.ServiceErrorException;
+import simpledoc.exceptions.StorageErrorException;
 
 public interface ServiceFunction {
-	public ResourceResponse run(ResourceRequest request) throws ServiceErrorException, StorageErrorException, UnsupportedServiceRequest;
+	public ResourceResponse run(ResourceRequest request, StorageControl storage) throws ServiceErrorException, StorageErrorException ;
 }
