@@ -46,26 +46,30 @@ const prototype = agencyState => ({
       },
       getObject: function(){ return agencyState["assignment"][this.assignment_id] },
       validate: ()=>{ return true }
+    }
+  },
+  display: {
+    card: agent => {
+      return  <div className="agent container-row">{agencyState().user[agent.agent_user_id].username}</div>
     },
-    property_values: {
-      setValue: function(values){
-        if(values === null || values === undefined) this.property_values = {}
-        else if(!this.properties.property_values.validate(values)) throw "invalid property: Agency.Agent.property_values"
-        else this.property_values = values
-        return true
-      },
-      getObject: function(){ return agencyState["property"][this.property_values] },
-      validate: ()=>{ return true }
+    document: agent => {
+      return  <div className="agent container-fill">
+                <div className="container-row">
+                  agent document: {agent.id}
+                </div>
+              </div>
     },
-    active_role: {
-      setValue: function(role){
-        if(role === null || role === undefined) this.active_role = {}
-        else if(!this.properties.active_role.validate(role)) throw "invalid property: Agency.Agent.active_role"
-        else this.active_role = role
-        return true
-      },
-      getObject: function(){ return agencyState["role"][this.active_role] },
-      validate: ()=>{ return true }
+    builder: (agent, updateHandler) => {
+      function Builder(props){
+
+        return  <div className="agent container-fill">
+                  <div className="container-row">
+                    agent builder: {agent.id}
+                  </div>
+                </div>
+      }
+
+      return <Builder agent={agent} updateHandler={updateHandler} />
     }
   }
 })
@@ -76,32 +80,20 @@ const displayProps = agencyState => ({
   component: {
     list: {
       columns: {
-        limited: [],
-        expanded: []
-      }
-    },
-    agencyObject: {
-      card: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
+        limited: [{label: "", selector: "id"}],
+        expanded: [{label: "", selector: "id"}]
       },
-      editor: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
-      },
-      builder: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
-      }
+      tableData: Object.values(agencyState.agent),
+      listActions: [{label: "New Agent", action: () => {
+        let newAgent = agencyObject("agent", {id: "new_object"}, err=>{console.log(err)})
+        return newAgent.display.builder(newAgent)
+      }}],
+      drawerComponents: [
+        {label: "card", component: item => item.display.card(item)},
+        {label: "document", component: item => item.display.document(item)},
+        {label: "modify", component: item => item.display.builder(item)}
+      ],
+      overlayComponents: []
     }
   }
 })

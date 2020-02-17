@@ -33,7 +33,7 @@ const prototype = agencyState => ({
         else this.structuralNode_parent_id = id
         return true
       },
-      getObject: function(){ return agencyState["structuralNode"][this.structuralNode_parent_id]},
+      getObject: function(){ return agencyState()["structuralNode"][this.structuralNode_parent_id]},
       validate: ()=>{ return true }
     },
     structuralNode_dataTag_ids: {
@@ -43,7 +43,7 @@ const prototype = agencyState => ({
         else this.structuralNode_dataTag_ids = ids
         return true
       },
-      getObject: function(){ return this.structuralNode_dataTag_ids.map(id => agencyState["dataTag"][id] )},
+      getObject: function(){ return this.structuralNode_dataTag_ids.map(id => agencyState()["dataTag"][id] )},
       validate: ()=>{ return true }
     },
     property_values: {
@@ -65,7 +65,84 @@ const prototype = agencyState => ({
       },
       getObject: function(){},
       validate: ()=>{ return true }
+    }
+  },
+  display: {
+    card: node => {
+      return  <div className="structuralNode container-row">
+                <div className="container">
+                  <div className="header">{node.structuralNode_label}</div>
+                  <div className="subheader">-{agencyState().structuralNode[node.structuralNode_parent_id].structuralNode_label}</div>
+                </div>
+                <div className="container">
+                  {
+                    node.structuralNode_dataTag_ids
+                      .map(id => agencyState().dataTag[id])
+                      .map(tag => tag.display.card(tag))
+                  }
+                </div>
+              </div>
     },
+    document: node => {
+      return  <div className="structuralNode container-fill">
+                <div className="container-row btm-border">
+                  {node.display.card(node)}
+                </div>
+
+                <div className="container">
+                  <label>Agents</label>
+                  {
+                    Object.values(agencyState().agent).filter(agent => agent.structuralNode_id = node.id)
+                      .map( agent => agent.display.document(agent))
+                  }
+                </div>
+
+                <div className="container">
+                  <label>Property Values</label>
+                  {
+                    node.property_values === undefined || node.property_values === null ? null : Object.entries(node.property_values).map( ([propertyId, propertyValue]) => {
+                      let property = agencyState().property[propertyId]
+                      property.properties.property_value.setValue.call(property, propertyValue)
+
+                      return property.display.document(property)
+                    })
+                  }
+                </div>
+              </div>
+    },
+    editor: (node, updateHandler) => {
+      function Editor(props){
+        return  <div className="structuralNode container-fill">
+                  <div className="container-row btm-border">{props.structuralNode.display.card(props.structuralNode)}</div>
+
+                  <div className="container">
+                    <label>Property Values</label>
+                    {
+                      Object.entries(props.structuralNode.property_values).map( ([propertyId, propertyValue]) => {
+                        let property = agencyState().property[propertyId]
+                        property.properties.property_value.setValue.call(property, propertyValue)
+                        return property.display.editor(property)
+                      })
+                    }
+                  </div>
+                </div>
+      }
+
+      return <Editor structuralNode={node} updateHandler={updateHandler} />
+    },
+    builder: (node, updateHandler) => {
+      function Builder(props){
+        return  <div className="structuralNode container-fill">
+                  <div className="container-row btm-border">{ node.display.card(node) }</div>
+
+                  <div className="container-row">
+                    structural node builder: {node.structuralNode_label}
+                  </div>
+                </div>
+      }
+
+      return <Builder structuralNode={node} updateHandler={updateHandler} />
+    }
   },
   typeFunctions: {
     getChildren: function(){
@@ -73,7 +150,12 @@ const prototype = agencyState => ({
       return Object.entries(stateStructuralNodes).filter( ([id, value]) => value.structuralNode_parent_id === this.id && value.structuralNode_parent_id !== id ).map(([key, value]) => value)
     },
     branch: function(id, allNodes){},
-    getNodeSupervisor: function(id, allNodes){}
+    getNodeSupervisor: function(id, allNodes){},
+    getProperties: function(){
+      let state = agencyState()
+      return this.structuralNode_dataTag_ids.map( id => state.dataTag[id])
+        .map( tag => tag.dataTag_property_ids.map(propId => state.properties[propId]))
+    }
   }
 })
 
@@ -88,46 +170,17 @@ const displayProps = agencyState => ({
         limited: [{label: "", selector: "structuralNode_label"}],
         expanded: [{label: "", selector: "structuralNode_label"}]
       },
-      iconComponent: item =>
-        <div>
-          {item.structuralNode_label}
-          <div>{Object.values(agencyState.dataTag).filter(tag => item.structuralNode_dataTag_ids.includes(tag.id)).map( tag=> <div className="dataTag">{tag.dataTag_label}</div>)}</div>
-        </div>,
-      listActions: [{label: "new node", action: () => {
-        let newNode = agencyObject("structuralNode", {}, null)
-        return newNode.display.call(newNode, agencyState, error=>{throw new Error(`${error}`)}).builder
-      }}],
-      drawerComponents: [
-        {label: "card", component: item => item.display.call(item, agencyState, error=>{throw new Error(`${error}: handled by Agency`)}).card},
-      ],
+      iconComponent: item => item.display.card(item),
+      listActions: [],
+      drawerComponents: [],
       overlayComponents: [
-        {label: "Add Branch", component: ()=>console.log("fire action to create branch node")},
-        {label: "editor", component: item => item.display.call(item, agencyState, error=>{throw new Error(`${error}: handled by Agency`)}).editor},
-        {label: "builder", component: item => item.display.call(item, agencyState, error=>{throw new Error(`${error}: handled by Agency`)}).builder},
+        {label: "Add Branch", component: item => {
+          let newNode = agencyObject("structuralNode", {id:"new_object", structuralNode_label: "new node", structuralNode_parent_id: item.id}, err=>{throw err})
+          return newNode.display.builder(newNode) }},
+        {label: "document", component: item => item.display.document(item)},
+        {label: "editor", component: item => item.display.editor(item)},
+        {label: "builder", component: item => item.display.builder(item)},
       ]
-    },
-    agencyObject: {
-      card: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
-      },
-      editor: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
-      },
-      builder: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
-      }
     }
   }
 })

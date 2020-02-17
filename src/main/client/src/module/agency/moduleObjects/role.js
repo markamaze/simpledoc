@@ -54,39 +54,21 @@ const displayProps = agencyState => ({
       tableData: Object.values(agencyState.role),
       listActions: [
         {label: "New Role", action: () => {
-          let newRole = agencyObject("role", {}, null)
+          let newRole = agencyObject("role", {id: "new_object"}, err=>console.log(err))
           return newRole.display.call(newRole, agencyState, error=>{throw new Error(`${error}`)}).builder
         }}
       ],
       drawerComponents: [
         {label: "card", component: item => item.display.call(item, agencyState, err=>{throw err}).card},
-      ],
-      overlayComponents: [
-        {label: "editor", component: item => item.display.call(item, agencyState, error=>{throw error}).editor},
         {label: "builder", component: item => item.display.call(item, agencyState, error=>{throw error}).builder}
-      ]
+      ],
+      overlayComponents: []
     },
     agencyObject: {
-      card: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
-      },
-      editor: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
-      },
-      builder: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
+      objectData: {
+        getObjectData: role => ({
+          label: role.role_label
+        })
       }
     }
   }

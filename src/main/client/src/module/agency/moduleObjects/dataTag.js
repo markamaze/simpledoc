@@ -62,6 +62,73 @@ const prototype = agencyState => ({
       validate: ()=>{ return true }
     }
   },
+  display: {
+    card: dataTag => {
+      return  <div className="dataTag container-row">{dataTag.dataTag_label}</div>
+    },
+    document: dataTag => {
+      let state = agencyState()
+      return  <div className="dataTaga container-fill">
+                <div className="container-row">{`dataTag label: ${dataTag.dataTag_label}`}</div>
+
+                <div className="container-row">
+                  <label>properties:</label>
+                  {
+                    dataTag.dataTag_property_ids
+                      .map( id => state.property[id] )
+                      .map( property => property.display.card(property))
+                  }
+                </div>
+              </div>
+    },
+    builder: (dataTag, updateHandler) => {
+      function Builder(props){
+        const [tempDataTag, updateTempDataTag] = React.useState(props.dataTag)
+        const updateHandler = newState => props.updateHandler ? props.updateHandler(newState)
+          : updateTempDataTag(Object.assign(Object.create(Object.getPrototypeOf(tempDataTag)), tempDataTag, newState))
+
+        const toggleProperty = property => {
+          tempDataTag.dataTag_property_ids.includes(property.id) ?
+            updateHandler({dataTag_property_ids: tempDataTag.dataTag_property_ids.filter(id => id === property.id)})
+            : updateHandler({dataTag_property_ids: [...tempDataTag.dataTag_property_ids, property.id]})
+        }
+
+        return  <div className="dataTag container-fill">
+
+                  <div className="container-row">
+                    <label>Set Label</label>
+                    <input value={tempDataTag.dataTag_label}
+                          onChange={() => updateHandler({dataTag_label: event.target.value})} />
+                  </div>
+
+                  <div className="container">
+                    <label>Set TagType</label>
+                    <select value={tempDataTag.dataTag_tagType}
+                            onChange={() => updateHandler({dataTag_tagType: event.target.value})} >
+                      <option value=""></option>
+                      <option value="agent">Agent</option>
+                      <option value="structural">Structural</option>
+                    </select>
+                  </div>
+
+                  <div className="container">
+                    <label>Set Tag Properties</label>
+                    {
+                      Object.values(agencyState().property).map( property =>
+                          <div onClick={() => toggleProperty(property)}
+                                className={tempDataTag.dataTag_property_ids.includes(property.id) ? "selected-property" : "unselected-property"}>{property.display.document(property)}</div>)
+                    }
+                  </div>
+
+                  { props.updateHandler ? null : tempDataTag.storage.handlers.call(tempDataTag) }
+
+
+                </div>
+      }
+
+      return <Builder dataTag={dataTag} updateHandler={updateHandler} />
+    }
+  },
   typeFunctions: {}
 })
 
@@ -80,37 +147,15 @@ const displayProps = agencyState => ({
       },
       tableData: Object.values(agencyState.dataTag),
       listActions: [{label: "New DataTag", action: () => {
-        let newDataTag = agencyObject("dataTag", {}, null)
-        return newDataTag.display.call(newDataTag, agencyState, error=>{throw new Error(`${error}`)}).builder
+        let newDataTag = agencyObject("dataTag", {id: "new_object", dataTag_label: "new dataTag", dataTag_tagType: "agent"}, err=>{console.log(err)})
+        return newDataTag.display.builder(newDataTag)
       }}],
-      drawerComponents: [{label: "card", component: item => item.display.call(item, agencyState, err=>{throw err}).card}],
+      drawerComponents: [
+        {label: "document", component: item => item.display.document(item)}
+      ],
       overlayComponents: [
-        {label: "editor", component: item => item.display.call(item, agencyState, err=>{throw err}).editor},
-        {label: "builder", component: item => item.display.call(item, agencyState, err=>{throw err}).builder}
+        {label: "modify", component: item => item.display.builder(item)}
       ]
-    },
-    agencyObject: {
-      card: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
-      },
-      editor: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
-      },
-      builder: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
-      }
     }
   }
 })

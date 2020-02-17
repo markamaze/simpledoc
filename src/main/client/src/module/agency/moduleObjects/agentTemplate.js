@@ -36,6 +36,73 @@ const prototype = agencyState => ({
       getObject: function(){ return this.agentTemplate_dataTag_ids.map(id => agencyState["dataTag"][id] ) },
       validate: (ids)=>{ return true }
     }
+  },
+  display: {
+    card: template => {
+      let store = agencyState()
+      return  <div className="agentTemplate container-row">
+                { template.agentTemplate_label }
+                {
+                  template.agentTemplate_dataTag_ids
+                    .map(id => store.dataTag[id])
+                    .map(tag => tag.display.card(tag))
+                }
+              </div>
+    },
+    document: template => {
+      let store = agencyState()
+      return  <div className="agentTemplate container-fill">
+                { template.display.card(template) }
+
+                <div className="container">
+                  {
+                    template.agentTemplate_dataTag_ids
+                      .map(id => store.dataTag[id])
+                      .map(tag => tag.display.document(tag))
+                  }
+                </div>
+              </div>
+    },
+    builder: (template, updateHandler) => {
+      function Builder(props){
+        const [tempTemplate, updateTempTemplate] = React.useState(props.agentTemplate)
+        const updateHandler = newState => props.updateHandler ? props.updateHandler(newState) :
+          updateTempTemplate(Object.assign(Object.create(Object.getPrototypeOf(tempTemplate)), tempTemplate, newState))
+
+        const toggleDataTag = dataTag => {
+          tempTemplate.agentTemplate_dataTag_ids.includes(dataTag.id) ?
+            updateHandler({agentTemplate_dataTag_ids: tempTemplate.agentTemplate_dataTag_ids.filter(id => id === dataTag.id)})
+            : updateHandler({agentTemplate_dataTag_ids: [...tempTemplate.agentTemplate_dataTag_ids, dataTag.id]})
+        }
+
+        return  <div className="agentTemplate container-fill">
+
+                  <div className="container-fill">
+                    <div className="container-row">
+                      <label>Set Template Label</label>
+                      <input value={tempTemplate.agentTemplate_label}
+                            onChange={() => updateHandler({agentTemplate_label: event.target.value})} />
+                    </div>
+
+                    <div className="container-row">
+                      <label>Set DataTags</label>
+                      {
+                        Object.values(agencyState().dataTag).map( tag =>
+                            <div onClick={() => toggleDataTag(tag)}
+                                  className={tempTemplate.agentTemplate_dataTag_ids.includes(tag.id) ? "selected-tag" : "unselected-tag"}>{tag.display.card(tag)}</div>)
+                      }
+                    </div>
+
+                  </div>
+
+                  { props.updateHandler ? null : tempTemplate.storage.handlers.call(tempTemplate) }
+
+                </div>
+      }
+
+      return <Builder agentTemplate={template} updateHandler={updateHandler} />
+
+    }
   }
 })
 
@@ -51,42 +118,20 @@ const displayProps = agencyState => ({
       },
       tableData: Object.values(agencyState.agentTemplate),
       listActions: [{label: "New Template", action: () => {
-        let newTemplate = agencyObject("agentTemplate", {}, null)
-        return newTemplate.display.call(newTemplate, agencyState, error=>{throw new Error(`${error}`)}).builder
+        let newTemplate = agencyObject("agentTemplate", {id: "new_object", agentTemplate_label: "new template"}, err=>{throw err})
+        return newTemplate.display.builder(newTemplate)
       }}],
       drawerComponents: [
-        {label: "card", component: item => item.display.call(item, agencyState, err=>{throw err}).card}
+        {label: "card", component: item => item.display.card(item)}
       ],
       overlayComponents: [
-        {label: "editor", component: item => item.display.call(item, agencyState, error=>{throw error}).editor},
-        {label: "builder", component: item => item.display.call(item, agencyState, error=>{throw error}).builder}
+        {label: "document", component: item => item.display.document(item)},
+        {label: "builder", component: item => item.display.builder(item)}
       ]
-    },
-    agencyObject: {
-      card: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
-      },
-      editor: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
-      },
-      builder: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
-      }
     }
   }
 })
+
 
 
 export { prototype, displayProps }

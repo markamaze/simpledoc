@@ -35,9 +35,87 @@ const prototype = agencyState => ({
       },
       getObject: function(){ return this.password },
       validate: pword => { return true }
+    },
+    property_values: {
+      setValue: function(values){
+        if(values === null || values === undefined) this.property_values = {}
+        else if(!this.properties.property_values.validate(values)) throw "invalid property: Agency.Agent.property_values"
+        else this.property_values = values
+        return true
+      },
+      getObject: function(){ return agencyState["property"][this.property_values] },
+      validate: ()=>{ return true }
     }
-  }
+  },
+  display: {
+    card: user => {
+      return  <div className="user container-row">{user.username}</div>
+    },
+    document: user => {
+      let store = agencyState()
+      return  <div className="user container-fill">
 
+                <div className="container-row btm-border">{ user.display.card(user) }</div>
+
+                <div className="container-row">
+                  <label>username:</label>
+                  <input type="text" disable value={user.username} />
+                </div>
+              </div>
+    },
+    editor: (user, updateHandler) => {
+      function Editor(props) {
+        const [tempUser, updateTempUser] = React.useState(props.user)
+        const updateHandler = newState => props.updateHandler ? props.updateHandler(newState)
+          : updateTempUser(Object.assign(Object.create(Object.getPrototypeOf(tempUser)), tempUser, newState))
+
+        return  <div className="user container-fill">
+                  <div className="container-fill">
+                    <div className="container-row btm-border">{ tempUser.display.card(tempUser) }</div>
+
+                    <div className="container">
+                      <label>Property Values</label>
+                    </div>
+                  </div>
+
+                  { props.updateHandler ? null : tempUser.storage.handlers.call(tempUser) }
+
+                </div>
+      }
+      return <Editor user={user} updateHandler={updateHandler} />
+    },
+    builder: (user, updateHandler) => {
+      function Builder(props){
+        const [tempUser, updateTempUser] = React.useState(props.user)
+        const updateHandler = newState => props.updateHandler ? props.updateHandler(newState)
+          : updateTempUser(Object.assign(Object.create(Object.getPrototypeOf(tempUser)), tempUser, newState))
+
+        return  <div className="user container-fill">
+                  <div className="container-fill">
+
+                    <div className="container-row btm-border">{tempUser.display.card(tempUser)}</div>
+
+                    <div className="container-row">
+                      <label>set username:</label>
+                      <input value={tempUser.username}
+                            onChange={() => updateHandler({username: event.target.value})} />
+                    </div>
+
+                    <div className="container-row">
+                      <label>update password:</label>
+                      <input value={tempUser.password}
+                            onChange={() => updateHandler({password: event.target.value})} />
+                    </div>
+                  </div>
+
+                  { props.updateHandler ? null : tempUser.storage.handlers.call(tempUser) }
+
+                </div>
+      }
+      return <Builder user={user} updateHandler={updateHandler} />
+    }
+  },
+  typeFunctions: {}
 })
 
 
@@ -49,48 +127,24 @@ const displayProps = agencyState => ({
       columns: {
         limited: [{label: "Username", selector: "username"}],
         expanded: [
-          {label: "Username", selector: "username"},
-          {label: "Password", selector: "password"},
-          {label: "userId", selector: "id"}
+          {label: "Username", selector: "username"}
         ]
       },
       tableData: Object.values(agencyState.user),
       listActions: [
         {label: "New User", action: () => {
-          let newUser = agencyObject("user", {}, null)
-          return newUser.display.call(newUser, agencyState, error=>{throw new Error(`${error}`)}).builder
+          let newUser = agencyObject("user", {id: "new_object", username:"new user", password: "password"}, err=>{throw err})
+          return newUser.display.builder(newUser)
         }}
       ],
       drawerComponents: [
-        {label: "card", component: item => item.display.call(item, agencyState, err=>{throw err}).card},
+        {label: "card", component: item => item.display.card(item)},
       ],
       overlayComponents: [
-        {label: "editor", component: item => item.display.call(item, agencyState, error=>{throw error}).editor},
-        {label: "builder", component: item => item.display.call(item, agencyState, error=>{throw error}).builder}
+        {label: "document", component: item => item.display.document(item)},
+        {label: "editor", component: item => item.display.editor(item)},
+        {label: "builder", component: item => item.display.builder(item)}
       ]
-    },
-    agencyObject: {
-      card: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
-      },
-      editor: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
-      },
-      builder: {
-        objectData: {},
-        properties: {},
-        tags: {},
-        assignments: {},
-        roles: {}
-      }
     }
   }
 })
