@@ -4,8 +4,9 @@ import colors from '../colors'
 
 
 export const ListWrapper = styled.div`
-  display: block;
-
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
   .list-header {
     padding: 1rem 3rem;
     align-self: center;
@@ -35,9 +36,19 @@ export const ListWrapper = styled.div`
     color: lightgray;
     height: 100%;
     width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
   }
-    .list-overlay-close{}
-    .list-overlay-body{}
+    .list-overlay-close{
+      display: flex;
+      flex-grow: 0;
+    }
+    .list-overlay-body{
+      display: flex;
+      flex-grow: 2;
+      overflow: auto;
+    }
     .list-overlay-options{
     }
 
@@ -61,19 +72,18 @@ export const ListWrapper = styled.div`
     }
     .table-row{
       border-bottom: solid thin ${colors.three};
-      line-height: 1.2rem
+      /* line-height: 1.2rem */
     }
     .table-row-active{
       background: ${colors.three};
       color: ${colors.four};
-      padding: 1rem 0;
-      margin: .5rem 0;
+      /* margin: .5rem; */
     }
 
   .row{
     display: flex;
   }
-    null.row-cell{
+    .row-cell{
       display: flex;
       flex-grow: 1;
       flex-basis: 0;
@@ -87,12 +97,15 @@ export const ListWrapper = styled.div`
     .row-expanded{
       display: flex;
       flex-direction: row;
+      .list-overlay-options{
+        display: flex;
+        flex-direction: row;
+      }
     }
     .row-drawer{
       background: white;
       color: black;
-      margin: 0 .5rem .5rem;
-    padding: .5rem;
+      padding-bottom: .25rem;
     }
       .row-drawer-tabs{
         display: flex;
@@ -108,6 +121,11 @@ export const ListWrapper = styled.div`
     cursor: pointer;
     background: ${colors.one};
     padding: .25rem;
+
+    .list-overlay-options {
+      display: flex;
+      flex-direction: column;
+    }
   }
 
   .tree{
@@ -115,12 +133,12 @@ export const ListWrapper = styled.div`
     max-width: 100%;
     flex-wrap: wrap;
     flex-direction: column;
+    align-content: space-evenly;
   }
     .tree-node{
       display: flex;
       flex-direction: row;
       padding: .5rem;
-      background: white;
     }
     .tree-branch{
       display: flex;

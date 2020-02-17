@@ -58,25 +58,32 @@ export const HeaderWrapper = styled.div`
 
   .subheader {
     display: flex;
-    justify-content: space-around;
     background ${colors.three};
     color: ${colors.four};
+    flex-wrap: wrap;
   }
   .subheader-item{
-
+    font-size: small;
+    display: flex;
+    flex-grow: 1;
+    justify-content: center;
+    min-width: 5rem;
   }
 
   .module-menu {
     position: absolute;
     right: 0;
     top: 0;
-    background: ${colors.two};
-    color: ${colors.one};
-    width: 85%;
-    height: 85%;
+    background: ${colors.three};
+    color: ${colors.four};
+    padding: .5rem 0
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   .module-menu-item {
-
+    display: flex;
+    padding: .5rem;
   }
   .selected-module {
   }
@@ -88,6 +95,7 @@ export const FooterWrapper = styled.div`
   color: ${colors.four};
   display: flex;
   width: 100%;
+  box-sizing: border-box;
   padding: .5rem 1rem 1rem;
   height: 1rem;
   p {

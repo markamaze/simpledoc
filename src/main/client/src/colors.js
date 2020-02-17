@@ -1,7 +1,7 @@
 const colors = {
   one: '#C09F80',
   two: '#76323F',
-  three: '#565656',
+  three: '#4d4d75',
   four: '#D7CEC7'
 }
 
