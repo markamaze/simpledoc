@@ -61,6 +61,9 @@ public class AgencyValidator extends ModuleValidation {
 		case "AGENCY.STRUCTURALNODE":
 		case "AGENCY.DATATAG":
 		case "AGENCY.USER":
+		case "AGENCY.ASSIGNMENT":
+		case "AGENCY.ROLE":
+		case "AGENCY.PROPERTY":
 			return true;
       default: return false;
     }
