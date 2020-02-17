@@ -17,6 +17,18 @@ function AgencyPage(props){
             </AgencyPageWrapper>
 }
 
+function AgentManagerPage(props){
+
+    const agencyState = useSelector(state => (state.agency))
+    const displayProps = agencyTypeData("agent", agencyState).component.list
+
+    return  <AgencyPageWrapper id="agent-module" className="module-wrapper">
+              <ErrorBoundary displayName="AgentManager" >
+                <List {...displayProps} headerComponent={<div className="page-header">Agents</div>}/>
+              </ErrorBoundary>
+              </AgencyPageWrapper>
+}
+
 function TemplatesManagerPage(props){
   const agencyState = useSelector(state => state.agency)
   const displayProps = agencyTypeData("agentTemplate", agencyState).component.list
@@ -94,6 +106,7 @@ function PropertyManagerPage(props){
 }
 
 export { AgencyPage,
+          AgentManagerPage,
           UsersManagerPage,
           DataTagsManagerPage,
           TemplatesManagerPage,
