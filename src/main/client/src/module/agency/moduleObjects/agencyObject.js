@@ -1,8 +1,7 @@
 import React from 'react'
-import AgencyObject from '../moduleComponents/AgencyObject'
 
 import store from '../../../store'
-import { createAgencyObject, updateAgencyObject, deleteAgencyObject }  from '../module_actions'
+import { createAgencyObjects, updateAgencyObjects, removeAgencyObjects }  from '../module_actions'
 import uuidv4 from 'uuid/v4'
 
 import * as user from './user'
@@ -90,8 +89,8 @@ const agencyObjectPrototype = (objectPrototype) => ({
     else if(type === "dataTag") type = "AGENCY.DATATAG"
     else if(type === "user") type = "AGENCY.USER"
     else if(type === "assignment") type = "AGENCY.ASSIGNMENT"
-    else if(type === "role") type = "AGENCY.ROLE"
-    else throw "invalid operation"
+    else if(type === "property") type = "AGENCY.PROPERTY"
+    else throw "cannot convert to JSON: unknown agencyObject type"
 
     let objectData = Object.entries(this).filter(entry => entry[0] !== "id")
     return `{
@@ -101,47 +100,40 @@ const agencyObjectPrototype = (objectPrototype) => ({
     }`
   },
 
-  //remove arg "props"
-  display: function(agencyState, onError){
-    return {
-      card:     <AgencyObject.Card className="agencyObject-card"
-                    displayProps={agencyDisplayProps[this.type()](agencyState).component.agencyObject.card}
-                    dataItem={this}
-                    onError={onError} />,
-      editor:   <AgencyObject.Editor className="agencyObject-editor"
-                    displayProps={agencyDisplayProps[this.type()](agencyState).component.agencyObject.editor}
-                    dataItem={this}
-                    onError={onError} />,
-      builder:  <AgencyObject.Builder className="agencyObject-builder"
-                    displayProps={agencyDisplayProps[this.type()](agencyState).component.agencyObject.builder}
-                    dataItem={this}
-                    onError={onError} />
-    }},
-
   storage: {
+    handlers: function(){
+      return  <div className="storage-handlers" key={`storage-handlers-${this.id}`}>
+                <div className="storage-handler-item"
+                      key={this.storage.save.key.call(this)}
+                      onClick={()=>this.storage.save.action.call(this, err=>{throw err})}>{this.storage.save.label}</div>
+                <div className="storage-handler-item"
+                      key={this.storage.delete.key.call(this)}
+                      onClick={()=>this.storage.delete.action.call(this, err=>{throw err})}>{this.storage.delete.label}</div>
+              </div>
+    },
     save: {
       label: "Submit",
       key: function(){return `action-creater-save-${this.type()}-${this.id}`},
-      action: function(success, failure, confirm){
+      action: function(failure){
                 let result
                 try{
-                  if(!confirm || !confirm()) return false
-                  result = this.id === "new_object" ? storageActions.createAgencyObject(this, success, failure)
-                    : storageActions.updateAgencyObject(this, success, failure)
+                  if(confirm && !confirm()) return false
+                  result = this.id === "new_object" ? createAgencyObjects(this, failure)
+                    : updateAgencyObjects(this, failure)
 
-                  result.error ? failure(result) : success(result)
-                } catch(err){ failure(err) }}
+                  return result.error ? failure(result) : true
+
+                } catch(err){ throw err }}
     },
     delete: {
       label: "Delete",
       key: function(){return `action-creater-delete-${this.type()}-${this.id}`},
-      action: function(success, failure, confirm){
+      action: function(failure){
                 let result
                 try{
-                  if(!confirm || !confirm()) return false
-                  result  = storageActions.deleteAgencyObject(this, success, failure)
+                  result  = removeAgencyObjects(this, failure)
 
-                  result.error ? failure(result) : success(result)
+                  return result.error ? failure(result) : true
                 } catch(err){ failure(err) }}
     }
   }
