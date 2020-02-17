@@ -13,7 +13,7 @@ export function loadAgencyStore(){
 }
 
 export function createAgencyObjects(objectSet, failure){
-  post(`/agency`, function(request){
+  post(`/Agency`, objectSet, function(request){
     let result = JSON.parse(request.response)
 
     if(result.error) failure(result.error)
@@ -21,7 +21,7 @@ export function createAgencyObjects(objectSet, failure){
 }
 
 export function updateAgencyObjects(objectSet, failure){
-  put(`/agency`, function(request){
+  put(`/Agency`, objectSet, function(request){
     let result = JSON.parse(request.response)
 
     if(result.error) failure(result.error)
@@ -34,7 +34,7 @@ export function updateAgencyObjects(objectSet, failure){
 }
 
 export function removeAgencyObjects(objectSet, failure){
-  remove(`/agency`, function(request){
+  remove(`/Agency`, objectSet, function(request){
     let result = JSON.parse(request.response)
 
     if(result.error) failure(result.error)
