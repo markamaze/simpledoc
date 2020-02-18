@@ -19,24 +19,25 @@ export default function form_reducer(state=initialState, action) {
         let newformObject = formObject(form_object.type, {...form_object}, err=> {throw err})
         Object.assign(newState, {[`${form_object.type}`]: Object.assign(newState[form_object.type], {[`${form_object.id}`]:newformObject} )})
       })
-      console.log(newState)
-
       return newState
+    }
+
+    case "CREATE_FORM_OBJECTS": {
+      console.log("createFormObject", action.payload)
+
+      return state
     }
 
     case "UPDATE_FORM_OBJECTS": {
-      let newState = Object.assign({}, state)
-      action.payload.forEach( ([key, value]) => {
-        newState = Object.assign({}, newState,
-          { [`newState[${key}]`]:{
-            [`newState[${key}][${value.id}]`] : formObject(key, value, action.failure)} }) })
-      console.log(newState)
+      console.log("updateFormObject", action.payload)
 
-      return newState
+      return state
     }
 
     case "DELETE_FORM_OBJECTS": {
+      console.log("deleteFormObject", action.payload)
 
+      return state
     }
     default: return state
 

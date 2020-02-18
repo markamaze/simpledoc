@@ -42,11 +42,33 @@ export function loadSubmissions(){
 }
 
 export function createFormObject(object, failure){
-  console.log("createFormObject", object)
+  post(`/Forms`, objectSet, function(request){
+    let result = JSON.parse(request.response)
+    if(result.error) failure(result.error)
+    else store.dispatch({
+      type: "CREATE_FORM_OBJECTS",
+      payload: objectSet
+    })
+  })
 }
+
 export function updateFormObject(object, failure){
-  console.log("updateFormObject", object)
+  put(`/Forms`, objectSet, function(request){
+  let result = JSON.parse(request.response)
+  if(result.error) failure(result.error)
+  else store.dispatch({
+    type: "UPDATE_FORM_OBJECTS",
+    payload: objectSet
+  })
+})
 }
 export function deleteFormObject(object, failure){
-  console.log("deleteFormObject", object)
+  remove(`/Forms`, objectSet, function(request){
+    let result = JSON.parse(request.response)
+    if(result.error) failure(result.error)
+    else store.dispatch({
+      type: "DELETE_FORM_OBJECTS",
+      payload: objectSet
+    })
+  })
 }

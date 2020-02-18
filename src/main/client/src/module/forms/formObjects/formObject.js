@@ -88,6 +88,9 @@ const formObjectPrototype = (objectPrototype) => ({
 
   storage: {
     handlers: function(){
+
+      //take all subobjects and create a set of each object?
+
       return  <div className="storage-handlers" key={`storage-handlers-${this.id}`}>
                 <div className="storage-handler-item"
                       key={this.storage.save.key.call(this)}
