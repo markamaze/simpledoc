@@ -157,7 +157,6 @@ export const ListWrapper = styled.div`
 
 
   .action-handler{
-    font-size: x-small;
     font-style: italic;
     padding: .2rem;
     display: flex;

@@ -41,6 +41,12 @@ export function loadSubmissions(){
   }, function() { console.log("error loading submissions")})
 }
 
-export function createFormObject(object, success, failure){}
-export function updateFormObject(object, success, failure){}
-export function deleteFormObject(object, success, failure){}
+export function createFormObject(object, failure){
+  console.log("createFormObject", object)
+}
+export function updateFormObject(object, failure){
+  console.log("updateFormObject", object)
+}
+export function deleteFormObject(object, failure){
+  console.log("deleteFormObject", object)
+}
