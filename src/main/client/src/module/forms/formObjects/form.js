@@ -52,6 +52,43 @@ const prototype = getFormState => ({
       validate: settings => { return true }
     }
   },
+  display: {
+    document: form => {
+      return  <div className="container-fill">
+                form document
+              </div>
+    },
+    editor: (form, updateHandler) => {
+      return  <div className="container-fill">
+                form editor
+              </div>
+    },
+    creator: (form, updateHandler) => {
+      function Creator(props){
+        const [tempForm, updateTempForm] = React.useState(props.form)
+        const updateHandler = newState => props.updateHandler ? props.updateHandler(newState)
+          : updateTempForm(Object.assign(Object.create(Object.getPrototypeOf(tempForm)), tempForm, {...newState}))
+
+        return  <div className="container-fill">
+
+                  <div className="container">
+                    <label>Form Title:</label>
+                    <input type="text" value={tempForm.label}
+                            onChange={()=>updateHandler({label: event.target.value})} />
+                  </div>
+
+                  <div className="container">
+                    <label>Add Section:</label>
+                  </div>
+
+                  { props.updateHandler ? null : tempForm.storage.handlers.call(tempForm) }
+
+                </div>
+      }
+
+      return <Creator form={form} updateHandler={updateHandler} />
+    }
+  },
   typeFunctions: {
     formSections: function(){
       let formStore = getFormState()
@@ -73,42 +110,16 @@ const displayProps = formState => ({
       listActions: [
         { label: "create form", action: () => {
             let newForm = formObject("form", {id: "new_object", label: "new form"}, error => console.log(error))
-            return newForm.display.call(newForm, formState, error => console.log(error)).creator
+            return newForm.display.creator(newForm)
         }}
       ],
       drawerComponents: [
-        {label: "show form", component: item => item.display.call(item, formState, err=>{throw err}).document}
+        {label: "show form", component: item => item.display.document(item)}
       ],
       overlayComponents: [
-        {label: "editor", component: item => item.display.call(item, formState, err=>{throw err}).editor},
-        {label: "creator", component: item => item.display.call(item, formState, err=>{throw err}).creator}
+        {label: "editor", component: item => item.display.editor(item)},
+        {label: "creator", component: item => item.display.creator(item)}
       ]
-    },
-    formDisplay: {
-      document: {
-        formInfo: form => { console.log(form) },
-        sections: form => { console.log(form) },
-        layouts: section => { console.log(section)},
-        elements: layout => { console.log(layout) },
-        completionRules: form => { console.log(form) },
-        securityRules: form => { console.log(form) }
-      },
-      editor: {
-        formInfo: form => { console.log(form) },
-        sections: form => { console.log(form) },
-        layouts: section => { console.log(section)},
-        elements: layout => { console.log(layout) },
-        completionRules: form => { console.log(form) },
-        securityRules: form => { console.log(form) }
-      },
-      creator: {
-        formInfo: form => { console.log(form) },
-        sections: form => { console.log(form) },
-        layouts: section => { console.log(section)},
-        elements: layout => { console.log(layout) },
-        completionRules: form => { console.log(form) },
-        securityRules: form => { console.log(form) }
-      }
     }
   }
 })

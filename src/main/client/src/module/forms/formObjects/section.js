@@ -66,6 +66,11 @@ const prototype = getFormState => ({
       validate: settings => { return true }
     }
   },
+  display: {
+    document: section => {},
+    editor: section => {},
+    creator: sectino => {}
+  },
   typeFunctions: {}
 })
 

@@ -88,6 +88,11 @@ const prototype = getFormState => ({
       validate: id => { return true }
     }
   },
+  display: {
+    document: submission => {},
+    editor: submission => {},
+    creator: submission => {}
+  },
   typeFunctions: {}
 })
 

@@ -56,6 +56,11 @@ const prototype = getFormState => ({
       validate: settings => { return true }
     }
   },
+  display: {
+    document: formSet => {},
+    editor: formSet => {},
+    creator: formSet => {}
+  },
   typeFunctions: {}
 })
 

@@ -1,5 +1,4 @@
 import React from 'react'
-import FormDisplay from '../formComponents/FormDisplay'
 import uuidv4 from 'uuid/v4'
 
 
@@ -87,47 +86,40 @@ const formObjectPrototype = (objectPrototype) => ({
     }`
   },
 
-  display: function(formState, onError){
-    return {
-      document: <FormDisplay.Document className="formObject-document"
-                    displayProps={formDisplayProps[this.type()](formState).component.formDisplay.document}
-                    dataItem={this}
-                    onError={onError} >document</FormDisplay.Document>,
-      editor:   <FormDisplay.Editor className="formObject-editor"
-                    displayProps={formDisplayProps[this.type()](formState).component.formDisplay.editor}
-                    dataItem={this}
-                    onError={onError} >editor</FormDisplay.Editor>,
-      creator:  <FormDisplay.Creator className="formObject-creator"
-                    displayProps={formDisplayProps[this.type()](formState).component.formDisplay.creator}
-                    dataItem={this}
-                    onError={onError} >creator</FormDisplay.Creator>
-
-  }},
-
   storage: {
+    handlers: function(){
+      return  <div className="storage-handlers" key={`storage-handlers-${this.id}`}>
+                <div className="storage-handler-item"
+                      key={this.storage.save.key.call(this)}
+                      onClick={()=>this.storage.save.action.call(this, err=>{throw err})}>{this.storage.save.label}</div>
+                <div className="storage-handler-item"
+                      key={this.storage.delete.key.call(this)}
+                      onClick={()=>this.storage.delete.action.call(this, err=>{throw err})}>{this.storage.delete.label}</div>
+              </div>
+    },
     save: {
       label: "Submit",
       key: function(){return `action-creater-save-${this.type()}-${this.id}`},
-      action: function(success, failure, confirm){
+      action: function(failure){
                 let result
                 try{
                   if(!confirm || !confirm()) return false
-                  result = this.id === "new_object" ? storageActions.createFormObject(this, success, failure)
-                    : storageActions.updateFormObject(this, success, failure)
+                  result = this.id === "new_object" ? storageActions.createFormObject(this, failure)
+                    : storageActions.updateFormObject(this, failure)
 
-                  result.error ? failure(result) : success(result)
+                  // result.error ? failure(result) : success(result)
                 } catch(err){ failure(err) }}
     },
     delete: {
       label: "Delete",
       key: function(){return `action-creater-delete-${this.type()}-${this.id}`},
-      action: function(success, failure, confirm){
+      action: function(failure){
                 let result
                 try{
                   if(!confirm || !confirm()) return false
-                  result  = storageActions.deleteFormObject(this, success, failure)
+                  result  = storageActions.deleteFormObject(this, failure)
 
-                  result.error ? failure(result) : success(result)
+                  // result.error ? failure(result) : success(result)
                 } catch(err){ failure(err) }}
     }
   }
