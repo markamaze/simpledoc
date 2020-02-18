@@ -48,7 +48,7 @@ const agencyObjectPrototype = (objectPrototype) => ({
     let propObjects = Object.entries(objectPrototype.properties)
 
     if(state === null || state === undefined) success = false
-    else if(state.id === "new_object") state.id = uuidv4()
+    // else if(state.id === "new_object") state.id = uuidv4()
 
     while(success && index < propObjects.length){
       let property = propObjects[index]
@@ -118,10 +118,11 @@ const agencyObjectPrototype = (objectPrototype) => ({
                 let result
                 try{
                   if(confirm && !confirm()) return false
+                  // result = createAgencyObjects(this, failure)
                   result = this.id === "new_object" ? createAgencyObjects(this, failure)
                     : updateAgencyObjects(this, failure)
 
-                  return result.error ? failure(result) : true
+                  return result && result.error ? failure(result) : true
 
                 } catch(err){ throw err }}
     },
@@ -133,7 +134,7 @@ const agencyObjectPrototype = (objectPrototype) => ({
                 try{
                   result  = removeAgencyObjects(this, failure)
 
-                  return result.error ? failure(result) : true
+                  return result && result.error ? failure(result) : true
                 } catch(err){ failure(err) }}
     }
   }
