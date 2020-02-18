@@ -90,8 +90,7 @@ export const ListWrapper = styled.div`
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      font-size: small;
-      justify-content: center;
+      justify-content: justified;
       cursor: pointer;
     }
     .row-expanded{
@@ -137,8 +136,10 @@ export const ListWrapper = styled.div`
   }
     .tree-node{
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       padding: .5rem;
+      margin: .25rem;
+      width: 100%;
     }
     .tree-branch{
       display: flex;
@@ -148,7 +149,7 @@ export const ListWrapper = styled.div`
       padding: .25rem;
       width: 100%;
       box-sizing: border-box;
-      border: solid thin ${colors.four};
+      border-left: solid ${colors.three};
     }
 
 

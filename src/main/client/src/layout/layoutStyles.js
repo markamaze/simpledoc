@@ -63,8 +63,8 @@ export const HeaderWrapper = styled.div`
     flex-wrap: wrap;
   }
   .subheader-item{
-    font-size: small;
     display: flex;
+    padding: .5rem;
     flex-grow: 1;
     justify-content: center;
     min-width: 5rem;
