@@ -39,22 +39,22 @@ const prototype = agencyState => ({
       getObject: function(){ return this.property_value_type},
       validate: ()=>{ return true }
     },
-    property_value:{
-      setValue: function(value){
-        if(value === null || value === undefined) this.property_value = null
-        else if(!this.properties.property_value.validate(value)) throw "invalid property: Agency.Property.property_value"
-        else this.property_value = value
-        return true
-      },
-      validate: () => {return true}
-    }
+    // property_value:{
+    //   setValue: function(value){
+    //     if(value === null || value === undefined) this.property_value = null
+    //     else if(!this.properties.property_value.validate(value)) throw "invalid property: Agency.Property.property_value"
+    //     else this.property_value = value
+    //     return true
+    //   },
+    //   validate: () => {return true}
+    // }
   },
   display: {
     card: property => {
       return  <div className="property container-row">{`Key: ${property.property_key}`}</div>
     },
     document: property => {
-      return  <div className="property container-fill">{property.property_key}:{property.property_value ? property.property_value : `(${property.property_value_type})`}</div>
+      return  <div className="property container-fill">{property.property_key}:{`(${property.property_value_type})`}</div>
     },
     editor: (property, updateHandler) => {
       function Editor(props){
@@ -67,8 +67,8 @@ const prototype = agencyState => ({
                   <div className="container-row">
                     {props.property.property_key}:
                     <input type="text"
-                          value={props.property.property_value}
-                          onChange={() => updateHandler({property_value: event.target.value})} />
+                          value={props.property.property_value_type}
+                          onChange={() => updateHandler({property_value_type: event.target.value})} />
                   </div>
                 </div>
       }

@@ -6,10 +6,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import simpledoc.exceptions.ServiceErrorException;
+
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.json.JSONObject;
+import org.postgresql.util.PGobject;
 
 import java.util.UUID;
 
@@ -19,12 +22,14 @@ public class User extends ModuleObject {
 
 	private String username;
 	private String password;
+	private Map<UUID, String> property_values;
 
 	User(UUID id, String type) { super(id, type); }
 	User(UUID user_id, String type, Map<String, Object> data) throws ServiceErrorException {
 		super(user_id, type);
 		setUsername(data.get("username").toString());
 		setPassword(data.get("password").toString());
+		setPropertyValues(data.get("property_values"));
 	}
 
 	
@@ -36,9 +41,24 @@ public class User extends ModuleObject {
 		if(AgencyValidator.validateString(object, 8, 32, false, true)) this.password = object.toString();
 		else throw new ServiceErrorException("invalid password");
 	}
+	private void setPropertyValues(Object object) throws ServiceErrorException {
+		if(object instanceof Map) this.property_values = (Map<UUID, String>) object;
+		else if(object instanceof PGobject) {
+			JSONObject asJson = new JSONObject(((PGobject)object).getValue());
+			Map<UUID, String> propertyValues = new HashMap<UUID, String>();
+			for(String uuid : asJson.keySet()) { 
+				if(!AgencyValidator.validateUUIDString(uuid)) 
+					throw new ServiceErrorException("invalid uuid found in StructuralNode.property_values");
+				else 
+				propertyValues.put(UUID.fromString(uuid), asJson.get(uuid).toString());
+			};
+			this.property_values = propertyValues;
+		}
+	}
 	
 	public String getUsername() { return this.username; }
 	public String getPassword() { return this.password; }
+	public Map<UUID,String> getPropertyValues() { return this.property_values; }
 	
 	@Override
 	public boolean update(Map<String, Object> objectData) throws ServiceErrorException {
@@ -57,6 +77,7 @@ public class User extends ModuleObject {
 	public boolean readStorageResult(ResultSet rs) throws ServiceErrorException, SQLException {
 		setUsername(rs.getString("username"));
 		setPassword(rs.getString("password"));
+//		setPropertyValues(rs.getObject("property_values"));
 
 		return true;
 	}	

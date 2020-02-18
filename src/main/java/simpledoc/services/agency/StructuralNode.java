@@ -137,18 +137,18 @@ public class StructuralNode extends ModuleObject {
 	public PreparedStatement writeStorageStatement(String type, Connection connection) throws ServiceErrorException, SQLException {
 		PreparedStatement statement = null;
 		
-		if(type.equals("create")) statement = connection.prepareStatement("call agency.create_structuralNode(?,?,?,?,?,?,?)");
-		else if(type.equals("update")) statement = connection.prepareStatement("call agency.update_structuralnode(?,?,?,?,?,?,?)");
+		if(type.equals("create")) statement = connection.prepareStatement("call agency.create_structuralNode(?,?,?,?,?,?)");
+		else if(type.equals("update")) statement = connection.prepareStatement("call agency.update_structuralnode(?,?,?,?,?,?)");
 			
 		PGobject propertiesPG = new PGobject();
-		JSONArray arr = new JSONArray(this.getPropertyValues());
+		JSONObject jsonPropertyValues = new JSONObject(this.getPropertyValues());
 		propertiesPG.setType("json");
-		propertiesPG.setValue(arr.toString());
+		propertiesPG.setValue(jsonPropertyValues.toString());
 			
 		PGobject assignmentsPG = new PGobject();
-		JSONArray asgnArr = new JSONArray(this.getActiveAssignments());
+		JSONObject jsonAssignments = new JSONObject(this.getActiveAssignments());
 		assignmentsPG.setType("json");
-		assignmentsPG.setValue(asgnArr.toString());
+		assignmentsPG.setValue(jsonAssignments.toString());
 			
 		statement.setObject(1, this.getId());
 		statement.setString(2, this.getStructuralNodeLabel());

@@ -15,8 +15,11 @@ export function loadAgencyStore(){
 export function createAgencyObjects(objectSet, failure){
   post(`/Agency`, objectSet, function(request){
     let result = JSON.parse(request.response)
-
     if(result.error) failure(result.error)
+    else store.dispatch({
+      type: "CREATE_AGENCY_OBJECTS",
+      payload: objectSet
+    })
   })
 }
 

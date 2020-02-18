@@ -132,12 +132,48 @@ const prototype = agencyState => ({
     },
     builder: (node, updateHandler) => {
       function Builder(props){
+        const [tempNode, setTempNode] = React.useState(props.structuralNode)
+        const updateHandler = newState => props.updateHandler ? props.updateHandler(newState)
+          : setTempNode(Object.assign(Object.create(Object.getPrototypeOf(tempNode)), tempNode, newState))
+
+
+        const toggleDataTag = dataTag => {
+          tempNode.structuralNode_dataTag_ids.includes(dataTag.id) ?
+            updateHandler({structuralNode_dataTag_ids: tempNode.structuralNode_dataTag_ids.filter(id => id === dataTag.id)})
+            : updateHandler({structuralNode_dataTag_ids: [...tempNode.structuralNode_dataTag_ids, dataTag.id]})
+        }
+
         return  <div className="structuralNode container-fill">
                   <div className="container-row btm-border">{ node.display.card(node) }</div>
 
                   <div className="container-row">
-                    structural node builder: {node.structuralNode_label}
+                    <label>Node Title:</label>
+                    <input type="text" value={tempNode.structuralNode_label}
+                          onChange={() => updateHandler({structuralNode_label: event.target.value})} />
                   </div>
+
+                  <div className="container-row">
+                    <label>Parent Node:</label>
+                    <select onChange={()=> updateHandler({structuralNode_parent_id})} value={tempNode.structuralNode_parent_id}>
+                      <option>select parent node</option>
+                      {
+                        Object.values(agencyState().structuralNode).map( node =>
+                          <option value={node.id}>{node.structuralNode_label}</option>)
+                      }
+                    </select>
+                  </div>
+
+                  <div className="container-row">
+                    <label>Set DataTags</label>
+                    {
+                      Object.values(agencyState().dataTag).map( tag =>
+                          <div onClick={() => toggleDataTag(tag)}
+                                className={tempNode.structuralNode_dataTag_ids.includes(tag.id) ? "selected-tag" : "unselected-tag"}>{tag.display.card(tag)}</div>)
+                    }
+                  </div>
+
+                  { props.updateHandler ? null : tempNode.storage.handlers.call(tempNode) }
+
                 </div>
       }
 
@@ -170,9 +206,8 @@ const displayProps = agencyState => ({
         limited: [{label: "", selector: "structuralNode_label"}],
         expanded: [{label: "", selector: "structuralNode_label"}]
       },
-      iconComponent: item => item.display.card(item),
       listActions: [],
-      drawerComponents: [],
+      drawerComponents: [{label: "card", component: item => item.display.card(item)}],
       overlayComponents: [
         {label: "Add Branch", component: item => {
           let newNode = agencyObject("structuralNode", {id:"new_object", structuralNode_label: "new node", structuralNode_parent_id: item.id}, err=>{throw err})

@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import simpledoc.exceptions.ServiceErrorException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -45,12 +46,12 @@ public class DataTag extends ModuleObject {
 		else throw new ServiceErrorException("invalid property for DataTag.dataTag_tagType");
 	}
 	private void setDataTagPropertyIds(Object object) throws ServiceErrorException, SQLException {	
-		if(object instanceof Set) this.dataTag_property_ids = (Set<UUID>) object;
+		if(object instanceof ArrayList) this.dataTag_property_ids = new HashSet<UUID>((ArrayList<UUID>)object);
 		else if(object instanceof PgArray) this.dataTag_property_ids = new HashSet<UUID>(Arrays.asList((UUID[])((PgArray)object).getArray()));
 		else throw new ServiceErrorException("invalid property for DataTag.dataTag_property_ids");
 	}
 	private void setTypeObjectIds(Object object) throws ServiceErrorException, SQLException {
-		if(object instanceof Set) this.dataTag_typeObject_ids = (Set<UUID>) object;
+		if(object instanceof ArrayList) this.dataTag_typeObject_ids = new HashSet<UUID>((ArrayList<UUID>)object);
 		else if(object instanceof PgArray) this.dataTag_typeObject_ids = new HashSet<UUID>(Arrays.asList((UUID[])((PgArray)object).getArray()));
 		else throw new ServiceErrorException("invalid type object for data tag");
 	}

@@ -87,6 +87,15 @@ public class AgencyService implements ServiceModule {
 					case "AGENCY.USER":
 						resource.add("user");
 						break;
+					case "AGENCY.ASSIGNMENT":
+						resource.add("assignment");
+						break;
+					case "AGENCY.PROPERTY":
+						resource.add("property");
+						break;						
+					case "AGENCY.ROLE":
+						resource.add("role");
+						break;
 				}
 				resource.add(id);
 				T currentObj;
