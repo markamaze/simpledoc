@@ -51,7 +51,7 @@ const prototype = agencyState => ({
   },
   display: {
     card: property => {
-      return  <div className="property container-row">{`Key: ${property.property_key}`}</div>
+      return  <div className="property container">{property.property_key}</div>
     },
     document: property => {
       return  <div className="property container-fill">{property.property_key}:{`(${property.property_value_type})`}</div>

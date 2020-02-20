@@ -2,9 +2,7 @@ CREATE TABLE agency.agent (
   id UUID,
   agent_user_id UUID,
   structuralNode_id UUID,
-  assignment_id UUID,
-  property_values JSON,
-  active_role_id UUID
+  assignment_id UUID
 );
 
 
@@ -13,9 +11,7 @@ CREATE OR REPLACE PROCEDURE agency.create_agent (
   _id UUID,
   _agent_user_id UUID,
   _structuralNode_id UUID,
-  _assignment_id UUID,
-  _property_values JSON,
-  _active_role_id UUID
+  _assignment_id UUID
 )
 LANGUAGE sql
 AS $procedure$
@@ -23,10 +19,8 @@ AS $procedure$
     id,
     agent_user_id,
     structuralNode_id,
-    assignment_id,
-    property_values,
-    active_role_id )
-  VALUES ( _id, _agent_user_id, _structuralNode_id, _assignment_id, _property_values, _active_role_id );
+    assignment_id )
+  VALUES ( _id, _agent_user_id, _structuralNode_id, _assignment_id );
 $procedure$;
 
 
@@ -35,9 +29,7 @@ CREATE OR REPLACE PROCEDURE agency.update_agent (
   _id UUID,
   _agent_user_id UUID,
   _structuralNode_id UUID,
-  _assignment_id UUID,
-  _property_values JSON,
-  _active_role_id UUID)
+  _assignment_id UUID )
 LANGUAGE sql
 AS $procedure$
   UPDATE
@@ -45,9 +37,7 @@ AS $procedure$
   SET
     agent_user_id = _agent_user_id,
     structuralNode_id = _structuralNode_id,
-    assignment_id = _assignment_id,
-    property_values = _property_values,
-    active_role_id = _active_role_id
+    assignment_id = _assignment_id
   WHERE
     id = _id;
 $procedure$;
@@ -74,9 +64,7 @@ AS $function$
     id,
     agent_user_id,
     structuralNode_id,
-    assignment_id,
-    property_values,
-    active_role_id
+    assignment_id
   FROM agency.agent
 $function$;
 

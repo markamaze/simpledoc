@@ -40,11 +40,10 @@ const prototype = agencyState => ({
     }
   },
   display: {
-    card: assignment => {
-      let position = agencyState().agentTemplate[assignment.agentTemplate_id]
-
-      return  <div className="assignment container-row">{`Position: ${position.agentTemplate_label}`}</div>
-    },
+    card: assignment =>
+      <div className="assignment container">
+        {agencyState().agentTemplate[assignment.agentTemplate_id].agentTemplate_label}
+      </div>,
     document: assignment => {
       let store = agencyState()
       let position = store.agentTemplate[assignment.agentTemplate_id]
@@ -86,7 +85,7 @@ const prototype = agencyState => ({
                           {
                             Object.values(agencyState().assignment).map( assignment => {
                               let assignmentTemplate = agencyState().agentTemplate[assignment.agentTemplate_id]
-                              return <option value={assignmentTemplate.id}>{assignmentTemplate.agentTemplate_label}</option>
+                              return <option value={assignment.id}>{assignmentTemplate.agentTemplate_label}</option>
                             })
                           }
                       </select>
@@ -109,10 +108,7 @@ const displayProps = agencyState => ({
   displayKey: "id",
   component: {
     list: {
-      columns: {
-        limited: [{label: "", selector: "id"}],
-        expanded: [{label: "", selector: "id"}]
-      },
+      iconComponent: assignment => assignment.display.card(assignment),
       tableData: Object.values(agencyState.assignment),
       listActions: [
         {label: "New Assignment", action: () => {

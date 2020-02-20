@@ -71,7 +71,7 @@ const prototype = agencyState => ({
 
         const toggleDataTag = dataTag => {
           tempTemplate.agentTemplate_dataTag_ids.includes(dataTag.id) ?
-            updateHandler({agentTemplate_dataTag_ids: tempTemplate.agentTemplate_dataTag_ids.filter(id => id === dataTag.id)})
+            updateHandler({agentTemplate_dataTag_ids: tempTemplate.agentTemplate_dataTag_ids.filter(id => id !== dataTag.id)})
             : updateHandler({agentTemplate_dataTag_ids: [...tempTemplate.agentTemplate_dataTag_ids, dataTag.id]})
         }
 
@@ -116,13 +116,14 @@ const displayProps = agencyState => ({
         limited: [{label: "Template Name", selector: "agentTemplate_label"}],
         expanded: [{label: "Template Name", selector: "agentTemplate_label"}]
       },
+      // iconComponent: template => template.display.card(template),
       tableData: Object.values(agencyState.agentTemplate),
       listActions: [{label: "New Template", action: () => {
         let newTemplate = agencyObject("agentTemplate", {id: "new_object", agentTemplate_label: "new template"}, err=>{throw err})
         return newTemplate.display.builder(newTemplate)
       }}],
       drawerComponents: [
-        {label: "card", component: item => item.display.card(item)}
+        {label: "document", component: item => item.display.card(item)}
       ],
       overlayComponents: [
         {label: "document", component: item => item.display.document(item)},

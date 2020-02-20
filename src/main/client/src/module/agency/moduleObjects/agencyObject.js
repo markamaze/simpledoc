@@ -48,7 +48,7 @@ const agencyObjectPrototype = (objectPrototype) => ({
     let propObjects = Object.entries(objectPrototype.properties)
 
     if(state === null || state === undefined) success = false
-    // else if(state.id === "new_object") state.id = uuidv4()
+    else if(state.id === "new_object") state.id = `n-${uuidv4()}`
 
     while(success && index < propObjects.length){
       let property = propObjects[index]
@@ -83,7 +83,7 @@ const agencyObjectPrototype = (objectPrototype) => ({
 
   toJSON: function(){
     let type = this.type()
-    if(type === "agent") type = "AGENCY.USER"
+    if(type === "agent") type = "AGENCY.AGENT"
     else if(type === "agentTemplate") type = "AGENCY.AGENTTEMPLATE"
     else if(type === "structuralNode") type = "AGENCY.STRUCTURALNODE"
     else if(type === "dataTag") type = "AGENCY.DATATAG"
@@ -115,14 +115,26 @@ const agencyObjectPrototype = (objectPrototype) => ({
       label: "Submit",
       key: function(){return `action-creater-save-${this.type()}-${this.id}`},
       action: function(failure){
-                let result
                 try{
-                  if(confirm && !confirm()) return false
-                  // result = createAgencyObjects(this, failure)
-                  result = this.id === "new_object" ? createAgencyObjects(this, failure)
-                    : updateAgencyObjects(this, failure)
+                  let objectSet = this.new_object ? [this, ...this.new_object] : [this]
+                  let isNew = this.id.substring(0,2) === 'n-'
+                  if(this.new_object){
+                    objectSet = [...this.new_object]
+                    delete this.new_object
+                    objectSet = [this, ...objectSet]
+                    //.map( agencyObject => {
+                    //   if(agencyObject.id.substring(0,2) === 'n-')
+                    //   agencyObject.properties.id.setValue.call(agencyObject, agencyObject.id.substring(2))
+                    //
+                    //   return agencyObject
+                    // })
+                  }
+                  else objectSet = [this]
 
-                  return result && result.error ? failure(result) : true
+                  let result = isNew ? createAgencyObjects(objectSet, failure)
+                    : updateAgencyObjects(objectSet, failure)
+
+                  // return result && result.error ? failure(result) : true
 
                 } catch(err){ throw err }}
     },

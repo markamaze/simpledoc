@@ -50,27 +50,71 @@ const prototype = agencyState => ({
   },
   display: {
     card: agent => {
-      return  <div className="agent container-row">{agencyState().user[agent.agent_user_id].username}</div>
+      let state = agencyState()
+      return  <div className="agent container-row">
+                <div>{state.user[agent.agent_user_id].username}</div>
+                <div>{agent.typeFunctions.getAgentTemplateLabel(agent)}</div>
+              </div>
     },
     document: agent => {
+      let state = agencyState()
       return  <div className="agent container-fill">
                 <div className="container-row">
-                  agent document: {agent.id}
+                  <label>Assigned User</label>
+                  <div>{agent.typeFunctions.getAssignedUsername(agent)}</div>
+                </div>
+                <div className="container-row">
+                  <label>Assigned Node</label>
+                  <div>{agent.typeFunctions.getAssignedNodeLabel(agent)}</div>
+                </div>
+                <div className="container-row">
+                  <label>Position</label>
+                  <div>{agent.typeFunctions.getAgentTemplateLabel(agent)}</div>
                 </div>
               </div>
     },
     builder: (agent, updateHandler) => {
       function Builder(props){
 
+        const [tempAgent, updateTempAgent] = React.useState(props.agent)
+        const updateHandler = newState => props.updateHandler ? props.updateHandler(newState) :
+          updateTempAgent(Object.assign(Object.create(Object.getPrototypeOf(tempAgent)), tempAgent, newState))
+
+        const state = agencyState()
+
         return  <div className="agent container-fill">
-                  <div className="container-row">
-                    agent builder: {agent.id}
+
+                  <div className="container-fill">
+
+                    { tempAgent.display.document(tempAgent) }
+
+                    <div className="container-row">
+                      <label>Assign User</label>
+                      <select value={tempAgent.agent_user_id}
+                              onChange={() => updateHandler({agent_user_id: event.target.value})}>
+                        {
+                          Object.values(state.user).map( user =>
+                            <option value={user.id}>{user.username}</option>)
+                        }
+                      </select>
+                    </div>
+
+
                   </div>
+
+                  { props.updateHandler ? null : tempAgent.storage.handlers.call(tempAgent) }
+
                 </div>
       }
 
       return <Builder agent={agent} updateHandler={updateHandler} />
     }
+  },
+  typeFunctions: {
+    getAgentTemplateLabel: agent => agencyState().agentTemplate[agencyState().assignment[agent.assignment_id].agentTemplate_id].agentTemplate_label,
+    getAssignedUsername: agent => agent.agent_user_id === undefined ? "unassigned" : agencyState().user[agent.agent_user_id].username,
+    getAssignedNodeLabel: agent => agencyState().structuralNode[agent.structuralNode_id].structuralNode_label,
+
   }
 })
 
@@ -79,21 +123,15 @@ const displayProps = agencyState => ({
   displayKey: "",
   component: {
     list: {
-      columns: {
-        limited: [{label: "", selector: "id"}],
-        expanded: [{label: "", selector: "id"}]
-      },
+      iconComponent: agent => agent.display.card(agent),
       tableData: Object.values(agencyState.agent),
-      listActions: [{label: "New Agent", action: () => {
-        let newAgent = agencyObject("agent", {id: "new_object"}, err=>{console.log(err)})
-        return newAgent.display.builder(newAgent)
-      }}],
+      listActions: [],
       drawerComponents: [
-        {label: "card", component: item => item.display.card(item)},
-        {label: "document", component: item => item.display.document(item)},
-        {label: "modify", component: item => item.display.builder(item)}
+        {label: "document", component: item => item.display.document(item)}
       ],
-      overlayComponents: []
+      overlayComponents: [
+        {label: "modify", component: item => item.display.builder(item)}
+      ]
     }
   }
 })

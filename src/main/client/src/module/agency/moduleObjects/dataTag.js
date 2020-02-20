@@ -71,9 +71,11 @@ const prototype = agencyState => ({
       return  <div className="dataTaga container-fill">
                 <div className="container-row">{`dataTag label: ${dataTag.dataTag_label}`}</div>
 
-                <div className="container-row">
+                <div className="container">
                   <label>properties:</label>
                   {
+                    dataTag.dataTag_property_ids.length < 1 ? <div>no properties set</div> :
+
                     dataTag.dataTag_property_ids
                       .map( id => state.property[id] )
                       .map( property => property.display.card(property))
@@ -89,11 +91,11 @@ const prototype = agencyState => ({
 
         const toggleProperty = property => {
           tempDataTag.dataTag_property_ids.includes(property.id) ?
-            updateHandler({dataTag_property_ids: tempDataTag.dataTag_property_ids.filter(id => id === property.id)})
+            updateHandler({dataTag_property_ids: tempDataTag.dataTag_property_ids.filter(id => id !== property.id)})
             : updateHandler({dataTag_property_ids: [...tempDataTag.dataTag_property_ids, property.id]})
         }
 
-        return  <div className="dataTag container-fill">
+        return  <div className="container-fill">
 
                   <div className="container-row">
                     <label>Set Label</label>
@@ -115,8 +117,8 @@ const prototype = agencyState => ({
                     <label>Set Tag Properties</label>
                     {
                       Object.values(agencyState().property).map( property =>
-                          <div onClick={() => toggleProperty(property)}
-                                className={tempDataTag.dataTag_property_ids.includes(property.id) ? "selected-property" : "unselected-property"}>{property.display.document(property)}</div>)
+                          <span onClick={() => toggleProperty(property)}
+                                className={tempDataTag.dataTag_property_ids.includes(property.id) ? "selected-property" : "unselected-property"}>{property.display.card(property)}</span>)
                     }
                   </div>
 
@@ -145,15 +147,17 @@ const displayProps = agencyState => ({
           {label: "Type", selector: "dataTag_tagType"}
         ]
       },
+      // iconComponent: dataTag => dataTag.display.card(dataTag),
       tableData: Object.values(agencyState.dataTag),
       listActions: [{label: "New DataTag", action: () => {
         let newDataTag = agencyObject("dataTag", {id: "new_object", dataTag_label: "new dataTag", dataTag_tagType: "agent"}, err=>{console.log(err)})
         return newDataTag.display.builder(newDataTag)
       }}],
       drawerComponents: [
-        {label: "document", component: item => item.display.document(item)}
+        {label: "card", component: item => item.display.card(item)}
       ],
       overlayComponents: [
+        {label: "document", component: item => item.display.document(item)},
         {label: "modify", component: item => item.display.builder(item)}
       ]
     }

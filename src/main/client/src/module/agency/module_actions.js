@@ -17,7 +17,7 @@ export function createAgencyObjects(objectSet, failure){
     let result = JSON.parse(request.response)
     if(result.error) failure(result.error)
     else store.dispatch({
-      type: "CREATE_AGENCY_OBJECTS",
+      type: "WRITE_AGENCY_OBJECTS",
       payload: objectSet
     })
   })
@@ -29,7 +29,7 @@ export function updateAgencyObjects(objectSet, failure){
 
     if(result.error) failure(result.error)
     else store.dispatch({
-      type: "UPDATE_AGENCY_OBJECTS",
+      type: "WRITE_AGENCY_OBJECTS",
       payload: objectSet,
       failure: failure
     })

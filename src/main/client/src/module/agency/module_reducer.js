@@ -27,20 +27,18 @@ export default function agency_reducer(state=initialState, action) {
       return newState
     }
 
-    case "CREATE_AGENCY_OBJECTS": {
-      let newObject = { [`${action.payload.id}`]: action.payload }
-      let type = action.payload.type()
-      let newTypeSet = Object.assign({}, state[type], newObject)
+    case "WRITE_AGENCY_OBJECTS": {
+      let newState = Object.assign({}, state)
+      let newObjects = action.payload
 
-      return Object.assign({}, state, { [`${type}`] : newTypeSet })
-    }
+      newObjects.forEach(agencyObject => {
+        let newObject = { [`${agencyObject.id}`]: agencyObject }
+        let newTypeSet = Object.assign({}, newState[agencyObject.type()], newObject)
+        newState = Object.assign({}, newState, { [`${agencyObject.type()}`] : newTypeSet})
+      })
 
-    case "UPDATE_AGENCY_OBJECTS": {
-      let updatedObject = { [`${action.payload.id}`]: action.payload }
-      let type = action.payload.type()
-      let updatedTypeSet = Object.assign({}, state[type], updatedObject)
 
-      return Object.assign({}, state, { [`${type}`]: updatedTypeSet })
+      return newState
     }
 
     case "DELETE_AGENCY_OBJECTS": {

@@ -38,10 +38,7 @@ export const DisplayWrapper = styled(ModuleStyles)`
 
 
 
-  .tag {
-    background: lightblue;
-    border-radius: .2rem;
-  }
+
 `
 
 
@@ -51,17 +48,21 @@ export const AgencyPageWrapper = styled.div`
   height: 100%;
   max-height: 100%;
   overflow: auto;
-  /* .dataTag {
+  .dataTag {
     display: flex;
     max-width: max-content;
-    font-size: x-small;
+    font-size: small;
     background: ${colors.two};
     color: ${colors.one};
-    padding: .2rem;
-    margin: .2rem;
+    padding: .4rem;
+    margin: .4rem;
     border-radius: .5rem;
     justify-content: center;
-  } */
+  }
+  .selected-tag {
+    background: ${colors.one};
+    color: ${colors.two};
+  }
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;

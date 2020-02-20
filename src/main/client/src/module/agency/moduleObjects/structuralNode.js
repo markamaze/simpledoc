@@ -84,16 +84,25 @@ const prototype = agencyState => ({
               </div>
     },
     document: node => {
+      let state = agencyState()
       return  <div className="structuralNode container-fill">
                 <div className="container-row btm-border">
                   {node.display.card(node)}
                 </div>
 
                 <div className="container">
-                  <label>Agents</label>
+                  <label>Assigned Agents</label>
                   {
-                    Object.values(agencyState().agent).filter(agent => agent.structuralNode_id = node.id)
-                      .map( agent => agent.display.document(agent))
+                    Object.entries(node.active_assignments).map( ([assignmentId, assignmentObject]) => {
+                      let assignment = state.assignment[assignmentId]
+                      let activeAgents = assignmentObject.active_agents ? assignmentObject.active_agents : []
+
+                      return activeAgents.map( agentId => {
+                        let agent = state.agent[agentId]
+
+                        return agent.display.document(agent)
+                      })
+                    })
                   }
                 </div>
 
@@ -112,19 +121,76 @@ const prototype = agencyState => ({
     },
     editor: (node, updateHandler) => {
       function Editor(props){
-        return  <div className="structuralNode container-fill">
-                  <div className="container-row btm-border">{props.structuralNode.display.card(props.structuralNode)}</div>
+        let state = agencyState()
 
-                  <div className="container">
-                    <label>Property Values</label>
-                    {
-                      Object.entries(props.structuralNode.property_values).map( ([propertyId, propertyValue]) => {
-                        let property = agencyState().property[propertyId]
-                        property.properties.property_value.setValue.call(property, propertyValue)
-                        return property.display.editor(property)
-                      })
-                    }
+        const [tempNode, setTempNode] = React.useState(props.structuralNode)
+        const updateHandler = newState => props.updateHandler ? props.updateHandler(newState)
+          : setTempNode(Object.assign(tempNode, newState))
+
+        const createAgent = (userId, assignmentId, assignmentObject) => {
+          let newAgent = agencyObject("agent", {id: "new_object", agent_user_id: userId, structuralNode_id: tempNode.id, assignment_id: assignmentId}, err=>{throw err})
+
+          updateHandler({
+            new_object: tempNode.new_object ? [...tempNode.new_object, newAgent] : [newAgent],
+            active_assignments: Object.assign({}, tempNode.active_assignments, { [`${assignmentId}`] : Object.assign({}, assignmentObject, {active_agents: [...assignmentObject.active_agents, newAgent.id]})})
+          })
+        }
+
+        return  <div className="structuralNode container-fill">
+                  <div className="container-fill">
+                    <div className="container-row">{props.structuralNode.display.card(props.structuralNode)}</div>
+
+                    <div className="container">
+                      <label>Property Values</label>
+                      {
+                        Object.entries(props.structuralNode.property_values).map( ([propertyId, propertyValue]) => {
+                          let property = state.property[propertyId]
+                          property.properties.property_value.setValue.call(property, propertyValue)
+                          return property.display.editor(property)
+                        })
+                      }
+                    </div>
+
+                    <div className="container">
+                      <label>Assigned Agents</label>
+                      {
+                        Object.entries(props.structuralNode.active_assignments).map( ([assignmentId, assignmentObject]) => {
+                          let assignment = state.assignment[assignmentId]
+                          let activeAgents = assignmentObject.active_agents ? assignmentObject.active_agents : []
+
+                          return activeAgents.map( agentId => {
+                            let agent = agentId.substring(0,2) === 'n-' ?
+                              tempNode.new_object.find(object => object.id === agentId)
+                              : state.agent[agentId]
+
+                            return agent.display.document(agent)
+                          })
+                        })
+                      }
+                    </div>
+
+                    <div className="container">
+                      <label>Manage Agents</label>
+                      {
+                        Object.entries(tempNode.active_assignments).map( ([assignmentId, assignmentObject]) =>
+                          <div className="container-row">
+                            <div>{state.agentTemplate[state.assignment[assignmentId].agentTemplate_id].agentTemplate_label}</div>
+                            {
+                              //<select onChange={()=>createAgent(event.target.value, assignmentId, assignmentObject)} value="">
+                            //   <option value="">select user to implement agent assignment</option>
+                            //   {
+                            //     Object.values(state.user).map( user => <option value={user.id}>{user.username}</option>)
+                            //   }
+                            // </select>
+                            }
+                            <button onClick={()=>createAgent("562ef7bd-7a24-46ee-af70-94d4c3fee0a1", assignmentId, assignmentObject)}>create</button>
+                          </div>)
+                      }
+                    </div>
                   </div>
+
+                  { props.updateHandler ? null : tempNode.storage.handlers.call(tempNode) }
+
                 </div>
       }
 
@@ -139,8 +205,20 @@ const prototype = agencyState => ({
 
         const toggleDataTag = dataTag => {
           tempNode.structuralNode_dataTag_ids.includes(dataTag.id) ?
-            updateHandler({structuralNode_dataTag_ids: tempNode.structuralNode_dataTag_ids.filter(id => id === dataTag.id)})
+            updateHandler({structuralNode_dataTag_ids: tempNode.structuralNode_dataTag_ids.filter(id => id !== dataTag.id)})
             : updateHandler({structuralNode_dataTag_ids: [...tempNode.structuralNode_dataTag_ids, dataTag.id]})
+        }
+
+        const addAssignment = assignment => {
+          let assignmentData = { active_agents: [] }
+          let newAssignmentSet = Object.assign({}, tempNode.active_assignments, {[`${assignment.id}`] : assignmentData })
+          updateHandler({active_assignments: newAssignmentSet})
+        }
+
+        const removeAssignment = assignment => {
+          let newAssignmentSet = Object.assign({}, tempNode.active_assignments)
+          delete newAssignmentSet[assignment.id]
+          updateHandler({active_assignments: newAssignmentSet})
         }
 
         return  <div className="structuralNode container-fill">
@@ -169,6 +247,27 @@ const prototype = agencyState => ({
                       Object.values(agencyState().dataTag).map( tag =>
                           <div onClick={() => toggleDataTag(tag)}
                                 className={tempNode.structuralNode_dataTag_ids.includes(tag.id) ? "selected-tag" : "unselected-tag"}>{tag.display.card(tag)}</div>)
+                    }
+                  </div>
+
+                  <div className="container-row">
+                    <label>Assignments</label>
+                    {
+                      Object.keys(tempNode.active_assignments).map( assignment_id => {
+                        let state = agencyState()
+                        let foundAssignment = state.assignment[assignment_id]
+
+                        return <div>{foundAssignment.display.card(foundAssignment)}<div onClick={() => removeAssignment(foundAssignment)}>remove</div></div>
+                      })
+                    }
+                  </div>
+
+                  <div className="container-row">
+                    <label>Set Assignments</label>
+                    {
+                      Object.values(agencyState().assignment).map( assignment =>
+                        <div onClick={() => addAssignment(assignment)}
+                              className={Object.keys(tempNode.active_assignments).includes(assignment.id) ? "selected-assignment": "unselected_assignment"}>{assignment.display.card(assignment)}</div>)
                     }
                   </div>
 

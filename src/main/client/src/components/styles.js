@@ -116,7 +116,7 @@ export const ListWrapper = styled.div`
   .icons{}
   .icon{
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     cursor: pointer;
     background: ${colors.one};
     padding: .25rem;
@@ -137,9 +137,11 @@ export const ListWrapper = styled.div`
     .tree-node{
       display: flex;
       flex-direction: column;
-      padding: .5rem;
+      padding: 0;
       margin: .25rem;
       width: 100%;
+      border-left: solid ${colors.three};
+      border-top: solid ${colors.three};
     }
     .tree-branch{
       display: flex;
@@ -149,7 +151,6 @@ export const ListWrapper = styled.div`
       padding: .25rem;
       width: 100%;
       box-sizing: border-box;
-      border-left: solid ${colors.three};
     }
 
 
