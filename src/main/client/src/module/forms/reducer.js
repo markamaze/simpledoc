@@ -23,21 +23,42 @@ export default function form_reducer(state=initialState, action) {
     }
 
     case "CREATE_FORM_OBJECTS": {
-      console.log("createFormObject", action.payload)
+      let newState = Object.assign({}, state)
+      let newObjects = action.payload
 
-      return state
+      newObjects.forEach(formObject => {
+        let newObject = { [`${formObject.id}`]: formObject }
+        let newTypeSet = Object.assign({}, newState[formObject.type()], newObject)
+        newState = Object.assign({}, newState, { [`${formObject.type()}`] : newTypeSet})
+      })
+
+      return newState
     }
 
     case "UPDATE_FORM_OBJECTS": {
-      console.log("updateFormObject", action.payload)
+      let newState = Object.assign({}, state)
+      let updatedObjects = action.payload
 
-      return state
+      updatedObjects.forEach(formObject => {
+        let updatedObject = { [`${formObject.id}`]: formObject }
+        let newTypeSet = Object.assign({}, newState[formObject.type()], updatedObject)
+        newState = Object.assign({}, newState, { [`${formObject.type()}`] : newTypeSet})
+      })
+
+      return newState
     }
 
     case "DELETE_FORM_OBJECTS": {
-      console.log("deleteFormObject", action.payload)
+      let newState = Object.assign({}, state)
+      let removeObjects = action.payload
 
-      return state
+      removeObjects.forEach(formObject => {
+        let newTypeSet = Object.assign({}, newState[formObject.type()])
+        delete newTypeSet[`${formObject.id}`]
+        newState = Object.assign({}, newState, { [`${formObject.type()}`] : newTypeSet})
+      })
+
+      return newState
     }
     default: return state
 

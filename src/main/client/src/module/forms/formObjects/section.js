@@ -69,7 +69,9 @@ const prototype = getFormState => ({
   display: {
     document: section => {},
     editor: section => {},
-    creator: sectino => {}
+    builder: section => {
+      return <div>section builder</div>
+    }
   },
   typeFunctions: {}
 })

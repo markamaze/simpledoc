@@ -41,7 +41,7 @@ export function loadSubmissions(){
   }, function() { console.log("error loading submissions")})
 }
 
-export function createFormObject(object, failure){
+export function createFormObject(objectSet, failure){
   post(`/Forms`, objectSet, function(request){
     let result = JSON.parse(request.response)
     if(result.error) failure(result.error)
@@ -52,7 +52,7 @@ export function createFormObject(object, failure){
   })
 }
 
-export function updateFormObject(object, failure){
+export function updateFormObject(objectSet, failure){
   put(`/Forms`, objectSet, function(request){
   let result = JSON.parse(request.response)
   if(result.error) failure(result.error)
@@ -62,7 +62,7 @@ export function updateFormObject(object, failure){
   })
 })
 }
-export function deleteFormObject(object, failure){
+export function deleteFormObject(objectSet, failure){
   remove(`/Forms`, objectSet, function(request){
     let result = JSON.parse(request.response)
     if(result.error) failure(result.error)

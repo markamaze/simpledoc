@@ -15,6 +15,9 @@ const getFormState = () => store.getState().forms
 
 const formPrototypes = {
   form: form.prototype(getFormState),
+  section: section.prototype(getFormState),
+  layout: layout.prototype(getFormState),
+  element: element.prototype(getFormState),
   formSet: formSet.prototype(getFormState),
   submissions: submission.prototype(getFormState)
 }
@@ -34,7 +37,7 @@ const formObjectPrototype = (objectPrototype) => ({
     let propObjects = Object.entries(objectPrototype.properties)
 
     if(state === null || state === undefined) success = false
-    else if(state.id === "new_object") state.id = uuidv4()
+    else if(state.id === "new_object") state.id = `n-${uuidv4()}`
 
     while(success && index < propObjects.length){
       let property = propObjects[index]
@@ -104,11 +107,23 @@ const formObjectPrototype = (objectPrototype) => ({
       label: "Submit",
       key: function(){return `action-creater-save-${this.type()}-${this.id}`},
       action: function(failure){
-                let result
+                let result, isNew
                 try{
-                  if(!confirm || !confirm()) return false
-                  result = this.id === "new_object" ? storageActions.createFormObject(this, failure)
-                    : storageActions.updateFormObject(this, failure)
+                  let objectSet = this.new_object ? this.new_object : []
+                  isNew = this.id.substring(0,2) === 'n-'
+                  if(this.new_object) {
+                    objectSet = [...this.new_object]
+                    delete this.new_object
+                    objectSet = [this, ...objectSet].map( formObject => {
+                      if(formObject.id.substring(0,2) === 'n-') formObject.properties.id.setValue.call(formObject, formObject.id.substring(2))
+
+                      return formObject
+                    })
+
+                  }
+                  else objectSet = [this]
+                  result = isNew ? storageActions.createFormObject(objectSet, failure)
+                    : storageActions.updateFormObject(objectSet, failure)
 
                   // result.error ? failure(result) : success(result)
                 } catch(err){ failure(err) }}
@@ -120,7 +135,7 @@ const formObjectPrototype = (objectPrototype) => ({
                 let result
                 try{
                   if(!confirm || !confirm()) return false
-                  result  = storageActions.deleteFormObject(this, failure)
+                  result  = storageActions.deleteFormObject([this], failure)
 
                   // result.error ? failure(result) : success(result)
                 } catch(err){ failure(err) }}

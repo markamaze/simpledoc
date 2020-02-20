@@ -44,6 +44,20 @@ export const FormPageWrapper = styled.div`
   border: thin solid black;
   overflow: auto;
 }
+
+.storage-handlers{
+  display: flex;
+  flex-direction: row;
+  margin: .5rem;
+}
+.storage-handler-item{
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+  margin: .5rem;
+  background: lightgray;
+  cursor: pointer;
+}
 `
 
 export const DocumentWrapper = styled.div``

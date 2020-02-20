@@ -63,22 +63,40 @@ const prototype = getFormState => ({
                 form editor
               </div>
     },
-    creator: (form, updateHandler) => {
+    builder: (form, updateHandler) => {
       function Creator(props){
         const [tempForm, updateTempForm] = React.useState(props.form)
         const updateHandler = newState => props.updateHandler ? props.updateHandler(newState)
           : updateTempForm(Object.assign(Object.create(Object.getPrototypeOf(tempForm)), tempForm, {...newState}))
 
+        const formState = getFormState()
+
         return  <div className="container-fill">
+                  <div className="container-fill">
 
-                  <div className="container">
-                    <label>Form Title:</label>
-                    <input type="text" value={tempForm.label}
-                            onChange={()=>updateHandler({label: event.target.value})} />
-                  </div>
+                    <div className="container">
+                      <label>Form Title:</label>
+                      <input type="text" value={tempForm.label}
+                              onChange={()=>updateHandler({label: event.target.value})} />
+                    </div>
 
-                  <div className="container">
-                    <label>Add Section:</label>
+                    <div className="container">
+                      <label>Section</label>
+                      <button onClick={() => {
+                        let newSection = formObject("section", {id: "new_object", label: "new section", form_id: tempForm.id.substring(2)}, err=>{throw err})
+
+                        updateHandler({section_ids: [...tempForm.section_ids, newSection.id.substring(2)], new_object: tempForm.new_object ? [tempForm.new_object, newSection] : [newSection]})
+                        }} >add section</button>
+                      <div className="container">
+                        {
+                          tempForm.section_ids.map( id => {
+                            let section = formState["section"][id] ? formState["section"][id] : tempForm.new_object.find(object => object.id.substring(2) === id)
+
+                            return section.display.builder(section, updateHandler)})
+                        }
+                      </div>
+                    </div>
+
                   </div>
 
                   { props.updateHandler ? null : tempForm.storage.handlers.call(tempForm) }
@@ -110,7 +128,7 @@ const displayProps = formState => ({
       listActions: [
         { label: "create form", action: () => {
             let newForm = formObject("form", {id: "new_object", label: "new form"}, error => console.log(error))
-            return newForm.display.creator(newForm)
+            return newForm.display.builder(newForm)
         }}
       ],
       drawerComponents: [
@@ -118,7 +136,7 @@ const displayProps = formState => ({
       ],
       overlayComponents: [
         {label: "editor", component: item => item.display.editor(item)},
-        {label: "creator", component: item => item.display.creator(item)}
+        {label: "creator", component: item => item.display.builder(item)}
       ]
     }
   }
