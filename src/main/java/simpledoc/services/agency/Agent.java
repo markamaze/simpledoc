@@ -54,33 +54,33 @@ public class Agent extends ModuleObject {
 		if(uuid != null) this.assignment_id = uuid;
 		else throw new ServiceErrorException("invalid id set for Agent.assignment_id");
 	}
-	private void setActiveRoleId(Object object) throws ServiceErrorException {
-		UUID uuid = AgencyValidator.validateUUIDString(object);
+//	private void setActiveRoleId(Object object) throws ServiceErrorException {
+//		UUID uuid = AgencyValidator.validateUUIDString(object);
+//
+//		if(uuid != null) this.active_role_id = uuid;
+//		else throw new ServiceErrorException("invalid id set for Agent.active_role_id");
+//	}
+//	private void setPropertyValues(Object object) throws ServiceErrorException {
+//		//TODO: set Property values based on incoming Object type
+//		if(object instanceof Map) this.property_values = (Map<UUID, String>) object;
+//		else if(object instanceof PGobject) {
+//			JSONObject asJson = new JSONObject(((PGobject)object).getValue());
+//			Map<UUID, String> propertyValues = new HashMap<UUID, String>();
+//			for(String id : asJson.keySet()) { 
+//				UUID uuid = AgencyValidator.validateUUIDString(id);
+//
+//				if(uuid != null) propertyValues.put(uuid, asJson.get(id).toString());
+//				else throw new ServiceErrorException("invalid uuid found in Agent.property_values");				
+//			}
+//			this.property_values = propertyValues;
+//		}
+//	}
 
-		if(uuid != null) this.active_role_id = uuid;
-		else throw new ServiceErrorException("invalid id set for Agent.active_role_id");
-	}
-	private void setPropertyValues(Object object) throws ServiceErrorException {
-		//TODO: set Property values based on incoming Object type
-		if(object instanceof Map) this.property_values = (Map<UUID, String>) object;
-		else if(object instanceof PGobject) {
-			JSONObject asJson = new JSONObject(((PGobject)object).getValue());
-			Map<UUID, String> propertyValues = new HashMap<UUID, String>();
-			for(String id : asJson.keySet()) { 
-				UUID uuid = AgencyValidator.validateUUIDString(id);
-
-				if(uuid != null) propertyValues.put(uuid, asJson.get(id).toString());
-				else throw new ServiceErrorException("invalid uuid found in Agent.property_values");				
-			}
-			this.property_values = propertyValues;
-		}
-	}
-	
 	public UUID getAgentUserId() { return this.agent_user_id; }
 	public UUID getStructuralNodeId() { return this.structuralNode_id; }
 	public UUID getAssignmentId() { return this.assignment_id; }
-	public UUID getActiveRoleId() { return this.active_role_id; }
-	public Map<UUID, String> getPropertyValues() { return this.property_values; }
+//	public UUID getActiveRoleId() { return this.active_role_id; }
+//	public Map<UUID, String> getPropertyValues() { return this.property_values; }
 	
 
 	@Override
