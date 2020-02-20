@@ -18,9 +18,9 @@ public class Property extends ModuleObject {
 	String property_value_type;
 	
 	
-	public Property(UUID uuid, String type) { super(uuid, type); }
-	public Property(UUID uuid, String type, Map<String, Object> data) throws ServiceErrorException {
-		super(uuid, type);
+	public Property(String uuid, String type) { super(uuid, type); }
+	public Property(String string, String type, Map<String, Object> data) throws ServiceErrorException {
+		super(string, type);
 		setPropertyKey(data.get("property_key"));
 		setPropertyValueType(data.get("property_value_type"));
 	}
@@ -65,7 +65,10 @@ public class Property extends ModuleObject {
 		if(type.equals("create")) statement = connection.prepareCall("call agency.create_property(?,?,?)");
 		else if(type.equals("update")) statement = connection.prepareCall("call agency.update_property(?,?,?)");
 		
-		statement.setObject(1, this.getId());
+		UUID uuid;
+		if(this.getId().startsWith("n-")) uuid = AgencyValidator.validateUUIDString(this.getId().substring(2));
+		else uuid = AgencyValidator.validateUUIDString(this.getId());
+		statement.setObject(1, uuid);
 		statement.setString(2, this.getPropertyType());
 		statement.setString(3, this.getPropertyValueType());		
 		

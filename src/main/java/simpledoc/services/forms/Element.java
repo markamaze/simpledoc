@@ -28,8 +28,8 @@ public class Element extends ModuleObject {
   private List<Object> completion_rules;
   private List<Object> security_settings;
 
-  Element(UUID id, String type) { super(id, type); }
-  Element(UUID id, String type, Map<String, Object> data) throws ServiceErrorException {
+  Element(String id, String type) { super(id, type); }
+  Element(String id, String type, Map<String, Object> data) throws ServiceErrorException {
     super(id, type);
     setFormId(data.get("form_id"));
     setSectionId(data.get("section_id"));
@@ -45,7 +45,8 @@ public class Element extends ModuleObject {
 	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Element.form_id");
 	  
 	  else if(object instanceof UUID) {
-		  if(FormsValidator.validateUUIDString(object)) this.form_id = (UUID) object;
+		  UUID uuid = FormsValidator.validateUUIDString(object);
+		  if(uuid != null) this.form_id = uuid;
 	  }
 	  
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.form_id");
@@ -54,7 +55,8 @@ public class Element extends ModuleObject {
 	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Element.section_id");
 	  
 	  else if(object instanceof UUID) {
-		  if(FormsValidator.validateUUIDString(object)) this.section_id = (UUID) object;
+		  UUID uuid = FormsValidator.validateUUIDString(object);
+		  if(uuid != null) this.section_id = uuid;
 	  }
 	  
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.section_id");
@@ -63,7 +65,8 @@ public class Element extends ModuleObject {
 	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Element.section_id");
 	  
 	  else if(object instanceof UUID) {
-		  if(FormsValidator.validateUUIDString(object)) this.layout_id = (UUID) object;
+		  UUID uuid = FormsValidator.validateUUIDString(object);
+		  if(uuid != null) this.layout_id = uuid;
 	  }
 	  
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.section_id");

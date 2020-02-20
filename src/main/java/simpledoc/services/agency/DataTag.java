@@ -10,7 +10,6 @@ import simpledoc.exceptions.ServiceErrorException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -28,9 +27,9 @@ public class DataTag extends ModuleObject {
 	private Set<UUID> dataTag_property_ids;
 	private Set<UUID> dataTag_typeObject_ids;
 
-	DataTag(UUID id, String type) {	super(id, type); }
-	DataTag(UUID tag_id, String type, Map<String, Object> data) throws ServiceErrorException, SQLException {
-		super(tag_id, type);
+	DataTag(String id, String type) {	super(id, type); }
+	DataTag(String string, String type, Map<String, Object> data) throws ServiceErrorException, SQLException {
+		super(string, type);
 		setDataTagLabel(data.get("dataTag_label").toString());
 		setDataTagType(data.get("dataTag_tagType"));
 		setDataTagPropertyIds(data.get("dataTag_property_ids"));
@@ -93,7 +92,11 @@ public class DataTag extends ModuleObject {
 		if(type.equals("create")) statement = connection.prepareStatement("call agency.create_dataTag(?,?,?,?,?)");
 		else if(type.equals("update")) statement = connection.prepareStatement("call agency.update_dataTag(?,?,?,?,?)");
 			
-		statement.setObject(1, this.getId());
+		UUID uuid;
+		if(this.getId().startsWith("n-")) uuid = AgencyValidator.validateUUIDString(this.getId().substring(2));
+		else uuid = AgencyValidator.validateUUIDString(this.getId());
+		
+		statement.setObject(1, uuid);
 		statement.setString(2, this.getDataTagLabel());
 		statement.setString(3, this.getDataTagType());
 		statement.setArray(4, connection.createArrayOf("UUID", this.getDataTagPropertyIds().toArray()));

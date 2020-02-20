@@ -18,9 +18,9 @@ public class Role extends ModuleObject {
 	private String role_label;
 	private String security_code;
 
-	public Role(UUID uuid, String type) { super(uuid, type); }
-	public Role(UUID uuid, String type, Map<String, Object> data) throws ServiceErrorException {
-		super(uuid, type);
+	public Role(String uuid, String type) { super(uuid, type); }
+	public Role(String string, String type, Map<String, Object> data) throws ServiceErrorException {
+		super(string, type);
 		setRoleLabel(data.get("role_label"));
 		setSecurityCode(data.get("security_code"));
 	}
@@ -65,7 +65,10 @@ public class Role extends ModuleObject {
 		if(type.equals("create")) statement = connection.prepareCall("call agency.create_role(?,?,?)");
 		else if(type.equals("update")) statement = connection.prepareCall("call agency.update_role(?,?,?)");
 	
-		statement.setObject(1, this.getId());
+		UUID uuid;
+		if(this.getId().startsWith("n-")) uuid = AgencyValidator.validateUUIDString(this.getId().substring(2));
+		else uuid = AgencyValidator.validateUUIDString(this.getId());
+		statement.setObject(1, uuid);
 		statement.setString(2, this.getRoleLabel());
 		statement.setString(3, this.getSecurityCode());
 

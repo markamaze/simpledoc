@@ -2,7 +2,6 @@ package simpledoc.services.agency;
 
 import java.sql.SQLException;
 import java.util.HashSet;
-import java.util.UUID;
 
 import simpledoc.exceptions.ServiceErrorException;
 import simpledoc.services.ModuleObject;
@@ -15,7 +14,7 @@ public class AgencyFactory<T extends ModuleObject> implements ModuleObjectFactor
 	@Override
 	@SuppressWarnings("unchecked")
 	public T build(ModuleObjectData item) throws ServiceErrorException, SQLException {
-		UUID id = getUUID(item.getIdString());
+		String id = item.getIdString();
 		String type = item.getType();
 
 		switch(type){
@@ -42,33 +41,27 @@ public class AgencyFactory<T extends ModuleObject> implements ModuleObjectFactor
 	@Override
 	@SuppressWarnings("unchecked")
 	public T build(String id_string, String type) throws ServiceErrorException {
-		UUID id = getUUID(id_string);
-		
 		switch(type){
-		case "structuralNode":
-		case "AGENCY.STRUCTURALNODE": return (T) new StructuralNode(id, type);
-		case "agentTemplate":
-		case "AGENCY.AGENTTEMPLATE": return (T) new AgentTemplate(id, type);
-		case "agent":
-		case "AGENCY.AGENT": return (T) new Agent(id, type);
-		case "dataTag":
-		case "AGENCY.DATATAG": return (T) new DataTag(id, type);
-		case "user":
-		case "AGENCY.USER": return (T) new User(id, type);
-		case "assignment":
-		case "AGENCY.ASSIGNMENT": return (T) new Assignment(id, type);
-		case "role":
-		case "AGENCY.ROLE": return (T) new Role(id, type);
-		case "property":
-		case "AGENCY.PROPERTY": return (T) new Property(id, type);
-		default: throw new ServiceErrorException("invalid Agency Object Type sent to factory: " + type);
-	}	}
-
-	private UUID getUUID(String id_string) throws ServiceErrorException {
-		if(id_string.equalsIgnoreCase("new_object")) return UUID.randomUUID();
-		else if(AgencyValidator.validateUUIDString(id_string)) return UUID.fromString(id_string);
-		else throw new ServiceErrorException("invalid UUID sent to factory");
+			case "structuralNode":
+			case "AGENCY.STRUCTURALNODE": return (T) new StructuralNode(id_string, type);
+			case "agentTemplate":
+			case "AGENCY.AGENTTEMPLATE": return (T) new AgentTemplate(id_string, type);
+			case "agent":
+			case "AGENCY.AGENT": return (T) new Agent(id_string, type);
+			case "dataTag":
+			case "AGENCY.DATATAG": return (T) new DataTag(id_string, type);
+			case "user":
+			case "AGENCY.USER": return (T) new User(id_string, type);
+			case "assignment":
+			case "AGENCY.ASSIGNMENT": return (T) new Assignment(id_string, type);
+			case "role":
+			case "AGENCY.ROLE": return (T) new Role(id_string, type);
+			case "property":
+			case "AGENCY.PROPERTY": return (T) new Property(id_string, type);
+			default: throw new ServiceErrorException("invalid Agency Object Type sent to factory: " + type);
+		}	
 	}
+
 	
 	@Override
 	public HashSet<String> getTypeSet() {

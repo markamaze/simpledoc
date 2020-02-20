@@ -40,7 +40,7 @@ public class AgencyValidator extends ModuleValidation {
 	      String type = item.getType();
 	      Map<String, Object> data = item.getObjectData();
 	
-	      if(!validateUUIDString(string_id) && !string_id.equalsIgnoreCase("new_object"))
+	      if(validateUUIDString(string_id) == null)
 	    	  throw new UnsupportedServiceRequest("invalid id: " + string_id);
 	      if(!validateObjectType(type))
 	    	  throw new UnsupportedServiceRequest("object type not supported: " + type);
@@ -112,5 +112,7 @@ public class AgencyValidator extends ModuleValidation {
 	return true;
     
   }
+  
+  
 
 }

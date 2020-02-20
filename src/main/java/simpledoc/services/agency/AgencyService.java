@@ -69,6 +69,8 @@ public class AgencyService implements ServiceModule {
 				String id = item.getIdString();
 				String item_type = item.getType();
 				List<String> resource = new ArrayList<String>();
+				T currentObj;
+
 	
 				resource.add("Agency");
 				switch(item_type) {
@@ -97,11 +99,15 @@ public class AgencyService implements ServiceModule {
 						resource.add("role");
 						break;
 				}
-				resource.add(id);
-				T currentObj;
-				currentObj = storage.queryResource(resource, Collections.emptyMap(), factory);
-	
-				currentObj.update(item.getObjectData());
+				
+				if(id.contains("n-")) {
+					currentObj = factory.build(item);
+				}
+				else {
+					resource.add(id);
+					currentObj = storage.queryResource(resource, Collections.emptyMap(), factory);
+					currentObj.update(item.getObjectData());	
+				}
 				working_data.add(currentObj);
 			}
 	

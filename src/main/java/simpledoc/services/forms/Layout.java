@@ -30,8 +30,8 @@ public class Layout extends ModuleObject {
   private List<Object> completion_rules;
   private List<Object> display_settings;
 
-  Layout(UUID id, String type) { super(id, type); }
-  Layout(UUID id, String type, Map<String, Object> data) throws ServiceErrorException {
+  Layout(String id, String type) { super(id, type); }
+  Layout(String id, String type, Map<String, Object> data) throws ServiceErrorException {
     super(id, type);
     setLabel(data.get("label"));
     setFormId(data.get("form_id"));
@@ -55,7 +55,8 @@ public class Layout extends ModuleObject {
 	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Layout.form_id");
 	  
 	  else if(object instanceof UUID) {
-		  if(FormsValidator.validateUUIDString(object)) this.form_id = (UUID) object;
+		  UUID uuid = FormsValidator.validateUUIDString(object);
+		  if(uuid != null) this.form_id = uuid;
 	  }
 	  
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Layout.form_id");
@@ -64,7 +65,8 @@ public class Layout extends ModuleObject {
 	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Layout.section_id");
 	  
 	  else if(object instanceof UUID) {
-		  if(FormsValidator.validateUUIDString(object)) this.section_id = (UUID) object;
+		  UUID uuid = FormsValidator.validateUUIDString(object);
+		  if(uuid != null) this.section_id = uuid;
 	  }
 	  
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Layout.section_id");

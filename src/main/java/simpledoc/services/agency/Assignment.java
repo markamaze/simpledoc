@@ -17,20 +17,23 @@ public class Assignment extends ModuleObject {
 	private UUID agentTemplate_id;
 	private UUID supervising_assignment_id;
 
-	public Assignment(UUID uuid, String type) { super(uuid, type); }
-	public Assignment(UUID uuid, String type, Map<String, Object> data) throws ServiceErrorException {
-		super(uuid, type);
+	public Assignment(String uuid, String type) { super(uuid, type); }
+	public Assignment(String string, String type, Map<String, Object> data) throws ServiceErrorException {
+		super(string, type);
 		setAgentTemplateId(data.get("agentTemplate_id"));
 		setSupervisingAssignmentId(data.get("supervising_assignment_id"));
 	}
 	
 	private void setAgentTemplateId(Object object) throws ServiceErrorException {
-		if(AgencyValidator.validateUUIDString(object)) this.agentTemplate_id = UUID.fromString(object.toString());
+		UUID uuid = AgencyValidator.validateUUIDString(object);
+		if(uuid != null) this.agentTemplate_id = uuid;
 		else throw new ServiceErrorException("invalid id set for Assignment.agentTemplate_id");
 	}
 	private void setSupervisingAssignmentId(Object object) throws ServiceErrorException {
+		UUID uuid = AgencyValidator.validateUUIDString(object);
+
 		if(object == null) this.supervising_assignment_id = null;
-		else if(AgencyValidator.validateUUIDString(object)) this.supervising_assignment_id = UUID.fromString(object.toString());
+		else if(uuid != null) this.supervising_assignment_id = uuid;
 		else throw new ServiceErrorException("invalid id set for Assignment.supervising_assignment_id");	
 	}
 	
@@ -63,7 +66,11 @@ public class Assignment extends ModuleObject {
 		if(type.equals("create")) statement = connection.prepareStatement("call agency.create_assignment(?,?,?)");
 		else if(type.equals("update")) statement = connection.prepareStatement("call agency.update_assignment(?,?,?)");
 		
-		statement.setObject(1, this.getId());
+		UUID uuid;
+		if(this.getId().startsWith("n-")) uuid = AgencyValidator.validateUUIDString(this.getId().substring(2));
+		else uuid = AgencyValidator.validateUUIDString(this.getId());
+		
+		statement.setObject(1, uuid);
 		statement.setObject(2, this.getAgentTemplateId());
 		statement.setObject(3, this.getSupervisingAssignmentId());
 			

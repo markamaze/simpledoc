@@ -9,15 +9,15 @@ import java.util.UUID;
 import simpledoc.exceptions.ServiceErrorException;
 public abstract class ModuleObject {
 
-	private UUID object_id;
+	private String object_id;
 	private String object_type;
 
-	public ModuleObject(UUID uuid, String type) {
-		this.object_id = uuid;
+	public ModuleObject(String string, String type) {
+		this.object_id = string;
 		this.object_type = type;
 	}
 
-	public UUID getId() { return this.object_id; }
+	public String getId() { return this.object_id; }
 	public String getModuleObjectType() { return this.object_type; }
 
 	public abstract boolean update(Map<String, Object> objectData) throws ServiceErrorException, SQLException;

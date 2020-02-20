@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,8 +27,8 @@ public class Form extends ModuleObject {
   private Map<String, String> completion_rules;
   private Map<String, String> security_settings;
 
-  Form(UUID id, String type) { super(id, type); }
-  Form(UUID id, String type, Map<String, Object> data) throws ServiceErrorException, SQLException {
+  Form(String id, String type) { super(id, type); }
+  Form(String id, String type, Map<String, Object> data) throws ServiceErrorException, SQLException {
     super(id, type);
     setLabel(data.get("label"));
     setSectionIds(data.get("section_ids"));
@@ -49,13 +50,23 @@ public class Form extends ModuleObject {
 	  Set<UUID> sections = new HashSet<UUID>();
 		
 	  if(object == null) this.section_ids = sections; 
+	  
+	  else if(object instanceof ArrayList) {
+		for(Object id : (ArrayList<?>)object) {
+			UUID uuid = FormsValidator.validateUUIDString(id);
+			if(uuid != null) sections.add(uuid);
+			else throw new ServiceErrorException("invalid id in dataTag list");
+		}
+		this.section_ids = sections;
+	  }
 		
 	  else if(object instanceof PgArray) {
-		  JSONObject asJson = new JSONObject(((PgArray) object).getArray());
+		  JSONArray asJson = new JSONArray(((PgArray) object).getArray());
 		  if(asJson.length() > 0)
-			  for(Entry<String, Object> entry : asJson.toMap().entrySet()) {
-				  if(!FormsValidator.validateUUIDString(entry.getValue())) throw new ServiceErrorException("invalid value for property: Forms.Form.section_ids");
-				  sections.add(UUID.fromString(entry.getValue().toString()));
+			  for(Object entry : asJson.toList()) {
+				  UUID uuid = FormsValidator.validateUUIDString(entry);
+				  if(uuid != null) sections.add(uuid);
+				  else throw new ServiceErrorException("invalid value for property: Forms.Form.section_ids");
 			  }
 		  this.section_ids = sections;
 	  }
@@ -66,6 +77,10 @@ public class Form extends ModuleObject {
 	 Map<String, String> rules = new HashMap<String, String>();
 	  
 	  if(object == null) this.completion_rules = rules;
+	  
+	  else if(object instanceof Map) {
+		  this.completion_rules = (Map<String, String>) object;
+	  }
 	  
 	  else if(object instanceof PGobject) {
 			if(((PGobject) object).getType() == "json") {
@@ -84,6 +99,10 @@ public class Form extends ModuleObject {
 	  Map<String, String> securitySettings = new HashMap<String, String>();
 	  
 	  if(object == null) this.security_settings = securitySettings;
+	  
+	  else if(object instanceof Map) {
+		  this.security_settings = (Map<String, String>) object;
+	  }
 	  
 	  else if(object instanceof PGobject) {
 			if(((PGobject) object).getType() == "json") {
@@ -111,10 +130,10 @@ public class Form extends ModuleObject {
   public boolean update(Map<String, Object> data) throws ServiceErrorException, SQLException{
     for(Entry<String, Object> entry: data.entrySet()){
       Object key = entry.getKey();
-      if(key == "label") setLabel(entry.getValue());
-      else if(key == "section_ids") setSectionIds(entry.getValue());
-      else if(key == "completion_rules") setCompletionRules(entry.getValue());
-      else if(key == "security_settings") setSecuritySettings(entry.getValue());
+      if(key.equals("label")) setLabel(entry.getValue());
+      else if(key.equals("section_ids")) setSectionIds(entry.getValue());
+      else if(key.equals("completion_rules")) setCompletionRules(entry.getValue());
+      else if(key.equals("security_settings")) setSecuritySettings(entry.getValue());
       else throw new ServiceErrorException("unknown property in Form");
     }
     return true;
@@ -139,23 +158,23 @@ public class Form extends ModuleObject {
     PreparedStatement statement = null;
 
     try {
-      if(type == "create") statement = connection.prepareStatement("call forms.create_section(?,?,?,?,?)");
-      else if(type == "update") statement = connection.prepareStatement("call forms.update_section(?,?,?,?,?)");
+      if(type == "create") statement = connection.prepareStatement("call forms.create_form(?,?,?,?,?)");
+      else if(type == "update") statement = connection.prepareStatement("call forms.update_form(?,?,?,?,?)");
 
       PGobject completionRulesPGObj = new PGobject();
       completionRulesPGObj.setType("json");
-      completionRulesPGObj.setValue(new JSONArray(this.getCompletionRules()).toString());
+      completionRulesPGObj.setValue(new JSONObject(this.getCompletionRules()).toString());
 
       PGobject securitySettingsPGObj = new PGobject();
       securitySettingsPGObj.setType("json");
-      securitySettingsPGObj.setValue(new JSONArray(this.getSecuritySettings()).toString());
+      securitySettingsPGObj.setValue(new JSONObject(this.getSecuritySettings()).toString());
 
       statement.setObject(1, this.getId());
       statement.setString(2, this.getLabel());
       statement.setArray(3, connection.createArrayOf("UUID", this.getSectionIds().toArray()));
       statement.setObject(4, completionRulesPGObj );
       statement.setObject(5, securitySettingsPGObj );
-    } catch(SQLException err) { throw new ServiceErrorException(err + "error setting storage statement for Section"); }
+    } catch(SQLException err) { throw new ServiceErrorException(err + "error setting storage statement for Form"); }
 
     return statement;
   }

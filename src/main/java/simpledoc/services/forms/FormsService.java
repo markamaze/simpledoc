@@ -125,43 +125,47 @@ public class FormsService implements ServiceModule {
 			validator.validateRequest(request.getDataSet(), request.method(), request.resource());
 	
 			for(ModuleObjectData item : request.getDataSet()) {
-	
+				T currentObj;
 				String id = item.getIdString();
-				String type = item.getType();
-				List<String> resource = new ArrayList<String>();
 	
-				resource.add("Forms");
-				switch(type) {
-					case "FORMS.FORMS":
-						resource.add("forms");
-						break;
-					case "FORMS.FORMSETS":
-						resource.add("formSets");
-						break;
-					case "FORMS.SUBMISSIONS":
-						resource.add("submissions");
-						break;
-					case "FORMS.SECTIONS":
-						resource.add("sections");
-						break;
-					case "FORMS.LAYOUTS":
-						resource.add("layouts");
-						break;
-					case "FORMS.ELEMENTS":
-						resource.add("elements");
-						break;
+				if(id.startsWith("n-")) {
+					currentObj = factory.build(item);
 				}
-				resource.add(id);
-	
-				T currentObj = storage.queryResource(resource, Collections.emptyMap(), factory);
-	
-				currentObj.update(item.getObjectData());
+				else {
+					String type = item.getType();
+					List<String> resource = new ArrayList<String>();
+					resource.add(id);
+					resource.add("Forms");
+					switch(type) {
+						case "FORMS.FORM":
+							resource.add("form");
+							break;
+						case "FORMS.FORMSET":
+							resource.add("formSet");
+							break;
+						case "FORMS.SUBMISSION":
+							resource.add("submission");
+							break;
+						case "FORMS.SECTIONS":
+							resource.add("section");
+							break;
+						case "FORMS.LAYOUT":
+							resource.add("layout");
+							break;
+						case "FORMS.ELEMENTS":
+							resource.add("element");
+							break;
+					}
+					currentObj = storage.queryResource(resource, Collections.emptyMap(), factory);
+					currentObj.update(item.getObjectData());
+				}
 				working_data.add(currentObj);
 			}
 	
 			storage.update(working_data);
 	
 			return response.setResponse("\"Successfully updated objects.\"", 200);
+			
 		} catch(UnsupportedServiceRequest err) { throw new ServiceErrorException(err + "could not validate data"); }
 	}
 	

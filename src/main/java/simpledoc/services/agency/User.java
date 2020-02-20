@@ -24,9 +24,9 @@ public class User extends ModuleObject {
 	private String password;
 	private Map<UUID, String> property_values;
 
-	User(UUID id, String type) { super(id, type); }
-	User(UUID user_id, String type, Map<String, Object> data) throws ServiceErrorException {
-		super(user_id, type);
+	User(String id, String type) { super(id, type); }
+	User(String string, String type, Map<String, Object> data) throws ServiceErrorException {
+		super(string, type);
 		setUsername(data.get("username").toString());
 		setPassword(data.get("password").toString());
 		setPropertyValues(data.get("property_values"));
@@ -46,11 +46,10 @@ public class User extends ModuleObject {
 		else if(object instanceof PGobject) {
 			JSONObject asJson = new JSONObject(((PGobject)object).getValue());
 			Map<UUID, String> propertyValues = new HashMap<UUID, String>();
-			for(String uuid : asJson.keySet()) { 
-				if(!AgencyValidator.validateUUIDString(uuid)) 
-					throw new ServiceErrorException("invalid uuid found in StructuralNode.property_values");
-				else 
-				propertyValues.put(UUID.fromString(uuid), asJson.get(uuid).toString());
+			for(String id : asJson.keySet()) { 
+				UUID uuid = AgencyValidator.validateUUIDString(id);
+				if(uuid != null) propertyValues.put(uuid, asJson.get(id).toString());
+				else throw new ServiceErrorException("invalid uuid found in StructuralNode.property_values");
 			};
 			this.property_values = propertyValues;
 		}
@@ -88,7 +87,10 @@ public class User extends ModuleObject {
 		if(type.equals("create")) statement = connection.prepareStatement("call agency.create_user(?,?,?)");
 		else if(type.equals("update")) statement = connection.prepareStatement("call agency.update_user(?,?,?)");
 		
-		statement.setObject(1, this.getId());
+		UUID uuid;
+		if(this.getId().startsWith("n-")) uuid = AgencyValidator.validateUUIDString(this.getId().substring(2));
+		else uuid = AgencyValidator.validateUUIDString(this.getId());
+		statement.setObject(1, uuid);
 		statement.setString(2, this.getUsername());
 		statement.setString(3, this.getPassword());
 			

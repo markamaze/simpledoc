@@ -28,9 +28,9 @@ public class AgentTemplate extends ModuleObject {
 	private Set<UUID> agentTemplate_dataTag_ids;
 
 
-	AgentTemplate(UUID id, String type) { super(id, type); }
-	AgentTemplate(UUID template_id, String type, Map<String, Object> data) throws ServiceErrorException, SQLException {
-		super(template_id, type);
+	AgentTemplate(String id, String type) { super(id, type); }
+	AgentTemplate(String string, String type, Map<String, Object> data) throws ServiceErrorException, SQLException {
+		super(string, type);
 		setLabel(data.get("agentTemplate_label"));
 		setDataTagIds(data.get("agentTemplate_dataTag_ids"));
 	}
@@ -51,9 +51,8 @@ public class AgentTemplate extends ModuleObject {
 		}		
 		else if(object instanceof ArrayList) {
 			for(Object id : (ArrayList<?>) object) {
-				if(AgencyValidator.validateUUIDString(id.toString())) {
-					tagsList.add(UUID.fromString(id.toString()));
-				}
+				  UUID uuid = AgencyValidator.validateUUIDString(id);
+				if(uuid != null) tagsList.add(uuid);
 				else throw new ServiceErrorException("invalid id in dataTag list");
 			}
 			this.agentTemplate_dataTag_ids = new HashSet<UUID>(tagsList);
@@ -94,7 +93,11 @@ public class AgentTemplate extends ModuleObject {
 		if(type.equals("create")) statement = connection.prepareStatement("call agency.create_agentTemplate(?,?,?)");
 		else if(type.equals("update")) statement = connection.prepareStatement("call agency.update_agentTemplate(?,?,?)");
 					
-		statement.setObject(1, this.getId());
+		UUID uuid;
+		if(this.getId().startsWith("n-")) uuid = AgencyValidator.validateUUIDString(this.getId().substring(2));
+		else uuid = AgencyValidator.validateUUIDString(this.getId());
+		
+		statement.setObject(1, uuid);
 		statement.setString(2, this.getLabel());
 		statement.setArray(3, connection.createArrayOf("UUID", this.getDataTagIds().toArray()));
 

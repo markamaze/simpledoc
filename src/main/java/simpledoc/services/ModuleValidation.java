@@ -13,17 +13,19 @@ public abstract class ModuleValidation {
     throws UnsupportedServiceRequest;
 
 
-    public static boolean validateUUIDString(Object id_object) {
+    public static UUID validateUUIDString(Object id_object) {
       try{ 
     	  
-    	  if(id_object instanceof UUID) return true;
-    	  else if(id_object instanceof String) UUID.fromString((String)id_object);
-    	  else UUID.fromString(id_object.toString());
-    
-    	  } 
-      catch (IllegalArgumentException err) { return false; }
-      catch(NullPointerException err) { return false; }
-      return true;
+    	  if(id_object instanceof UUID) return (UUID)id_object;
+    	  else if(id_object instanceof String) {
+    		  String id_string = (String) id_object;
+    		  if(id_string.startsWith("n-")) return UUID.fromString(id_string.substring(2));
+    		  else return UUID.fromString(id_string);
+    	  }
+    	  else return UUID.fromString(id_object.toString());
+      }
+      catch (IllegalArgumentException err) { return null; }
+      catch(NullPointerException err) { return null; }
     }
 
     public static boolean validateString(Object test_string, 

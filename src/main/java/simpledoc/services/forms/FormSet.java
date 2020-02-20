@@ -24,8 +24,8 @@ public class FormSet extends ModuleObject {
   private List<Object> completion_rules;
   private List<Object> security_settings;
 
-  FormSet(UUID id, String type) { super(id, type); }
-  FormSet(UUID id, String type, Map<String, Object> data) throws ServiceErrorException {
+  FormSet(String id, String type) { super(id, type); }
+  FormSet(String id, String type, Map<String, Object> data) throws ServiceErrorException {
     super(id, type);
     setLabel(data.get("label"));
     setFormIds(data.get("form_ids"));

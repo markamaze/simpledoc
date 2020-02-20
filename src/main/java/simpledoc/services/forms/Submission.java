@@ -24,8 +24,8 @@ public class Submission extends ModuleObject {
   private Date submitted_on;
   private UUID submitted_by;
 
-  Submission(UUID id, String type) { super(id, type); }
-  Submission(UUID id, String type, Map<String, Object> data) throws ServiceErrorException {
+  Submission(String id, String type) { super(id, type); }
+  Submission(String id, String type, Map<String, Object> data) throws ServiceErrorException {
     super(id, type);
     setFormId(data.get("form_id"));
     setSectionId(data.get("section_id"));

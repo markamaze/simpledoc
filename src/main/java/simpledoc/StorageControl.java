@@ -81,7 +81,12 @@ public class StorageControl {
 	  connection.setAutoCommit(false);
 	    	  
 	  for(T obj : data) {
-		PreparedStatement cs = obj.writeStorageStatement("update", connection);
+		PreparedStatement cs;
+		
+		if(obj.getId().startsWith("n-"))
+			cs = obj.writeStorageStatement("create", connection);
+		else cs = obj.writeStorageStatement("update", connection);
+		
 		int result = cs.executeUpdate();
 		if(result < 0) {
 			committed = false;
