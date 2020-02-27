@@ -1,5 +1,4 @@
 import React from 'react'
-import uuidv4 from 'uuid/v4'
 import { agencyObject } from './agencyObject'
 
 
@@ -51,64 +50,69 @@ const prototype = agencyState => ({
   },
   display: {
     card: property => {
-      return  <div className="property container">{property.property_key}</div>
+      return  <div className="property container-item">{property.property_key}</div>
     },
-    document: property => {
-      return  <div className="property container-fill">{property.property_key}:{`(${property.property_value_type})`}</div>
+    document: (property, value) => {
+      return  <div className="property container-row">
+                <div className="container-item">{property.property_key}:</div>
+                <div className="container-item">{`${property.value ? property.value : `(${property.property_value_type})` } `}</div>
+              </div>
     },
-    editor: (property, updateHandler) => {
+    editor: (property, value, updateHandler) => {
       function Editor(props){
-        const [tempProperty, updateTempProperty] = React.useState(props.property)
-        const updateHandler = newState => props.updateHandler ?
-          props.updateHandler(newState)
-          : updateTempProperty(Object.assign(Object.create(Object.getPrototypeOf(props.property)), props.property, newState))
+        const [tempValue, updateTempValue] = React.useState(props.value ? props.value : "")
 
-        return  <div className="property container-fill">
+        const setValue = () => props.updateHandler({[`${props.property.id}`]:tempValue})
+
+        return  <div className="property container">
                   <div className="container-row">
-                    {props.property.property_key}:
-                    <input type="text"
-                          value={props.property.property_value_type}
-                          onChange={() => updateHandler({property_value_type: event.target.value})} />
+                    <div className="container-item item-label">{props.property.property_key}</div>
+                    <input className="container-item"
+                        type="text"
+                        value={value}
+                        onChange={() => updateHandler(event.target.value)} />
                   </div>
                 </div>
       }
 
-      return <Editor property={property} updateHandler={updateHandler}/>
+      return <Editor property={property} value={value} updateHandler={updateHandler}/>
     },
-    builder: (property, updateHandler) => {
+    builder: (property) => {
       function Builder(props){
         const [tempProperty, updateTempProperty] = React.useState(props.property)
-        const updateHandler = newState => props.updateHandler ?
-          props.updateHandler(newState)
-          : updateTempProperty(Object.assign(Object.create(Object.getPrototypeOf(tempProperty)), tempProperty, {...newState}))
 
-        return  <div className="property container-fill">
+        const updateHandler = newState => updateTempProperty(Object.assign(Object.create(Object.getPrototypeOf(tempProperty)), tempProperty, {...newState}))
 
-                  <div className="container-row">
-                    <label>property key:</label>
-                    <input type="text"
-                            onChange={()=> updateHandler({property_key: event.target.value})}
-                            value={tempProperty.property_key} />
+        return  <div className="property document">
+                  <header>Modify Property</header>
+                  <div className="container-fill">
+                    <div className="container-row border-bottom">
+                      <div className="container-item item-label">Set Key</div>
+                      <input className="container-item container-fill"
+                          type="text"
+                          onChange={()=> updateHandler({property_key: event.target.value})}
+                          value={tempProperty.property_key} />
+                    </div>
+
+                    <div className="container-row border-bottom">
+                      <div className="container-item item-label">Set Value Type</div>
+                      <select className="container-item container-fill"
+                          onChange={() => updateHandler({property_value_type: event.target.value})}
+                          value={tempProperty.property_value_type}>
+                        <option value=""></option>
+                        <option value="string">String</option>
+                        <option value="number">Number</option>
+                        <option value="time">Time</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
                   </div>
 
-                  <div className="container-row">
-                    <label>property value type:</label>
-                    <select onChange={() => updateHandler({property_value_type: event.target.value})}
-                            value={tempProperty.property_value_type}>
-                      <option value=""></option>
-                      <option value="string">String</option>
-                      <option value="number">Number</option>
-                      <option value="time">Time</option>
-                    </select>
-                  </div>
-
-                  {
-                    props.updateHandler ? null : tempProperty.storage.handlers.call(tempProperty)
-                  }
+                  { tempProperty.storage.handlers.call(tempProperty) }
                 </div>
       }
 
-      return <Builder property={property} updateHandler={updateHandler} />
+      return <Builder property={property} />
     }
   }
 })
@@ -118,22 +122,16 @@ const displayProps = agencyState => ({
   displayKey: "property_key",
   component: {
     list: {
-      columns: {
-        limited: [{label: "key", selector: "property_key"}],
-        expanded: [{label: "key", selector: "property_key"},{label: "value type", selector:"property_value_type"}]
-      },
-      tableData: Object.values(agencyState.property),
+      columns: [{selector: "display"}],
+      tableData: Object.values(agencyState.property).map(property => ({data: property, display: property.display.document(property)})),
       listActions: [
         {label: "New Property", action: () => {
           let newProperty = agencyObject("property", {id: "new_object", }, err=>{throw err})
           return newProperty.display.builder(newProperty)
         }}
       ],
-      drawerComponents: [
-        {label: "modify", component: item => item.display.builder(item)}
-
-      ],
       overlayComponents: [
+        {label: "modify", component: item => item.data.display.builder(item.data)}
       ]
     }
   }

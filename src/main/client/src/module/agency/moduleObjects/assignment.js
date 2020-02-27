@@ -42,16 +42,15 @@ const prototype = agencyState => ({
   display: {
     card: assignment =>
       <div className="assignment container">
-        {agencyState().agentTemplate[assignment.agentTemplate_id].agentTemplate_label}
+        {assignment.typeFunctions.getTemplate(assignment).agentTemplate_label}
       </div>,
     document: assignment => {
-      let store = agencyState()
-      let position = store.agentTemplate[assignment.agentTemplate_id]
-      let supervisor = assignment.supervising_assignment_id === null ? null : store.agentTemplate[store.assignment[assignment.supervising_assignment_id].agentTemplate_id]
+      let position = assignment.typeFunctions.getTemplate(assignment)
+      let supervisor = assignment.typeFunctions.getSupervisorTemplate(assignment)
 
-      return  <div className="assignment container-fill">
-                <div className="container-row">{`Position: ${position.agentTemplate_label}`}</div>
-                <div className="container-row">{`Reports To: ${supervisor === null ? "node supervisor"
+      return  <div className="assignment container-row">
+                <div className="container-item">{`Position: ${position.agentTemplate_label}`}</div>
+                <div className="container-item">{`Reports To: ${supervisor === null ? "node supervisor"
                     : supervisor.agentTemplate_label}`}</div>
               </div>
     },
@@ -62,32 +61,36 @@ const prototype = agencyState => ({
           : updateTempAssignment(Object.assign(Object.create(Object.getPrototypeOf(tempAssignment)), tempAssignment, newState))
 
 
-        return  <div className="assignment container-fill">
+        return  <div className="assignment document">
+
+                  <header>Modify Assignment</header>
 
                   <div className="container-fill">
-                    <div className="container-row">
-                      <label>Set AgentTemplate</label>
-                      <select onChange={() => updateHandler({agentTemplate_id: event.target.value})}
-                              value={tempAssignment.agentTemplate_id} >
-                          <option value=""></option>
-                          {
-                            Object.values(agencyState().agentTemplate).map(template =>
-                              <option value={template.id}>{template.agentTemplate_label}</option>)
-                          }
+                    <div className="container-row border-bottom">
+                      <div className="container-item item-label">Set AgentTemplate</div>
+                      <select className="container-item container-fill"
+                          onChange={() => updateHandler({agentTemplate_id: event.target.value})}
+                          value={tempAssignment.agentTemplate_id} >
+                        <option value=""></option>
+                        {
+                          Object.values(agencyState().agentTemplate).map(template =>
+                            <option value={template.id}>{template.agentTemplate_label}</option>)
+                        }
                       </select>
                     </div>
 
-                    <div className="container-row">
-                      <label>set assignment supervisor</label>
-                      <select onChange={() => updateHandler({supervising_assignment_id: event.target.value})}
-                              value={tempAssignment.supervising_assignment_id} >
-                          <option value=""></option>
-                          {
-                            Object.values(agencyState().assignment).map( assignment => {
-                              let assignmentTemplate = agencyState().agentTemplate[assignment.agentTemplate_id]
-                              return <option value={assignment.id}>{assignmentTemplate.agentTemplate_label}</option>
-                            })
-                          }
+                    <div className="container-row border-bottom">
+                      <div className="container-item item-label">set assignment supervisor</div>
+                      <select className="container-item container-fill"
+                          onChange={() => updateHandler({supervising_assignment_id: event.target.value})}
+                          value={tempAssignment.supervising_assignment_id} >
+                        <option value=""></option>
+                        {
+                          Object.values(agencyState().assignment).map( assignment => {
+                            let assignmentTemplate = agencyState().agentTemplate[assignment.agentTemplate_id]
+                            return <option value={assignment.id}>{assignmentTemplate.agentTemplate_label}</option>
+                          })
+                        }
                       </select>
                     </div>
                   </div>
@@ -99,7 +102,8 @@ const prototype = agencyState => ({
     }
   },
   typeFunctions: {
-
+    getTemplate: assignment => agencyState().agentTemplate[assignment.agentTemplate_id],
+    getSupervisorTemplate: assignment => assignment.supervising_assignment_id === null ? null : agencyState().agentTemplate[agencyState().assignment[assignment.supervising_assignment_id].agentTemplate_id]
   }
 })
 
@@ -108,20 +112,15 @@ const displayProps = agencyState => ({
   displayKey: "id",
   component: {
     list: {
-      iconComponent: assignment => assignment.display.card(assignment),
-      tableData: Object.values(agencyState.assignment),
+      columns: [{selector: "display"}],
+      tableData: Object.values(agencyState.assignment).map(assignment => ({data: assignment, display: assignment.display.document(assignment)})),
       listActions: [
         {label: "New Assignment", action: () => {
           let newAssignment = agencyObject("assignment", {id: "new_object"}, err=>{throw err})
           return newAssignment.display.builder(newAssignment)
         }}
       ],
-      drawerComponents: [
-        {label: "document", component: item => item.display.document(item)}
-      ],
-      overlayComponents: [
-        {label: "builder", component: item => item.display.builder(item)}
-      ]
+      overlayComponents: [{label: "modify", component: item => item.data.display.builder(item.data)}]
     }
   }
 })

@@ -144,7 +144,7 @@ const agencyObjectPrototype = (objectPrototype) => ({
       action: function(failure){
                 let result
                 try{
-                  result  = removeAgencyObjects(this, failure)
+                  result  = removeAgencyObjects([this], failure)
 
                   return result && result.error ? failure(result) : true
                 } catch(err){ failure(err) }}

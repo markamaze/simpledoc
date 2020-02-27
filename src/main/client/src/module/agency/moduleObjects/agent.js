@@ -1,5 +1,4 @@
 import React from 'react'
-import uuidv4 from 'uuid/v4'
 import { agencyObject } from './agencyObject'
 
 
@@ -52,69 +51,58 @@ const prototype = agencyState => ({
     card: agent => {
       let state = agencyState()
       return  <div className="agent container-row">
-                <div>{state.user[agent.agent_user_id].username}</div>
-                <div>{agent.typeFunctions.getAgentTemplateLabel(agent)}</div>
+                <div className="container-item">{agent.typeFunctions.getAssignedNode(agent).structuralNode_label}</div>
+                <div className="container-item">{agent.typeFunctions.getAssignedAgentTemplate(agent).agentTemplate_label}</div>
+                <div className="container-row">{agent.typeFunctions.getDataTags(agent).map(tag => tag.display.card(tag))}</div>
               </div>
     },
     document: agent => {
-      let state = agencyState()
-      return  <div className="agent container-fill">
-                <div className="container-row">
-                  <label>Assigned User</label>
-                  <div>{agent.typeFunctions.getAssignedUsername(agent)}</div>
-                </div>
-                <div className="container-row">
-                  <label>Assigned Node</label>
-                  <div>{agent.typeFunctions.getAssignedNodeLabel(agent)}</div>
-                </div>
-                <div className="container-row">
-                  <label>Position</label>
-                  <div>{agent.typeFunctions.getAgentTemplateLabel(agent)}</div>
-                </div>
-              </div>
-    },
-    builder: (agent, updateHandler) => {
-      function Builder(props){
+      let assignedUser = agent.typeFunctions.getAssignedUser(agent)
+      let assignedNode = agent.typeFunctions.getAssignedNode(agent)
+      let assignedTemplate = agent.typeFunctions.getAssignedAgentTemplate(agent)
+      return  <div className="agent document">
+                <header>Agent Document</header>
 
-        const [tempAgent, updateTempAgent] = React.useState(props.agent)
-        const updateHandler = newState => props.updateHandler ? props.updateHandler(newState) :
-          updateTempAgent(Object.assign(Object.create(Object.getPrototypeOf(tempAgent)), tempAgent, newState))
-
-        const state = agencyState()
-
-        return  <div className="agent container-fill">
-
-                  <div className="container-fill">
-
-                    { tempAgent.display.document(tempAgent) }
-
-                    <div className="container-row">
-                      <label>Assign User</label>
-                      <select value={tempAgent.agent_user_id}
-                              onChange={() => updateHandler({agent_user_id: event.target.value})}>
-                        {
-                          Object.values(state.user).map( user =>
-                            <option value={user.id}>{user.username}</option>)
-                        }
-                      </select>
-                    </div>
-
-
+                <div className="container-fill">
+                  <div className="container-row border-bottom">
+                    <div className="container-item item-label">Assigned User:</div>
+                    <div className="container-item item-fill">{assignedUser.display.card(assignedUser)}</div>
                   </div>
 
-                  { props.updateHandler ? null : tempAgent.storage.handlers.call(tempAgent) }
+                  <div className="container-row border-bottom">
+                    <div className="container-item item-label">Assigned Node:</div>
+                    <div className="container-item item-fill">{assignedNode.display.card(assignedNode)}</div>
+                  </div>
+
+                  <div className="container-row">
+                    <div className="container-item item-label">Position:</div>
+                    <div className="container-item item-fill">{assignedTemplate.display.card(assignedTemplate)}</div>
+                  </div>
 
                 </div>
-      }
-
-      return <Builder agent={agent} updateHandler={updateHandler} />
+              </div>
     }
   },
   typeFunctions: {
-    getAgentTemplateLabel: agent => agencyState().agentTemplate[agencyState().assignment[agent.assignment_id].agentTemplate_id].agentTemplate_label,
-    getAssignedUsername: agent => agent.agent_user_id === undefined ? "unassigned" : agencyState().user[agent.agent_user_id].username,
-    getAssignedNodeLabel: agent => agencyState().structuralNode[agent.structuralNode_id].structuralNode_label,
+    getAssignedAgentTemplate: agent => agencyState().agentTemplate[agencyState().assignment[agent.assignment_id].agentTemplate_id],
+    getAssignedUser: agent => agent.agent_user_id === undefined ? null : agencyState().user[agent.agent_user_id],
+    getAssignedNode: agent => agencyState().structuralNode[agent.structuralNode_id],
+    getProperties: agent => {
+      let state = agencyState()
+      let properties = []
 
+      agent.typeFunctions.getDataTags(agent).map( dataTag => {
+        dataTag.dataTag_property_ids.forEach( id => {
+          properties = [...properties, state.property[id]]
+        })
+      })
+      return properties
+    },
+    getDataTags: agent => {
+      let state = agencyState()
+      return state.agentTemplate[state.assignment[agent.assignment_id].agentTemplate_id].agentTemplate_dataTag_ids.map( id => state.dataTag[id])
+    },
+    getAssignedNode: agent => agencyState().structuralNode[agent.structuralNode_id]
   }
 })
 
@@ -123,14 +111,10 @@ const displayProps = agencyState => ({
   displayKey: "",
   component: {
     list: {
-      iconComponent: agent => agent.display.card(agent),
-      tableData: Object.values(agencyState.agent),
-      listActions: [],
+      tableData: Object.values(agencyState.agent).map(agent => ({data: agent, display: agent.display.card(agent)})),
+      columns: [{selector: "display"}],
       drawerComponents: [
-        {label: "document", component: item => item.display.document(item)}
-      ],
-      overlayComponents: [
-        {label: "modify", component: item => item.display.builder(item)}
+        {label: "document", component: item => item.data.display.document(item.data)}
       ]
     }
   }

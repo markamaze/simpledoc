@@ -52,16 +52,38 @@ const prototype = agencyState => ({
       return  <div className="user container-row">{user.username}</div>
     },
     document: user => {
-      let store = agencyState()
-      return  <div className="user container-fill">
+      return  <div className="user document">
+                <header>{`User: ${user.username}`}</header>
+                <div className="container-fill">
+                  <div className="container-row border-bottom">
+                    <div className="container-item item-label">Username:</div>
+                    <div className="container-item container-fill">{user.username}</div>
+                  </div>
 
-                <div className="container-row btm-border">{ user.display.card(user) }</div>
+                  <div className="container-row border-bottom">
+                    <div className="container-item item-label">Active Agents:</div>
+                    <div className="container-item container-fill">
+                      {
+                        user.typeFunctions.getUserAgents(user).map( agent =>
+                          <div className="container-item">{agent.display.card(agent)}</div>)
+                      }
+                    </div>
+                  </div>
 
-                <div className="container-row">
-                  <label>username:</label>
-                  <input type="text" disable value={user.username} />
+                  <div className="container-row border-bottom">
+                    <div className="container-item item-label">Properties:</div>
+                    <div className="container-item container-fill">
+                      {
+                        user.typeFunctions.getProperties(user).length < 1 ?
+                          "no properties"
+                          : user.typeFunctions.getProperties(user).map( property =>
+                          property.display.document(property, user.property_values[property.id]))
+                      }
+                    </div>
+                  </div>
                 </div>
               </div>
+
     },
     editor: (user, updateHandler) => {
       function Editor(props) {
@@ -69,13 +91,22 @@ const prototype = agencyState => ({
         const updateHandler = newState => props.updateHandler ? props.updateHandler(newState)
           : updateTempUser(Object.assign(Object.create(Object.getPrototypeOf(tempUser)), tempUser, newState))
 
-        return  <div className="user container-fill">
+        return  <div className="user document">
+                  <header>Edit User Property Values</header>
                   <div className="container-fill">
-                    <div className="container-row btm-border">{ tempUser.display.card(tempUser) }</div>
 
-                    <div className="container">
-                      <label>Property Values</label>
+                    <div className="container-row border-bottom">
+                      <div className="container-item item-label">Properties:</div>
+                      <div className="container-item container-fill">
+                        {
+                          tempUser.typeFunctions.getProperties(tempUser).length < 1 ?
+                            "no properties"
+                            : tempUser.typeFunctions.getProperties(tempUser).map( property =>
+                            property.display.editor(property, tempUser.property_values[property.id], newValue => updateHandler({property_values: Object.assign({}, tempUser.property_values, { [`${property.id}`]: newValue })})))
+                        }
+                      </div>
                     </div>
+
                   </div>
 
                   { props.updateHandler ? null : tempUser.storage.handlers.call(tempUser) }
@@ -84,38 +115,59 @@ const prototype = agencyState => ({
       }
       return <Editor user={user} updateHandler={updateHandler} />
     },
-    builder: (user, updateHandler) => {
+    builder: (user) => {
       function Builder(props){
         const [tempUser, updateTempUser] = React.useState(props.user)
-        const updateHandler = newState => props.updateHandler ? props.updateHandler(newState)
-          : updateTempUser(Object.assign(Object.create(Object.getPrototypeOf(tempUser)), tempUser, newState))
+        const updateHandler = newState => updateTempUser(Object.assign(Object.create(Object.getPrototypeOf(tempUser)), tempUser, newState))
 
-        return  <div className="user container-fill">
+        return  <div className="user document">
+                  <header>Modify User</header>
                   <div className="container-fill">
 
-                    <div className="container-row btm-border">{tempUser.display.card(tempUser)}</div>
-
-                    <div className="container-row">
-                      <label>set username:</label>
-                      <input value={tempUser.username}
-                            onChange={() => updateHandler({username: event.target.value})} />
+                    <div className="container-row border-bottom">
+                      <div className="container-item item-label">Set Username</div>
+                      <input className="container-item container-fill"
+                          type="text"
+                          value={tempUser.username}
+                          onChange={() => updateHandler({username: event.target.value})} />
                     </div>
 
-                    <div className="container-row">
-                      <label>update password:</label>
-                      <input value={tempUser.password}
-                            onChange={() => updateHandler({password: event.target.value})} />
+                    <div classname="container-row border-bottom">
+                      <div className="container-item item-label">Reset Password</div>
+                      <input className="container-item container-fill"
+                          type="text"
+                          placeholder="enter new password"
+                          onChange={() => updateHandler({password: event.target.value})} />
                     </div>
+
                   </div>
 
-                  { props.updateHandler ? null : tempUser.storage.handlers.call(tempUser) }
+                  { tempUser.storage.handlers.call(tempUser) }
 
                 </div>
       }
-      return <Builder user={user} updateHandler={updateHandler} />
+      return <Builder user={user} />
     }
   },
-  typeFunctions: {}
+  typeFunctions: {
+    getUserAgents: user => Object.values(agencyState().agent).filter(agent => agent.agent_user_id === user.id),
+    getUserDataTags: user => {
+      let tagSet = []
+      user.typeFunctions.getUserAgents(user).forEach( agent => {
+        agent.typeFunctions.getDataTags(agent).forEach(dataTag => { tagSet = [...tagSet, dataTag]})
+      })
+      return tagSet
+    },
+    getProperties: user => {
+      let state = agencyState()
+      let propertySet = []
+
+      user.typeFunctions.getUserDataTags(user)
+        .map( tag => tag.dataTag_property_ids.forEach(propId => { propertySet = [...propertySet, state.property[propId]] }))
+
+        return propertySet
+    },
+  }
 })
 
 
@@ -124,12 +176,7 @@ const displayProps = agencyState => ({
   displayKey: "username",
   component: {
     list: {
-      columns: {
-        limited: [{label: "Username", selector: "username"}],
-        expanded: [
-          {label: "Username", selector: "username"}
-        ]
-      },
+      columns: [{selector: "username"}],
       tableData: Object.values(agencyState.user),
       listActions: [
         {label: "New User", action: () => {
@@ -138,12 +185,11 @@ const displayProps = agencyState => ({
         }}
       ],
       drawerComponents: [
-        {label: "card", component: item => item.display.card(item)},
+        {label: "show document", component: item => item.display.document(item)},
       ],
       overlayComponents: [
-        {label: "document", component: item => item.display.document(item)},
-        {label: "editor", component: item => item.display.editor(item)},
-        {label: "builder", component: item => item.display.builder(item)}
+        {label: "edit properties", component: item => item.display.editor(item)},
+        {label: "modify user", component: item => item.display.builder(item)}
       ]
     }
   }

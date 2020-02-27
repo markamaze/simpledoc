@@ -1,5 +1,4 @@
 import React from 'react'
-import uuidv4 from 'uuid/v4'
 import { agencyObject } from './agencyObject'
 
 
@@ -63,75 +62,94 @@ const prototype = agencyState => ({
     }
   },
   display: {
-    card: dataTag => {
-      return  <div className="dataTag container-row">{dataTag.dataTag_label}</div>
-    },
-    document: dataTag => {
-      let state = agencyState()
-      return  <div className="dataTaga container-fill">
-                <div className="container-row">{`dataTag label: ${dataTag.dataTag_label}`}</div>
+    card: dataTag => <div className="dataTag container-item">{dataTag.dataTag_label}</div>,
+    document: dataTag =>
+      <div className="document">
+        <header>{`DataTag Info: ${dataTag.dataTag_label}`}</header>
+        <div className="container-fill">
+          <div className="container-row border-bottom">
+            <div className="container-item item-label">DataTag:</div>
+            <div className="container-fill">{ dataTag.display.card(dataTag) }</div>
+          </div>
 
-                <div className="container">
-                  <label>properties:</label>
-                  {
-                    dataTag.dataTag_property_ids.length < 1 ? <div>no properties set</div> :
+          <div className="container-row border-bottom">
+            <div className="container-item item-label">DataTag Type:</div>
+            <div className="container-fill">
+              <div className="container-item">{dataTag.dataTag_tagType}</div>
+            </div>
+          </div>
 
-                    dataTag.dataTag_property_ids
-                      .map( id => state.property[id] )
-                      .map( property => property.display.card(property))
-                  }
-                </div>
-              </div>
-    },
-    builder: (dataTag, updateHandler) => {
+          <div className="container-row border-bottom">
+            <div className="container-item item-label">Properties:</div>
+            <div className="container-fill">
+              { dataTag.typeFunctions.getProperties(dataTag).map(property => property.display.card(property)) }
+            </div>
+          </div>
+        </div>
+      </div>,
+    builder: (dataTag) => {
       function Builder(props){
         const [tempDataTag, updateTempDataTag] = React.useState(props.dataTag)
-        const updateHandler = newState => props.updateHandler ? props.updateHandler(newState)
-          : updateTempDataTag(Object.assign(Object.create(Object.getPrototypeOf(tempDataTag)), tempDataTag, newState))
 
-        const toggleProperty = property => {
-          tempDataTag.dataTag_property_ids.includes(property.id) ?
-            updateHandler({dataTag_property_ids: tempDataTag.dataTag_property_ids.filter(id => id !== property.id)})
-            : updateHandler({dataTag_property_ids: [...tempDataTag.dataTag_property_ids, property.id]})
-        }
+        const updateHandler = newState => updateTempDataTag(Object.assign(Object.create(Object.getPrototypeOf(tempDataTag)), tempDataTag, newState))
 
-        return  <div className="container-fill">
+        const toggleProperty = property_id => tempDataTag.dataTag_property_ids.includes(property_id) ?
+          updateHandler({dataTag_property_ids: tempDataTag.dataTag_property_ids.filter(id => id !== property_id)})
+          : updateHandler({dataTag_property_ids: [...tempDataTag.dataTag_property_ids, property_id]})
 
-                  <div className="container-row">
-                    <label>Set Label</label>
-                    <input value={tempDataTag.dataTag_label}
-                          onChange={() => updateHandler({dataTag_label: event.target.value})} />
+        const tagTypeOptions = () =>
+          <select value={tempDataTag.dataTag_tagType}
+              onChange={() => updateHandler({dataTag_tagType: event.target.value})} >
+            <option value=""></option>
+            <option value="agent">Agent</option>
+            <option value="structural">Structural</option>
+          </select>
+
+        return  <div className="document">
+                  <header>Modify DataTag</header>
+                  <div className="container-fill">
+                    <div className="container-row border-bottom">
+                      <div className="container-item item-label">Set Label:</div>
+                      <div className="container-fill">
+                        <input value={tempDataTag.dataTag_label}
+                            onChange={() => updateHandler({dataTag_label: event.target.value})} />
+                      </div>
+                    </div>
+
+                    <div className="container-row border-bottom">
+                      <div className="container-item item-label">Set DataTag Type:</div>
+                      <div className="container-fill">
+                        <div className="container-item">{tagTypeOptions()}</div>
+                      </div>
+                    </div>
+
+                    <div className="container-row border-bottom">
+                      <div className="container-item item-label">Set Properties:</div>
+                      <div className="container">
+                        {
+                          Object.values(agencyState().property).map( property =>
+                            <div className={`container-item ${tempDataTag.dataTag_property_ids.includes(property.id) ? "selected" : ""}`}
+                                onClick={()=> toggleProperty(property.id)}>
+                              {property.display.card(property)}
+                            </div>)
+                        }
+                      </div>
+                    </div>
+
                   </div>
 
-                  <div className="container">
-                    <label>Set TagType</label>
-                    <select value={tempDataTag.dataTag_tagType}
-                            onChange={() => updateHandler({dataTag_tagType: event.target.value})} >
-                      <option value=""></option>
-                      <option value="agent">Agent</option>
-                      <option value="structural">Structural</option>
-                    </select>
-                  </div>
-
-                  <div className="container">
-                    <label>Set Tag Properties</label>
-                    {
-                      Object.values(agencyState().property).map( property =>
-                          <span onClick={() => toggleProperty(property)}
-                                className={tempDataTag.dataTag_property_ids.includes(property.id) ? "selected-property" : "unselected-property"}>{property.display.card(property)}</span>)
-                    }
-                  </div>
-
-                  { props.updateHandler ? null : tempDataTag.storage.handlers.call(tempDataTag) }
-
+                  { tempDataTag.storage.handlers.call(tempDataTag) }
 
                 </div>
       }
 
-      return <Builder dataTag={dataTag} updateHandler={updateHandler} />
+      return <Builder dataTag={dataTag} />
     }
   },
-  typeFunctions: {}
+  typeFunctions: {
+    getProperties: dataTag => dataTag.dataTag_property_ids.length < 1 ? []
+      : dataTag.dataTag_property_ids.map( id => agencyState().property[id] )
+  }
 })
 
 
@@ -140,27 +158,37 @@ const displayProps = agencyState => ({
   displayKey: "dataTag_label",
   component: {
     list: {
-      columns: {
-        limited: [{label: "Tag Name", selector: "dataTag_label"}],
-        expanded: [
-          {label: "Tag Name", selector: "dataTag_label"},
-          {label: "Type", selector: "dataTag_tagType"}
-        ]
-      },
-      // iconComponent: dataTag => dataTag.display.card(dataTag),
-      tableData: Object.values(agencyState.dataTag),
-      listActions: [{label: "New DataTag", action: () => {
-        let newDataTag = agencyObject("dataTag", {id: "new_object", dataTag_label: "new dataTag", dataTag_tagType: "agent"}, err=>{console.log(err)})
-        return newDataTag.display.builder(newDataTag)
-      }}],
+      columns: [{selector: "display"}],
+      tableData: Object.values(agencyState.dataTag).map(dataTag => ({
+        data: dataTag,
+        display: <div className="container-item">{dataTag.dataTag_label}</div>
+      })),
+      listActions: [
+        {label: "New DataTag", action: () => {
+          let newDataTag = agencyObject("dataTag", {id: "new_object", dataTag_label: "new dataTag", dataTag_tagType: "agent"}, err=>{console.log(err)})
+          return newDataTag.display.builder(newDataTag)
+        }}],
       drawerComponents: [
-        {label: "card", component: item => item.display.card(item)}
+        {label: "document", component: item => item.display.document(item)},
       ],
       overlayComponents: [
-        {label: "document", component: item => item.display.document(item)},
         {label: "modify", component: item => item.display.builder(item)}
       ]
     }
+  },
+  procedure: {
+    toggleTags: (dataTag, updateHandler) => {
+      return <select value="" onChange={() => updateHandler(event.target.value)} >
+        <option value=""></option>
+        {
+          Object.values(agencyState.dataTag).map( tag => <option value={tag.id} style={{background: `${dataTag.structuralNode_dataTag_ids.includes(tag.id) ? "yellow" : ""}`}}>{tag.dataTag_label}</option>)
+        }
+      </select>
+    },
+    showTags: tagSet => tagSet.map(tagId => {
+      let tag = agencyState.dataTag[tagId]
+      return tag.display.card(tag)}
+    )
   }
 })
 

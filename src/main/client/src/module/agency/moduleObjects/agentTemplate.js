@@ -41,25 +41,36 @@ const prototype = agencyState => ({
     card: template => {
       let store = agencyState()
       return  <div className="agentTemplate container-row">
-                { template.agentTemplate_label }
+                <div className="container-item item-label">Position:</div>
+                <div className="container-item">{ template.agentTemplate_label }</div>
+                <div className="container-item">
                 {
                   template.agentTemplate_dataTag_ids
                     .map(id => store.dataTag[id])
                     .map(tag => tag.display.card(tag))
                 }
+                </div>
               </div>
     },
     document: template => {
       let store = agencyState()
-      return  <div className="agentTemplate container-fill">
-                { template.display.card(template) }
+      return  <div className="agentTemplate document">
+                <header>{`AgentTemplate: ${template.agentTemplate_label}`}</header>
 
-                <div className="container">
-                  {
-                    template.agentTemplate_dataTag_ids
-                      .map(id => store.dataTag[id])
-                      .map(tag => tag.display.document(tag))
-                  }
+                <div className="container-fill">
+                  <div className="container-row border-bottom">{ template.display.card(template) }</div>
+
+                  <div className="container-row border-bottom">
+                    <div className="container-item item-label">Properties: </div>
+                    <div className="container-fill">
+                      {
+                        template.typeFunctions.getProperties(template).length < 1 ?
+                          <div className="container-item">no properties</div>
+                          : template.typeFunctions.getProperties(template).map(property =>
+                          <div className="container-item">{property.display.card(property)}</div>)
+                      }
+                    </div>
+                  </div>
                 </div>
               </div>
     },
@@ -75,22 +86,26 @@ const prototype = agencyState => ({
             : updateHandler({agentTemplate_dataTag_ids: [...tempTemplate.agentTemplate_dataTag_ids, dataTag.id]})
         }
 
-        return  <div className="agentTemplate container-fill">
+        return  <div className="agentTemplate document">
+                <header>Modify AgentTemplate</header>
 
                   <div className="container-fill">
-                    <div className="container-row">
-                      <label>Set Template Label</label>
-                      <input value={tempTemplate.agentTemplate_label}
-                            onChange={() => updateHandler({agentTemplate_label: event.target.value})} />
+                    <div className="container-row border-bottom">
+                      <div className="container-item item-label">Set Template Label</div>
+                      <input className="container-item  container-fill"
+                          value={tempTemplate.agentTemplate_label}
+                          onChange={() => updateHandler({agentTemplate_label: event.target.value})} />
                     </div>
 
-                    <div className="container-row">
-                      <label>Set DataTags</label>
-                      {
-                        Object.values(agencyState().dataTag).map( tag =>
-                            <div onClick={() => toggleDataTag(tag)}
-                                  className={tempTemplate.agentTemplate_dataTag_ids.includes(tag.id) ? "selected-tag" : "unselected-tag"}>{tag.display.card(tag)}</div>)
-                      }
+                    <div className="container-row border-bottom">
+                      <div className="container-item item-label">Set DataTags</div>
+                      <div className="container-item container-fill">
+                        {
+                          Object.values(agencyState().dataTag).map( tag =>
+                              <div onClick={() => toggleDataTag(tag)}
+                                    className={tempTemplate.agentTemplate_dataTag_ids.includes(tag.id) ? "container-item selected-tag" : "container-item"}>{tag.dataTag_label}</div>)
+                        }
+                      </div>
                     </div>
 
                   </div>
@@ -103,6 +118,19 @@ const prototype = agencyState => ({
       return <Builder agentTemplate={template} updateHandler={updateHandler} />
 
     }
+  },
+  typeFunctions: {
+    getDataTags: template => template.agentTemplate_dataTag_ids.map( id => agencyState().dataTag[id] ),
+    getProperties: template => {
+      let state = agencyState()
+      let properties = []
+      template.typeFunctions.getDataTags(template).forEach( tag => {
+        tag.typeFunctions.getProperties(tag).forEach( property => {
+          properties = [...properties, property]
+        })
+      })
+      return properties
+    }
   }
 })
 
@@ -112,22 +140,20 @@ const displayProps = agencyState => ({
   displayKey: "agentTemplate_label",
   component: {
     list: {
-      columns: {
-        limited: [{label: "Template Name", selector: "agentTemplate_label"}],
-        expanded: [{label: "Template Name", selector: "agentTemplate_label"}]
-      },
-      // iconComponent: template => template.display.card(template),
-      tableData: Object.values(agencyState.agentTemplate),
+      columns: [{selector: "display"}],
+      tableData: Object.values(agencyState.agentTemplate).map(template => ({
+        data: template,
+        display: <div className="container-item">{template.agentTemplate_label}</div>
+      })),
       listActions: [{label: "New Template", action: () => {
         let newTemplate = agencyObject("agentTemplate", {id: "new_object", agentTemplate_label: "new template"}, err=>{throw err})
         return newTemplate.display.builder(newTemplate)
       }}],
       drawerComponents: [
-        {label: "document", component: item => item.display.card(item)}
+        {label: "document", component: item => item.data.display.document(item.data)},
       ],
       overlayComponents: [
-        {label: "document", component: item => item.display.document(item)},
-        {label: "builder", component: item => item.display.builder(item)}
+        {label: "modify", component: item => item.data.display.builder(item.data)}
       ]
     }
   }

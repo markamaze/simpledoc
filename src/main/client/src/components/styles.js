@@ -7,18 +7,23 @@ export const ListWrapper = styled.div`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  max-width: 100%;
+  .list {
+    max-width: 100%;
+  }
   .list-header {
-    padding: 1rem 3rem;
     align-self: center;
     font-size: larger;
     font-weight: bolder;
     font-variant-caps: small-caps;
+    padding: .25rem .5rem;
   }
   .list-header-container{
     display: flex;
-    flex-direction: row;
-    /* background: ${colors.three};
-    color: ${colors.four}; */
+    flex-direction: column;
+    min-width: 30%;
+    background: ${colors.three};
+    color: ${colors.four};
     justify-content: space-between;
   }
   .list-footer{}
@@ -50,12 +55,20 @@ export const ListWrapper = styled.div`
       overflow: auto;
     }
     .list-overlay-options{
+      display: flex;
+      flex-direction: row;
     }
 
 
   .table{
     display: flex;
+    flex-grow: 1;
     flex-direction: column;
+    background: ${colors.four};
+    color: ${colors.three};
+    border: solid thin ${colors.four};
+    padding: 1rem 2rem;
+    overflow: auto;
   }
     .table-header{
       padding: 1rem 0 .5rem;
@@ -77,7 +90,8 @@ export const ListWrapper = styled.div`
     .table-row-active{
       background: ${colors.three};
       color: ${colors.four};
-      /* margin: .5rem; */
+      display: flex;
+      flex-direction: column;
     }
 
   .row{
@@ -105,25 +119,42 @@ export const ListWrapper = styled.div`
       background: white;
       color: black;
       padding-bottom: .25rem;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
     }
       .row-drawer-tabs{
         display: flex;
         justify-content: space-around;
       }
         .row-drawer-tab{}
-      .row-drawer-component{}
+      .row-drawer-component{
+        display: flex;
+        flex-grow: 1;
+        max-width: 100%;
+        align-self: center;
+      }
 
-  .icons{}
+  .icons{
+    display: flex;
+    flex-wrap: wrap;
+  }
   .icon{
     display: flex;
-    flex-direction: column;
     cursor: pointer;
-    background: ${colors.one};
+    background: ${colors.four};
+    border-top: ${colors.one};
+    border-left: ${colors.one};
+    color: ${colors.three};
     padding: .25rem;
+    margin: 0 .25rem;
+    align-items: center;
 
     .list-overlay-options {
       display: flex;
-      flex-direction: column;
+    }
+    .icon-wrapper {
+
     }
   }
 
@@ -140,8 +171,8 @@ export const ListWrapper = styled.div`
       padding: 0;
       margin: .25rem;
       width: 100%;
-      border-left: solid ${colors.three};
-      border-top: solid ${colors.three};
+      border-left: solid ${colors.one};
+      border-top: solid thin ${colors.one};
     }
     .tree-branch{
       display: flex;

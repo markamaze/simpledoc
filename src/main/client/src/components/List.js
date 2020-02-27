@@ -6,24 +6,31 @@ import { ListWrapper } from './styles'
 export default function List(props){
   const [showOverlay, setOverlay] = React.useState(false)
   const [drawerComponent, setDrawerComponent] = React.useState(false)
-  const [selectedItems, setSelectedItems] = React.useState([])
+  const [selectedItem, setSelectedItem] = React.useState(null)
 
-  const updateSelectedItems = item => {
-    isItemSelected(item) ? setSelectedItems(selectedItems.filter(selectedItem => selectedItem !== item)) : setSelectedItems([...selectedItems, item])
-
+  const updateSelectedItem = item => {
+    if(selectedItem === item) setSelectedItem(null)
+    else {
+      setDrawerComponent(false)
+      setSelectedItem(item)
+    }
   }
-  const isItemSelected = item => selectedItems.find( selectedItem => selectedItem === item )
+
+  const isItemSelected = item => selectedItem === item
 
   const addRow = (item, loadingFn) =>
     <div className={`table-row${isItemSelected(item) ? "-active" : ""}`}>
       <div className="row">
+        { item.selectable === false ? null : <div className="expand-row-icon">{`${isItemSelected(item) ? '<' : '>'}`}</div> }
         {
-          props.columns[props.limited ? "limited" : "expanded"].map( column =>
-            <div className="row-cell" onClick={()=> updateSelectedItems(item)}>{item[column.selector]}</div>)
+          props.columns.map( column =>
+            <div className="row-cell" onClick={()=> item.selectable === false ? null : updateSelectedItem(item)}>
+              {column.selectorIsFunction ? item[column.selector]() : item[column.selector]}
+            </div>)
         }
       </div>
       {
-        isItemSelected(item) ? //load set of action creators that will set overlay with a component
+        props.overlayComponents && isItemSelected(item) ? //load set of action creators that will set overlay with a component
           <div className="row-expanded">
             {
               props.overlayComponents.length > 0 ? <div className="list-overlay-options">{loadOverlayHandlers(item)}</div> : null
@@ -32,22 +39,23 @@ export default function List(props){
           : null
       }
       {
-        isItemSelected(item) ? //load drawer as tabbed pages inside drawer when item is selectedItem
-          props.drawerComponents.length > 0 ? <div className="row-drawer">{loadingFn(item)}</div> : null
+        props.drawerComponents && isItemSelected(item) ? //load drawer as tabbed pages inside drawer when item is selectedItem
+          props.drawerComponents.length > 0 ? loadingFn(item) : null
           : null
       }
+
     </div>
 
   const addIcon = item =>
-    <div className="icon" onClick={() => updateSelectedItems(item)}>
-      { props.iconComponent(item) }
+    <div className="icon">
+      <div className="icon-wrapper" onClick={() => updateSelectedItem(item)}>{ props.iconComponent(item) }</div>
       {
-        isItemSelected(item) ?
+        props.overlayComponents && isItemSelected(item) ?
           props.overlayComponents.length > 0 ? <div className="list-overlay-options">{loadOverlayHandlers(item)}</div> : null
           : null
       }
       {
-        isItemSelected(item) ?
+        props.drawerComponents && isItemSelected(item) ?
           props.drawerComponents.length > 0 ? <div className="row-drawer">{loadTableDrawer(item)}</div> : null
           : null
       }
@@ -57,15 +65,19 @@ export default function List(props){
     <div className="action-handler" onClick={() => setOverlay(overlayComponent.component(item))}>{overlayComponent.label}</div>)
 
   const loadTableDrawer = (item) => {
-    if(props.drawerComponents.length === 1) return props.drawerComponents[0].component(item)
-    if(props.drawerComponents.length < 1) return null
+    if(props.drawerComponents === null) return null
+    else if(props.drawerComponents.length < 1) return null
+    else if(props.drawerComponents.length === 1) return props.drawerComponents[0].component(item)
+    else if(!drawerComponent) setDrawerComponent(props.drawerComponents[0].component(item))
 
     return  <div className="row-drawer">
               <div className="row-drawer-tabs">
                 { props.drawerComponents.map( component =>
                     <div className="row-drawer-tab" onClick={() => setDrawerComponent(component.component(item))}>{component.label}</div>) }
               </div>
-              { drawerComponent ? <div className="row-drawer-component">{ drawerComponent}</div> : null }
+              { drawerComponent ?
+                  <div className="row-drawer-component">{ drawerComponent }</div>
+                  :  null }
             </div>
   }
 
@@ -80,12 +92,16 @@ export default function List(props){
     props.iconComponent ?
       <div className="icons">{ props.tableData.map(item=>addIcon(item))}</div>
       : <div className="table">
-          <div className="table-header row">
-            { props.columns[props.limited ? "limited" : "expanded"].map( column =>
-                <div className="table-header-column row-cell">{column.label}</div>) }
-          </div>
+          {
+            props.columns.filter(colObj => colObj.label === undefined ? false : true ).length > 0 ?
+              <div className="table-header row">
+                { props.columns.map( column =>
+                    <div className="table-header-column row-cell">{column.label}</div>) }
+              </div>
+              : null
+          }
           <div className="table-body">
-            { props.tableData.map( item => addRow(item, loadTableDrawer)) }
+            { props.tableData && props.tableData.length > 0 ? props.tableData.map( item => addRow(item, loadTableDrawer)) : "no data"}
           </div>
         </div>
 
@@ -106,7 +122,7 @@ export default function List(props){
 
 
   try {
-    return  <ListWrapper className="list" style={props.style}>
+    return  <ListWrapper className={`list ${props.className}`} style={props.style}>
               <div className="list-header-container">
                 { props.headerComponent ? <div className="list-header">{props.headerComponent}</div> : null }
                 { props.listActions && props.listActions.length > 0 ? loadListActions() : null }
