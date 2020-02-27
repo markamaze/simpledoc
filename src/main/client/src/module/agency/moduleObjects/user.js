@@ -132,7 +132,7 @@ const prototype = agencyState => ({
                           onChange={() => updateHandler({username: event.target.value})} />
                     </div>
 
-                    <div classname="container-row border-bottom">
+                    <div className="container-row border-bottom">
                       <div className="container-item item-label">Reset Password</div>
                       <input className="container-item container-fill"
                           type="text"
