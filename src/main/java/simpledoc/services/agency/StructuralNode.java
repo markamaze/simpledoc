@@ -16,7 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+import org.postgresql.jdbc.PgArray;
 import org.postgresql.util.PGobject;
 
 import java.util.UUID;
@@ -29,7 +31,7 @@ public class StructuralNode extends ModuleObject {
 	private UUID structuralNode_parent_id;
 	private Set<UUID> structuralNode_dataTag_ids;
 	private Map<UUID, String> property_values;
-	private Map<UUID, Object> active_assignments;
+	private Set<Entry<UUID, UUID>> active_assignments;
 	
 
 	StructuralNode(String id, String type) { super(id, type); }
@@ -85,43 +87,47 @@ public class StructuralNode extends ModuleObject {
 		}
 	}
 	private void setActiveAssignments(Object object) throws ServiceErrorException {
-		Map<UUID, Object> assignments = new HashMap<UUID, Object>();
+		Set<Entry<UUID, UUID>> assignments = new HashSet<Map.Entry<UUID, UUID>>();
 
 		if(object instanceof PGobject) {
-			JSONObject asJson = new JSONObject(((PGobject)object).getValue());
-			for(String id : asJson.keySet()) {
-				UUID uuid = AgencyValidator.validateUUIDString(id);
-				if(uuid != null) assignments.put(uuid, asJson.get(id));
-				else throw new ServiceErrorException("invalid uuid found in StructuralNode.active_assignments");
+			JSONArray asJson = new JSONArray(((PGobject)object).getValue());
+			for(Object pair : asJson) {
+				if(pair instanceof String && ((String) pair).split("=").length == 2) {
+					UUID assignmentId = AgencyValidator.validateUUIDString(((String)pair).split("=")[0]);
+					UUID agentId = AgencyValidator.validateUUIDString(((String)pair).split("=")[1]);
+					
+					if(assignmentId == null) throw new ServiceErrorException("invalid uuid found in StructuralNode.active_assignments");
+					else assignments.add(Map.entry(assignmentId, agentId));
+				}
+				else if(pair instanceof JSONArray && ((JSONArray)pair).length() == 2) {
+					UUID assignmentId, agentId;
+					if(((JSONArray)pair).get(0) == null) throw new ServiceErrorException("invalid uuid found in StructuralNode.active_assignments");
+					else assignmentId = AgencyValidator.validateUUIDString(((JSONArray)pair).get(0));
+					
+					if(((JSONArray)pair).get(1) != null && AgencyValidator.validateUUIDString(((JSONArray)pair).get(1)) == null)
+						throw new ServiceErrorException("invalid uuid found in StructuralNode.active_assignments");
+					else agentId = AgencyValidator.validateUUIDString(((JSONArray)pair).get(1));
+
+					assignments.add(Map.entry(assignmentId, agentId));
+				}
 			}
 			this.active_assignments = assignments;
 		}
+		else if(object instanceof PgArray) System.out.println("is PGarray");
 		
-		else if(object instanceof Map) {
-			
-		
-			((Map<?,?>)object).forEach((key, value) -> {
-				assignments.put(UUID.fromString(key.toString()), value);
+		else if(object instanceof ArrayList) {
+			for(Object pair : (ArrayList<?>)object) {
+				if(pair instanceof ArrayList && ((ArrayList<?>)pair).size() == 2) {
+					UUID assignmentId = AgencyValidator.validateUUIDString(((ArrayList<?>)pair).get(0));
+					UUID agentId = AgencyValidator.validateUUIDString(((ArrayList<?>)pair).get(1));		
+					
+					if(assignmentId == null) throw new ServiceErrorException("invalid UUID found in StructuralNode.active_assignments");
+					else if(agentId == null) assignments.add(Map.entry(assignmentId, new UUID(0,0)));
+					else assignments.add(Map.entry(assignmentId, agentId));
+				}
 				
-				//				UUID assignmentId = null;
-//				Map<String, Object> assignment_data = new HashMap<String, Object>();
-//				
-//				if(key instanceof UUID) assignmentId = (UUID)object;
-//				else if(key instanceof String)assignmentId = UUID.fromString(key.toString());
-//				
-//				if(value instanceof Map) {
-//					((Map<?,?>)value).forEach((k, v) -> {
-//						if(k.equals("active_agents")) {
-//							if(v instanceof ArrayList) {
-//								((ArrayList<?>)v).forEach(item ->{
-//									if(AgencyValidator.validateUUIDString(item)) ;
-//								});
-//							}
-//						}
-//					});
-//				}
-			
-			});
+			}
+
 			this.active_assignments = assignments;
 		}
 	}
@@ -131,7 +137,7 @@ public class StructuralNode extends ModuleObject {
 	public UUID getParentId() { return this.structuralNode_parent_id; }
 	public Set<UUID> getDataTagIds() { return this.structuralNode_dataTag_ids; }
 	public Map<UUID, String> getPropertyValues() { return this.property_values; }
-	public Map<UUID, Object> getActiveAssignments() { return this.active_assignments; }
+	public Set<Entry<UUID, UUID>> getActiveAssignments() { return this.active_assignments; }
 
 	
 	@Override
@@ -172,7 +178,8 @@ public class StructuralNode extends ModuleObject {
 		propertiesPG.setValue(jsonPropertyValues.toString());
 			
 		PGobject assignmentsPG = new PGobject();
-		JSONObject jsonAssignments = new JSONObject(this.getActiveAssignments());
+		JSONArray jsonAssignments = new JSONArray(this.getActiveAssignments());
+		
 		assignmentsPG.setType("json");
 		assignmentsPG.setValue(jsonAssignments.toString());
 			

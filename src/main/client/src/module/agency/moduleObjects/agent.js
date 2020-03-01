@@ -51,9 +51,8 @@ const prototype = agencyState => ({
     card: agent => {
       let state = agencyState()
       return  <div className="agent container-row">
-                <div className="container-item">{agent.typeFunctions.getAssignedNode(agent).structuralNode_label}</div>
+                <div className="container-item">{agent.typeFunctions.getAssignedUser(agent).username}</div>
                 <div className="container-item">{agent.typeFunctions.getAssignedAgentTemplate(agent).agentTemplate_label}</div>
-                <div className="container-row">{agent.typeFunctions.getDataTags(agent).map(tag => tag.display.card(tag))}</div>
               </div>
     },
     document: agent => {
@@ -102,7 +101,13 @@ const prototype = agencyState => ({
       let state = agencyState()
       return state.agentTemplate[state.assignment[agent.assignment_id].agentTemplate_id].agentTemplate_dataTag_ids.map( id => state.dataTag[id])
     },
-    getAssignedNode: agent => agencyState().structuralNode[agent.structuralNode_id]
+    getAssignedNode: agent => agencyState().structuralNode[agent.structuralNode_id],
+    getDisplayLabel: agent => {
+      let title = agent.typeFunctions.getAssignedAgentTemplate(agent).agentTemplate_label
+      let user = agent.typeFunctions.getAssignedUser(agent)
+
+      return `${title}:${user.typeFunctions.getDisplayLabel(user)}`
+    }
   }
 })
 

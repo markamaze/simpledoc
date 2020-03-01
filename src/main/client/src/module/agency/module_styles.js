@@ -47,7 +47,8 @@ export const AgencyPageWrapper = styled.div`
   max-width: 100%;
   height: 100%;
   max-height: 100%;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   .dataTag {
     display: flex;
     max-width: max-content;
@@ -59,7 +60,7 @@ export const AgencyPageWrapper = styled.div`
     border-radius: .5rem;
     justify-content: center;
   }
-  .selected-tag {
+  .selected {
     background: ${colors.one};
     color: ${colors.two};
   }
@@ -98,6 +99,8 @@ export const AgencyPageWrapper = styled.div`
     display: flex;
     margin: .25rem;
     flex-grow: 1;
+    white-space: pre-wrap;
+    flex-basis: 0;
   }
   .item-label{
     font-style: italic;
@@ -111,6 +114,7 @@ export const AgencyPageWrapper = styled.div`
     flex-direction: column;
     padding: .25rem;
     align-items: center;
+    flex-grow: 1;
 
     @media (min-width: 500px) {
       flex-direction: row;

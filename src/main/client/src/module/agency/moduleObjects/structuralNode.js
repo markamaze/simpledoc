@@ -58,9 +58,9 @@ const prototype = agencyState => ({
     },
     active_assignments: {
       setValue: function(assignments){
-        if(assignments === null || assignments === undefined) this.active_assignments = {}
+        if(assignments === null || assignments === undefined) this.active_assignments = []
         else if(!this.properties.active_assignments.validate(assignments)) throw "invalid property: Agency.StructualNode.active_assignments"
-        else this.active_assignments = assignments
+        else this.active_assignments = assignments.map(assignment => ([assignment.split("=")[0], assignment.split("=")[1] ]))
         return true
       },
       getObject: function(){},
@@ -71,7 +71,6 @@ const prototype = agencyState => ({
     card: node => {
       return  <div className="structuralNode container-row">
                 <div className="container-item header">{node.structuralNode_label}</div>
-                <div className="container-item subheader">-{node.typeFunctions.getParentNode(node).structuralNode_label}</div>
                 { node.typeFunctions.getDataTags(node).map(tag => tag.display.card(tag)) }
               </div>
     },
@@ -82,42 +81,34 @@ const prototype = agencyState => ({
 
                 <div className="container-fill">
 
-                  <div className="container-row border-bottom">
-                    <div className="container-item item-label">Title & Parent:</div>
-                    {node.display.card(node)}
-                  </div>
+                  <List className="container-row border-bottom"
+                      headerComponent={<div>Node Info:</div>}
+                      tableData={[
+                        {label: "Node:", data: node, display: node.display.card(node), selectable: false},
+                        {label: "Parent Node:", data: node.typeFunctions.getParentNode(node), display: node.typeFunctions.getParentNode(node).display.card(node.typeFunctions.getParentNode(node)), selectable: false},
+                        {label: "Node Supervisor", selectable: false, data: <div>unknown at this time</div>}
+                      ]}
+                      columns={[{selector: "label"},{selector: "display"}]} />
 
-                  <div className="container-row border-bottom">
-                    <div className="container-item item-label">Branches:</div>
-                    <div className="container-fill">
-                      {
-                        node.typeFunctions.getChildren(node).map( child => child.display.card(child))
-                      }
-                    </div>
-                  </div>
+                  <List className="container-row border-bottom"
+                      headerComponent={<div>Branches:</div>}
+                      tableData={node.new_object ? [...node.new_object.filter(obj => obj.type() === "structuralNode" && obj.structuralNode_parent_id === node.id).map(child => ({data: child, display: child.display.card(child)})), ...node.typeFunctions.getChildren(node).map( child => ({data: child, display: child.display.card(child)}))] : node.typeFunctions.getChildren(node).map( child => ({data: child, display: child.display.card(child)}))}
+                      columns={[{selector: "display"}]}
+                      overlayComponents={[{label: "show document", component: item => item.data.display.document(item.data)}]} />
 
-                  <div className="container-row border-bottom">
-                    <div className="container-item item-label">Assignments:</div>
-                    <div className="container-fill">
-                      {
-                        node.typeFunctions.getActiveAgents(node).map(agent => {
-                          <div className="container-item">{agent.display.card(agent)}</div>
-                        })
-                      }
-                    </div>
-                  </div>
+                  <List className="container-row border-bottom"
+                      headerComponent={<div>Assignments:</div>}
+                      tableData={node.active_assignments.map( ([assignment_id, agent_id]) => ({
+                        assignment_display: agencyState().assignment[assignment_id].typeFunctions.getDisplayLabel(agencyState().assignment[assignment_id]),
+                        agent_display: agent_id === "00000000-0000-0000-0000-000000000000" ? "unassigned"
+                                          : agencyState().agent[agent_id].typeFunctions.getDisplayLabel(agencyState().agent[agent_id]),
+                        selectable: false}))}
+                      columns={[{selector: "assignment_display"},{selector: "agent_display"}]} />
 
-                  <div className="container-row border-bottom">
-                    <div className="container-item item-label">Properties:</div>
-                    <div className="container-item container-fill">
-                      {
-                        node.typeFunctions.getProperties(node).length < 1 ?
-                          "no properties"
-                          : node.typeFunctions.getProperties(node).map( property =>
-                          property.display.document(property, node.property_values[property.id]))
-                      }
-                    </div>
-                  </div>
+                  <List className="container-row"
+                      headerComponent={<div>Properties:</div>}
+                      tableData={node.typeFunctions.getProperties(node).map(property => ({display: property.display.document(property, node.property_values[property.id])}))}
+                      columns={[{selector: "display"}]} />
                 </div>
               </div>
     },
@@ -128,39 +119,85 @@ const prototype = agencyState => ({
         const [tempNode, updateTempNode] = React.useState(props.structuralNode)
         const updateHandler = newState => updateTempNode(Object.assign(Object.create(Object.getPrototypeOf(tempNode)), tempNode, newState))
 
-        const createAgent = (userId, assignmentId, assignmentObject) => {
+        const createAgent = (userId, assignmentId) => {
           let newAgent = agencyObject("agent", {id: "new_object", agent_user_id: userId, structuralNode_id: tempNode.id, assignment_id: assignmentId}, err=>{throw err})
+
+          let updateActiveAssignment = [...tempNode.active_assignments]
+
+          updateActiveAssignment = [[assignmentId, newAgent.id], ...updateActiveAssignment.filter( ([assignment_id, agent_id]) => {
+            if(assignmentId !== assignment_id) return true
+            else if(agent_id !== "00000000-0000-0000-0000-000000000000") return true
+            else return false
+          })]
+
 
           updateHandler({
             new_object: tempNode.new_object ? [...tempNode.new_object, newAgent] : [newAgent],
-            active_assignments: Object.assign({}, tempNode.active_assignments, { [`${assignmentId}`] : Object.assign({}, assignmentObject, {active_agents: [...assignmentObject.active_agents, newAgent.id]})})
+            active_assignments: updateActiveAssignment
           })
         }
+
+        const deactivateAgent = (assignment_id, agent_id) => console.log("deactivate agent assignment")
 
         return  <div className="structuralNode document">
                   <header>Node Editor</header>
                   <div className="container-fill">
 
-                    <div className="container-row">
-                      <div className="container-item item-label">Set Values:</div>
-                      <div className="container-item container-fill">
-                        {
-                          tempNode.typeFunctions.getProperties(tempNode).length < 1 ?
-                            "no properties"
-                            : tempNode.typeFunctions.getProperties(tempNode).map( property =>
-                            property.display.editor(property, tempNode.property_values[property.id], newValue => updateHandler({property_values: Object.assign({}, tempNode.property_values, { [`${property.id}`]: newValue })})))
-                        }
-                      </div>
-                    </div>
+                    <List className="container-row border-bottom"
+                        headerComponent={<div className="container-item item-label">Set Properties:</div>}
+                        tableData={tempNode.typeFunctions.getProperties(tempNode).map(property => ({
+                          property_editor:
+                            <div className="property container-row">
+                              <div className="container-item item-label">{property.property_key}</div>
+                              <input className="container-item"
+                                  type="text"
+                                  value={tempNode.property_values[property.id]}
+                                  onChange={() => updateHandler({property_values: Object.assign({}, tempNode.property_values, { [`${property.id}`]: event.target.value })})} />
+                            </div>,
+                          selectable: false
+                        }))}
+                        columns={[{selector:"property_editor"}]} />
 
-                    <div className="container-row">
-                      <div className="container-item item-label">Assign Agents</div>
-                      <div className="container-item container-fill">
-                        {
-                          tempNode.typeFunctions.getActiveAssignments(tempNode).map(assignment => {})
-                        }
-                      </div>
-                    </div>
+                    <List className="container-row border-bottom"
+                        headerComponent={<div className="container-item item-label">Assign Agents</div>}
+                        tableData={tempNode.active_assignments.map( ([assignment_id, agent_id]) => {
+                          let assignment = state.assignment[assignment_id]
+                          let agent = agent_id === "00000000-0000-0000-0000-000000000000" ? null : state.agent[agent_id]
+
+                          return {
+                            assignment_display: assignment.typeFunctions.getDisplayLabel(assignment),
+                            agent_display: agent === null ? Object.values(state.user).map(user => <div className="container-item" onClick={() => createAgent(user.id, assignment_id)}>{user.username}</div>) : <div className="container-row">filled</div>
+
+                            // agent_display: agent === null ?
+                            //   <div className="container-row">
+                            //     <div className="container-item">Assign User</div>
+                            //     <select className="container-item" value="" onChange={() => createAgent(event.target.value, assignment_id)}>
+                            //       <option value=""></option>
+                            //       {
+                            //         Object.values(state.user).map( user => <option value={user.id}>{user.typeFunctions.getDisplayLabel(user)}</option>)
+                            //       }
+                            //     </select>
+                            //   </div> : <div className="container-row">filled</div>
+                          }
+                        })}
+                        columns={[{selector: "assignment_display"}, {selector: "agent_display"}]} />
+
+                    <List classname="container-row"
+                        headerComponent={<div className="container-item item-label">Assigned Agents</div>}
+                        tableData={tempNode.active_assignments
+                                      .filter( ([assignment_id, agent_id]) => agent_id !== "00000000-0000-0000-0000-000000000000")
+                                      .map( ([assignment_id, agent_id]) => {
+                                          let item;
+                                          if(agent_id.substring(0,2) === "n-") item = tempNode.new_object.find(obj => obj.id === agent_id)
+                                          else item = agencyState().agent[agent_id]
+                                          return {
+                                            display: item.display.card(item),
+                                            action: <button className="container-item" onClick={() => deactivateAgent(assignment_id, agent_id)}>deactivate</button>,
+                                            selectable: false
+                                          }
+                                        })}
+                        columns={[{selector: "display"},{selector: "action"}]} />
+
 
                   </div>
 
@@ -174,80 +211,86 @@ const prototype = agencyState => ({
     builder: node => {
       function Builder(props){
         const [tempNode, setTempNode] = React.useState(props.structuralNode)
+        const [tempNewNodeLabel, updateTempNewNodeLabel] = React.useState("new node")
         const updateHandler = newState => setTempNode(Object.assign(Object.create(Object.getPrototypeOf(tempNode)), tempNode, newState))
 
+        const addBranch = () => {
+          let newNode = agencyObject("structuralNode", {id:"new_object", structuralNode_parent_id: node.id, structuralNode_label: tempNewNodeLabel})
 
-        const toggleDataTag = dataTag_id => {
-          tempNode.structuralNode_dataTag_ids.includes(dataTag_id) ?
-            updateHandler({structuralNode_dataTag_ids: tempNode.structuralNode_dataTag_ids.filter(id => id !== dataTag_id)})
-            : updateHandler({structuralNode_dataTag_ids: [...tempNode.structuralNode_dataTag_ids, dataTag_id]})
+          updateHandler({
+            new_object: tempNode.new_object ? [...tempNode.new_object, newNode] : [newNode]
+          })
         }
 
-        // const addAssignment = assignment => {
-        //   let assignmentData = { active_agents: [] }
-        //   let newAssignmentSet = Object.assign({}, tempNode.active_assignments, {[`${assignment.id}`] : assignmentData })
-        //   updateHandler({active_assignments: newAssignmentSet})
-        // }
-        // const removeAssignment = assignment => {
-        //   let newAssignmentSet = Object.assign({}, tempNode.active_assignments)
-        //   delete newAssignmentSet[assignment.id]
-        //   updateHandler({active_assignments: newAssignmentSet})
-        // }
-        // const newDataTagBuilder = () => {
-        //   let dataTag = agencyObject("dataTag", {id: "new_object", dataTag_label: "new dataTag", dataTag_tagType: "structural"}, err=>{console.log(err)})
-        //
-        //   return dataTag.display.builder(dataTag, newState => updateHandler(console.log("structural node handling of datatag updateHandler", dataTag, newState)))
-        // }
-        // const newAssignmentBuilder = () => {
-        //   let assignment = agencyObject("assignment", {id: "new_object"}, err=>{console.log(err)})
-        //
-        //   return assignment.display.builder(assignment, newState => updateHandler(console.log("structural node handling of assignment updateHandler", assignment, newState)))
-        // }
+        const addDataTag = dataTag_id => updateHandler({structuralNode_dataTag_ids: [...tempNode.structuralNode_dataTag_ids, dataTag_id]})
+
+        const removeDataTag = dataTag_id => updateHandler({structuralNode_dataTag_ids: tempNode.structuralNode_dataTag_ids.filter(id => id !== dataTag_id)})
+
+        const addAssignment = assignment_id => {
+          updateHandler({active_assignments: [...tempNode.active_assignments, [assignment_id, null]]})
+        }
+        const removeAssignment = (assignment_id, agent_id) => {
+
+          updateHandler({active_assignments: tempNode.active_assignments.filter( ([assignmentId, agentId]) => {
+            if(assignmentId !== assignment_id) return true
+            else if(agentId !== agentId) return true
+            else return false
+          } )})
+        }
 
         return  <div className="structuralNode document ">
                   <header>Node Builder</header>
 
                   <div className="container-fill">
 
-                    <div className="container-row border-bottom">
-                      <div className="container-item item-label">Set Title:</div>
-                      <div className="container-item container-fill">
-                        <input type="text" value={tempNode.structuralNode_label} onChange={()=> updateHandler({structuralNode_label: event.target.value})}/>
-                      </div>
-                    </div>
-
-                    <div className="container-row border-bottom">
-                      <div className="container-item item-label">Set Branch of:</div>
-                      <div className="container-item container-fill">
-                      {
-                        node.id === node.structuralNode_parent_id ?
-                          <div className="container-item">Agency Root</div>
-                          : <select value={tempNode.structuralNode_parent_id} onChange={() => updateHandler({structuralNode_parent_id: event.target.value})}>
+                    <List className="container-row border-bottom"
+                        headerComponent={<div className="container-item item-label">Node Settings</div>}
+                        tableData={[
+                          {label: <div className="container-item item-label">Set Title</div>, selectable: false, input: <input className="container-item" type="text" value={tempNode.structuralNode_label} onChange={()=> updateHandler({structuralNode_label: event.target.value})}/>},
+                          {label: <div className="container-item item-label">Set Parent</div>, selectable: false, input: props.structuralNode.id === props.structuralNode.structuralNode_parent_id ? <div className="container-row">Cannot reassign root</div> : <select className="container-item" value={tempNode.structuralNode_parent_id} onChange={() => updateHandler({structuralNode_parent_id: event.target.value})}>
                               <option value=""></option>
                               { Object.values(agencyState().structuralNode).map(node =>
                                   <option value={node.id} style={{background: `${node.id === tempNode.structuralNode_parent_id ? "yellow" : ""}`}}>
                                     {node.structuralNode_label}
                                   </option>) }
-                            </select>
-                      }
-                      </div>
-                    </div>
+                            </select>},
+                          {label: <div className="container-item item-label">Add Branch</div>, selectable: false, input: <div className="container">
+                            <input className="container-item" type="text" value={tempNewNodeLabel} onChange={() => updateTempNewNodeLabel(event.target.value)} />
+                            <button className="container-item" onClick={() => addBranch()}>Create</button>
+                          </div>}
+                        ]}
+                        columns={[{selector: "label"}, {selector: "input"}]}
+                        listActions={[{label: "show document", action: () => tempNode.display.document(tempNode)}]} />
 
-                    <div className="container-row border-bottom">
-                      <div className="container-item item-label">Set Assignments</div>
-                      <div className="container-item container-fill"></div>
-                    </div>
 
-                    <div className="container-row border-bottom">
-                      <div className="container-item item-label">Set DataTags</div>
-                      <div className="container-item container-fill">
-                        {
-                          Object.values(agencyState().dataTag).map( tag =>
-                              <div onClick={() => toggleDataTag(tag.id)}
-                                    className={tempNode.structuralNode_dataTag_ids.includes(tag.id) ? "container-item selected-tag" : "container-item"}>{tag.dataTag_label}</div>)
-                        }
-                      </div>
-                    </div>
+                    <List className="container-row border-bottom"
+                        headerComponent={<div className="container-item item-label">Manage Assignments</div>}
+                        tableData={[
+                          {label: "Add Assignment", selectable: false, input:
+                            <select className="container-row" value="" onChange={() => addAssignment(event.target.value)}>
+                              <option value=""></option>
+                              {
+                                Object.values(agencyState().assignment).map( assignment =>
+                                  <option value={assignment.id}>{assignment.typeFunctions.getDisplayLabel(assignment)}</option>)
+                                }
+                            </select>},
+                          ...tempNode.active_assignments.map( ([assignment_id, agent_id]) => ({label: agencyState().assignment[assignment_id].typeFunctions.getDisplayLabel(agencyState().assignment[assignment_id]), selectable: false, input: <button onClick={() => removeAssignment(assignment_id, agent_id)}>X</button>}))
+                        ]}
+                        columns={[{selector: "label"},{selector: "input"}]} />
+
+
+
+                    <List className="container-row"
+                        headerComponent={<div className="container-item item-label">Manage DataTags</div>}
+                        tableData={[{selectable: false, label: "Add DataTag" , input: <select className="container-row" value="" onChange={() => addDataTag(event.target.value)}>
+                          <option value=""></option>
+                          {
+                            Object.values(agencyState().dataTag).map( tag => <option value={tag.id}>{tag.dataTag_label}</option>)
+                          }
+                        </select>},...tempNode.structuralNode_dataTag_ids
+                          .map(tagId => agencyState().dataTag[tagId])
+                          .map(tag => ({data: tag, selectable: false, input: <button onClick={()=> removeDataTag(tag.id)}>X</button>, label: tag.display.card(tag) }))]}
+                        columns={[{selector: "label"}, {selector: "input"}]} />
                   </div>
 
                   { tempNode.storage.handlers.call(tempNode) }
@@ -276,8 +319,8 @@ const prototype = agencyState => ({
       let state = agencyState()
       let activeAgents = []
 
-      Object.values(node.active_assignments).forEach( assignmentObject => {
-        // activeAgents = [...activeAgents, ...assignmentObject.active_agents]
+      node.active_assignments.forEach( ([assignment_id, agent_id]) => {
+        agent_id === null ? null : activeAgents = [...activeAgents, agent_id]
       })
 
       return activeAgents.map(agent_id => state.agent[agent_id])
@@ -288,11 +331,8 @@ const prototype = agencyState => ({
 
 
 
-      Object.entries(node.active_assignments).forEach( ([assignment_id, assignment_data]) => {
+      node.active_assignments.forEach( ([assignment_id, assignment_data]) => {
         let assignment = agencyState().assignment[assignment_id]
-
-
-
       })
       return activeAssignments
     }

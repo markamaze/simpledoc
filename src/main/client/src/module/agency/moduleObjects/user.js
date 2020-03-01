@@ -1,5 +1,6 @@
 import React from 'react'
 import { agencyObject } from './agencyObject'
+import List from '../../../components/List'
 
 
 
@@ -54,33 +55,24 @@ const prototype = agencyState => ({
     document: user => {
       return  <div className="user document">
                 <header>{`User: ${user.username}`}</header>
+
                 <div className="container-fill">
-                  <div className="container-row border-bottom">
-                    <div className="container-item item-label">Username:</div>
-                    <div className="container-item container-fill">{user.username}</div>
-                  </div>
 
-                  <div className="container-row border-bottom">
-                    <div className="container-item item-label">Active Agents:</div>
-                    <div className="container-item container-fill">
-                      {
-                        user.typeFunctions.getUserAgents(user).map( agent =>
-                          <div className="container-item">{agent.display.card(agent)}</div>)
-                      }
-                    </div>
-                  </div>
+                  <List className="container-row"
+                      headerComponent={<div className="container-item item-label">User Info:</div>}
+                      columns={[{selector: "label"},{selector:"display"}]}
+                      tableData={[{label: "Username:", display: user.username, selectable: false}]} />
 
-                  <div className="container-row border-bottom">
-                    <div className="container-item item-label">Properties:</div>
-                    <div className="container-item container-fill">
-                      {
-                        user.typeFunctions.getProperties(user).length < 1 ?
-                          "no properties"
-                          : user.typeFunctions.getProperties(user).map( property =>
-                          property.display.document(property, user.property_values[property.id]))
-                      }
-                    </div>
-                  </div>
+                  <List className="container-row"
+                      headerComponent={<div className="container-item item-label">Active Agents:</div>}
+                      columns={[{selector:"display"}]}
+                      tableData={user.typeFunctions.getUserAgents(user).map(agent => ({display: agent.display.card(agent), selectable: false}))} />
+
+                  <List className="container-row"
+                      headerComponent={<div>Properties:</div>}
+                      tableData={user.typeFunctions.getProperties(user).map(property => ({display: property.display.document(property, user.property_values[property.id])}))}
+                      columns={[{selector: "display"}]} />
+
                 </div>
               </div>
 
@@ -158,15 +150,10 @@ const prototype = agencyState => ({
       })
       return tagSet
     },
-    getProperties: user => {
-      let state = agencyState()
-      let propertySet = []
-
-      user.typeFunctions.getUserDataTags(user)
-        .map( tag => tag.dataTag_property_ids.forEach(propId => { propertySet = [...propertySet, state.property[propId]] }))
-
-        return propertySet
-    },
+    getProperties: user => Object.keys(user.property_values).map( property_id => agencyState().property[property_id]),
+    getDisplayLabel: user => {
+      return user.username
+    }
   }
 })
 

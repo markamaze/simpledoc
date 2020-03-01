@@ -103,7 +103,8 @@ const prototype = agencyState => ({
   },
   typeFunctions: {
     getTemplate: assignment => agencyState().agentTemplate[assignment.agentTemplate_id],
-    getSupervisorTemplate: assignment => assignment.supervising_assignment_id === null ? null : agencyState().agentTemplate[agencyState().assignment[assignment.supervising_assignment_id].agentTemplate_id]
+    getSupervisorTemplate: assignment => assignment.supervising_assignment_id === null ? null : agencyState().agentTemplate[agencyState().assignment[assignment.supervising_assignment_id].agentTemplate_id],
+    getDisplayLabel: assignment => `${assignment.typeFunctions.getTemplate(assignment).agentTemplate_label} - reports to - ${assignment.typeFunctions.getSupervisorTemplate(assignment) ? assignment.typeFunctions.getSupervisorTemplate(assignment).agentTemplate_label : " node supervisor"}`
   }
 })
 

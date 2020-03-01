@@ -25,6 +25,7 @@ export const ListWrapper = styled.div`
     background: ${colors.three};
     color: ${colors.four};
     justify-content: space-between;
+    align-self: stretch;
   }
   .list-footer{}
   .list-actions{
@@ -154,7 +155,8 @@ export const ListWrapper = styled.div`
       display: flex;
     }
     .icon-wrapper {
-
+      display: flex;
+      flex-grow: 1;
     }
   }
 

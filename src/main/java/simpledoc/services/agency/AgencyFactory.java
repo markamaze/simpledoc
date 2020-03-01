@@ -85,7 +85,7 @@ public class AgencyFactory<T extends ModuleObject> implements ModuleObjectFactor
 		case "delete":
 		  if(type.equals("AGENCY.AGENT")) return "delete from agency.agent where id='" + id + "'";
 		  else if(type.equals("AGENCY.AGENTTEMPLATE")) return "delete from agency.agenttemplate where id='" + id + "'";
-		  else if(type.equals("AGENCY.STRUCTURALNODE")) return "delete from agency.structualnode where id='" + id + "'";
+		  else if(type.equals("AGENCY.STRUCTURALNODE")) return "delete from agency.structuralnode where id='" + id + "'";
 		  else if(type.equals("AGENCY.DATATAG")) return "delete from agency.datatag where id='" + id + "'";
 		  else if(type.equals("AGENCY.USER")) return "delete from agency.user where id='" + id + "'";
 		  else if(type.equals("AGENCY.ASSIGNMENT")) return "delete from agency.assignment where id='" + id + "'";

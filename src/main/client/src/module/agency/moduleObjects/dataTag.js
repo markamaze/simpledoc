@@ -169,10 +169,10 @@ const displayProps = agencyState => ({
           return newDataTag.display.builder(newDataTag)
         }}],
       drawerComponents: [
-        {label: "document", component: item => item.display.document(item)},
+        {label: "document", component: item => item.data.display.document(item.data)},
       ],
       overlayComponents: [
-        {label: "modify", component: item => item.display.builder(item)}
+        {label: "modify", component: item => item.data.display.builder(item.data)}
       ]
     }
   },

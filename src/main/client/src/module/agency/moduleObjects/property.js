@@ -55,28 +55,26 @@ const prototype = agencyState => ({
     document: (property, value) => {
       return  <div className="property container-row">
                 <div className="container-item">{property.property_key}:</div>
-                <div className="container-item">{`${property.value ? property.value : `(${property.property_value_type})` } `}</div>
+                <div className="container-item">{`${value ? value : ""}`}</div>
               </div>
     },
-    editor: (property, value, updateHandler) => {
-      function Editor(props){
-        const [tempValue, updateTempValue] = React.useState(props.value ? props.value : "")
-
-        const setValue = () => props.updateHandler({[`${props.property.id}`]:tempValue})
-
-        return  <div className="property container">
-                  <div className="container-row">
-                    <div className="container-item item-label">{props.property.property_key}</div>
-                    <input className="container-item"
-                        type="text"
-                        value={value}
-                        onChange={() => updateHandler(event.target.value)} />
-                  </div>
-                </div>
-      }
-
-      return <Editor property={property} value={value} updateHandler={updateHandler}/>
-    },
+    // editor: (property, value, updateHandler) => {
+    //   function Editor(props){
+    //     const [tempValue, updateTempValue] = React.useState(props.value ? props.value : "")
+    //
+    //     const setValue = () => props.updateHandler({[`${props.property.id}`]:tempValue})
+    //
+    //     return  <div className="property container-row">
+    //               <div className="container-item item-label">{props.property.property_key}</div>
+    //               <input className="container-item"
+    //                   type="text"
+    //                   value={value}
+    //                   onChange={() => updateHandler(event.target.value)} />
+    //             </div>
+    //   }
+    //
+    //   return <Editor property={property} value={value} updateHandler={updateHandler}/>
+    // },
     builder: (property) => {
       function Builder(props){
         const [tempProperty, updateTempProperty] = React.useState(props.property)
