@@ -75,9 +75,71 @@ const prototype = getFormState => ({
     }
   },
   display: {
-    document: layout => {},
+    document: layout => {
+      return  <div className="document">
+                <div className="container-fill">
+                  { element.element_ids.map(id => getFormState().element[id])
+                      .map( element => <div className="container-row">{element.display.document(element)}</div>) }
+                </div>
+              </div>
+    },
     editor: layout => {},
-    creator: layout => {}
+    builder: (layout, updater) => {
+      function Creator(props){
+        const [tempLayout, updateTempSection] = React.useState(props.layout)
+        const updateHandler = newState =>  updateTempSection(Object.assign(Object.create(Object.getPrototypeOf(tempLayout)), tempLayout, {...newState}))
+
+        const addElement = () => {
+          let elementState = {
+            id: "new_object",
+            key: "new element",
+            form_id: tempLayout.form_id,
+            section_id: tempLayout.section_id,
+            layout_id: tempLayout.id
+          }
+          let newElement = formObject("element", elementState, err => {throw err})
+
+          updateHandler({
+            element_ids: [...tempLayout.element_ids, newElement.id],
+            new_object: tempLayout.new_object ? [...tempLayout.new_object, newElement] : [newElement]
+          })
+        }
+        const removeElement = element_id => {
+          updateHandler({
+            element_ids: tempLayout.element_ids.filter( id => id !== element_id ),
+            new_object: tempLayout.new_object ? tempLayout.new_object.filter( object => object.id !== element_id ) : []
+          })
+        }
+
+        return  <div className="document">
+                  <div className="container-row">
+                    <div className="container-item item-label">Set Layout Type:</div>
+                    <select value={tempLayout.layout_type}>
+                      <option></option>
+                    </select>
+                    <button onClick={() => addElement()}>Add Element</button>}
+                  </div>
+
+                  <div className="container-fill">
+
+                    {
+                      tempLayout.element_ids.map( id =>
+                        <div className="container-row border-bottom">
+                          <div className="container-row">
+                            <button onClick={() => removeElement(id)}>Remove Element</button>
+                          </div>
+                          { id.substring(0,2) === "n-" ?
+                              tempLayout.new_object.find( obj => obj.id === id).display.builder(tempLayout.new_object.find(obj=>obj.id===id))
+                              : getFormState().element[id].display.builder(getFormState().element[id]) }
+                        </div>)
+                    }
+
+                  </div>
+                </div>
+      }
+
+      return <Creator layout={layout} />
+    }
   },
   typeFunctions: {}
 })

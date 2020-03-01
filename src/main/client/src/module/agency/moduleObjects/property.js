@@ -75,7 +75,7 @@ const prototype = agencyState => ({
     //
     //   return <Editor property={property} value={value} updateHandler={updateHandler}/>
     // },
-    builder: (property) => {
+    builder: (property, close, alert) => {
       function Builder(props){
         const [tempProperty, updateTempProperty] = React.useState(props.property)
 
@@ -106,7 +106,7 @@ const prototype = agencyState => ({
                     </div>
                   </div>
 
-                  { tempProperty.storage.handlers.call(tempProperty) }
+                  { tempProperty.storage.handlers.call(tempProperty, close, alert) }
                 </div>
       }
 
@@ -123,13 +123,13 @@ const displayProps = agencyState => ({
       columns: [{selector: "display"}],
       tableData: Object.values(agencyState.property).map(property => ({data: property, display: property.display.document(property)})),
       listActions: [
-        {label: "New Property", action: () => {
-          let newProperty = agencyObject("property", {id: "new_object", }, err=>{throw err})
-          return newProperty.display.builder(newProperty)
+        {label: "New Property", action: (close, alert) => {
+          let newProperty = agencyObject("property", {id: "new_object", }, alert)
+          return newProperty.display.builder(newProperty, close, alert)
         }}
       ],
       overlayComponents: [
-        {label: "modify", component: item => item.data.display.builder(item.data)}
+        {label: "modify", component: (item, close, alert) => item.data.display.builder(item.data, close, alert)}
       ]
     }
   }

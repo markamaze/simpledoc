@@ -101,20 +101,20 @@ const agencyObjectPrototype = (objectPrototype) => ({
   },
 
   storage: {
-    handlers: function(){
+    handlers: function(success, failure){
       return  <div className="storage-handlers" key={`storage-handlers-${this.id}`}>
                 <div className="storage-handler-item"
                       key={this.storage.save.key.call(this)}
-                      onClick={()=>this.storage.save.action.call(this, err=>{throw err})}>{this.storage.save.label}</div>
+                      onClick={()=>this.storage.save.action.call(this, success, failure)}>{this.storage.save.label}</div>
                 <div className="storage-handler-item"
                       key={this.storage.delete.key.call(this)}
-                      onClick={()=>this.storage.delete.action.call(this, err=>{throw err})}>{this.storage.delete.label}</div>
+                      onClick={()=>this.storage.delete.action.call(this, success, failure)}>{this.storage.delete.label}</div>
               </div>
     },
     save: {
       label: "Submit",
       key: function(){return `action-creater-save-${this.type()}-${this.id}`},
-      action: function(failure){
+      action: function(success, failure){
                 try{
                   let objectSet = this.new_object ? [this, ...this.new_object] : [this]
                   let isNew = this.id.substring(0,2) === 'n-'
@@ -131,8 +131,8 @@ const agencyObjectPrototype = (objectPrototype) => ({
                   }
                   else objectSet = [this]
 
-                  let result = isNew ? createAgencyObjects(objectSet, failure)
-                    : updateAgencyObjects(objectSet, failure)
+                  let result = isNew ? createAgencyObjects(objectSet, success, failure)
+                    : updateAgencyObjects(objectSet, success, failure)
 
                   // return result && result.error ? failure(result) : true
 
@@ -141,10 +141,10 @@ const agencyObjectPrototype = (objectPrototype) => ({
     delete: {
       label: "Delete",
       key: function(){return `action-creater-delete-${this.type()}-${this.id}`},
-      action: function(failure){
+      action: function(success, failure){
                 let result
                 try{
-                  result  = removeAgencyObjects([this], failure)
+                  result  = removeAgencyObjects([this], success, failure)
 
                   return result && result.error ? failure(result) : true
                 } catch(err){ failure(err) }}

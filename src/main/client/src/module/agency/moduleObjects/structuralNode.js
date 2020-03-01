@@ -77,11 +77,9 @@ const prototype = agencyState => ({
     document: node => {
       let state = agencyState()
       return  <div className="structuralNode document">
-                <header>Node Document</header>
-
                 <div className="container-fill">
 
-                  <List className="container-row border-bottom"
+                  <List className="container border-bottom"
                       headerComponent={<div>Node Info:</div>}
                       tableData={[
                         {label: "Node:", data: node, display: node.display.card(node), selectable: false},
@@ -90,13 +88,13 @@ const prototype = agencyState => ({
                       ]}
                       columns={[{selector: "label"},{selector: "display"}]} />
 
-                  <List className="container-row border-bottom"
+                  <List className="container border-bottom"
                       headerComponent={<div>Branches:</div>}
                       tableData={node.new_object ? [...node.new_object.filter(obj => obj.type() === "structuralNode" && obj.structuralNode_parent_id === node.id).map(child => ({data: child, display: child.display.card(child)})), ...node.typeFunctions.getChildren(node).map( child => ({data: child, display: child.display.card(child)}))] : node.typeFunctions.getChildren(node).map( child => ({data: child, display: child.display.card(child)}))}
                       columns={[{selector: "display"}]}
                       overlayComponents={[{label: "show document", component: item => item.data.display.document(item.data)}]} />
 
-                  <List className="container-row border-bottom"
+                  <List className="container border-bottom"
                       headerComponent={<div>Assignments:</div>}
                       tableData={node.active_assignments.map( ([assignment_id, agent_id]) => ({
                         assignment_display: agencyState().assignment[assignment_id].typeFunctions.getDisplayLabel(agencyState().assignment[assignment_id]),
@@ -105,14 +103,14 @@ const prototype = agencyState => ({
                         selectable: false}))}
                       columns={[{selector: "assignment_display"},{selector: "agent_display"}]} />
 
-                  <List className="container-row"
+                  <List className="container"
                       headerComponent={<div>Properties:</div>}
                       tableData={node.typeFunctions.getProperties(node).map(property => ({display: property.display.document(property, node.property_values[property.id])}))}
                       columns={[{selector: "display"}]} />
                 </div>
               </div>
     },
-    editor: node => {
+    editor: (node, close, alert) => {
       function Editor(props){
         let state = agencyState()
 
@@ -182,7 +180,7 @@ const prototype = agencyState => ({
                         })}
                         columns={[{selector: "assignment_display"}, {selector: "agent_display"}]} />
 
-                    <List classname="container-row"
+                    <List className="container-row"
                         headerComponent={<div className="container-item item-label">Assigned Agents</div>}
                         tableData={tempNode.active_assignments
                                       .filter( ([assignment_id, agent_id]) => agent_id !== "00000000-0000-0000-0000-000000000000")
@@ -201,21 +199,21 @@ const prototype = agencyState => ({
 
                   </div>
 
-                  { tempNode.storage.handlers.call(tempNode) }
+                  { tempNode.storage.handlers.call(tempNode, close, alert) }
 
                 </div>
       }
 
       return <Editor structuralNode={node} />
     },
-    builder: node => {
+    builder: (node, close, alert) => {
       function Builder(props){
         const [tempNode, setTempNode] = React.useState(props.structuralNode)
         const [tempNewNodeLabel, updateTempNewNodeLabel] = React.useState("new node")
         const updateHandler = newState => setTempNode(Object.assign(Object.create(Object.getPrototypeOf(tempNode)), tempNode, newState))
 
         const addBranch = () => {
-          let newNode = agencyObject("structuralNode", {id:"new_object", structuralNode_parent_id: node.id, structuralNode_label: tempNewNodeLabel})
+          let newNode = agencyObject("structuralNode", {id:"new_object", structuralNode_parent_id: node.id, structuralNode_label: tempNewNodeLabel}, alert)
 
           updateHandler({
             new_object: tempNode.new_object ? [...tempNode.new_object, newNode] : [newNode]
@@ -293,7 +291,7 @@ const prototype = agencyState => ({
                         columns={[{selector: "label"}, {selector: "input"}]} />
                   </div>
 
-                  { tempNode.storage.handlers.call(tempNode) }
+                  { tempNode.storage.handlers.call(tempNode, close, alert) }
 
                 </div>
       }
@@ -350,9 +348,9 @@ const displayProps = agencyState => ({
       iconComponent: node => node.display.card(node),
       // drawerComponents: [{label: "card", component: item => item.display.card(item)}],
       overlayComponents: [
-        {label: "document", component: item => item.display.document(item)},
-        {label: "editor", component: item => item.display.editor(item)},
-        {label: "builder", component: item => item.display.builder(item)},
+        {label: "document", component: (item) => item.display.document(item)},
+        {label: "editor", component: (item, close, alert) => item.display.editor(item, close, alert)},
+        {label: "builder", component: (item, close, alert) => item.display.builder(item, close, alert)},
       ]
     }
   }

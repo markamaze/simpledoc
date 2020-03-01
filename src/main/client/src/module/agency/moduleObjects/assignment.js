@@ -54,11 +54,10 @@ const prototype = agencyState => ({
                     : supervisor.agentTemplate_label}`}</div>
               </div>
     },
-    builder: (assignment, updateHandler) => {
+    builder: (assignment, close, alert) => {
       function Builder(props){
         const [tempAssignment, updateTempAssignment] = React.useState(props.assignment)
-        const updateHandler = newState => props.updateHandler ? props.updateHandler(newState)
-          : updateTempAssignment(Object.assign(Object.create(Object.getPrototypeOf(tempAssignment)), tempAssignment, newState))
+        const updateHandler = newState => updateTempAssignment(Object.assign(Object.create(Object.getPrototypeOf(tempAssignment)), tempAssignment, newState))
 
 
         return  <div className="assignment document">
@@ -95,10 +94,10 @@ const prototype = agencyState => ({
                     </div>
                   </div>
 
-                  { props.updateHandler ? null : tempAssignment.storage.handlers.call(tempAssignment) }
+                  { tempAssignment.storage.handlers.call(tempAssignment, close, alert) }
                 </div>
       }
-      return <Builder assignment={assignment} updateHandler={updateHandler} />
+      return <Builder assignment={assignment} />
     }
   },
   typeFunctions: {
@@ -116,12 +115,12 @@ const displayProps = agencyState => ({
       columns: [{selector: "display"}],
       tableData: Object.values(agencyState.assignment).map(assignment => ({data: assignment, display: assignment.display.document(assignment)})),
       listActions: [
-        {label: "New Assignment", action: () => {
-          let newAssignment = agencyObject("assignment", {id: "new_object"}, err=>{throw err})
-          return newAssignment.display.builder(newAssignment)
+        {label: "New Assignment", action: (close, alert) => {
+          let newAssignment = agencyObject("assignment", {id: "new_object"}, alert)
+          return newAssignment.display.builder(newAssignment, close, alert)
         }}
       ],
-      overlayComponents: [{label: "modify", component: item => item.data.display.builder(item.data)}]
+      overlayComponents: [{label: "modify", component: (item, close, alert) => item.data.display.builder(item.data, close, alert)}]
     }
   }
 })

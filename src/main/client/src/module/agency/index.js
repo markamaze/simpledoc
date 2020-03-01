@@ -12,7 +12,6 @@ export default module = {
   path: "/agency",
   routes: {
     agency: { path: "/agency", default: true, title: "Agency", component: state => <Agency.AgencyPage  />},
-    agents: { path: "/agency/agents", title: "Agents", component: state => <Agency.AgentManagerPage  />},
     users: { path: "/agency/users", title: "Users", component: state => <Agency.UsersManagerPage historyState={state} />},
     supplemental: { path: "/agency/supplemental", title: "Other", component: state => <Agency.SupplementalDataManagerPage historyState={state} />}
 

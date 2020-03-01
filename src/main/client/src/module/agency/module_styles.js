@@ -75,7 +75,7 @@ export const AgencyPageWrapper = styled.div`
     background: ${colors.three};
     color: ${colors.four};
     flex-grow: 1;
-    padding: .5rem 2rem 1rem;
+    padding: 1rem 2rem 1rem;
     overflow: auto;
 
     .storage-handler-item{
@@ -87,7 +87,7 @@ export const AgencyPageWrapper = styled.div`
   .container {
     display: flex;
     flex-direction: column;
-    padding: .25rem;
+    padding: .5rem;
     overflow: auto;
 
     .selected {

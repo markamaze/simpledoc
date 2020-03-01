@@ -66,7 +66,8 @@ const prototype = agencyState => ({
                   <List className="container-row"
                       headerComponent={<div className="container-item item-label">Active Agents:</div>}
                       columns={[{selector:"display"}]}
-                      tableData={user.typeFunctions.getUserAgents(user).map(agent => ({display: agent.display.card(agent), selectable: false}))} />
+                      tableData={user.typeFunctions.getUserAgents(user).map(agent => ({display: agent.typeFunctions.getDisplayLabel(agent), data: agent}))}
+                      drawerComponents={[{component: item => item.data.display.document(item.data)}]} />
 
                   <List className="container-row"
                       headerComponent={<div>Properties:</div>}
@@ -77,11 +78,10 @@ const prototype = agencyState => ({
               </div>
 
     },
-    editor: (user, updateHandler) => {
+    editor: (user, close, alert) => {
       function Editor(props) {
         const [tempUser, updateTempUser] = React.useState(props.user)
-        const updateHandler = newState => props.updateHandler ? props.updateHandler(newState)
-          : updateTempUser(Object.assign(Object.create(Object.getPrototypeOf(tempUser)), tempUser, newState))
+        const updateHandler = newState => updateTempUser(Object.assign(Object.create(Object.getPrototypeOf(tempUser)), tempUser, newState))
 
         return  <div className="user document">
                   <header>Edit User Property Values</header>
@@ -101,13 +101,13 @@ const prototype = agencyState => ({
 
                   </div>
 
-                  { props.updateHandler ? null : tempUser.storage.handlers.call(tempUser) }
+                  { tempUser.storage.handlers.call(tempUser, close, alert) }
 
                 </div>
       }
-      return <Editor user={user} updateHandler={updateHandler} />
+      return <Editor user={user} />
     },
-    builder: (user) => {
+    builder: (user, close, alert) => {
       function Builder(props){
         const [tempUser, updateTempUser] = React.useState(props.user)
         const updateHandler = newState => updateTempUser(Object.assign(Object.create(Object.getPrototypeOf(tempUser)), tempUser, newState))
@@ -134,7 +134,7 @@ const prototype = agencyState => ({
 
                   </div>
 
-                  { tempUser.storage.handlers.call(tempUser) }
+                  { tempUser.storage.handlers.call(tempUser, close, alert) }
 
                 </div>
       }
@@ -166,17 +166,17 @@ const displayProps = agencyState => ({
       columns: [{selector: "username"}],
       tableData: Object.values(agencyState.user),
       listActions: [
-        {label: "New User", action: () => {
-          let newUser = agencyObject("user", {id: "new_object", username:"new user", password: "password"}, err=>{throw err})
-          return newUser.display.builder(newUser)
+        {label: "New User", action: (close, alert) => {
+          let newUser = agencyObject("user", {id: "new_object", username:"new user", password: "password"}, alert )
+          return newUser.display.builder(newUser, close, alert)
         }}
       ],
       drawerComponents: [
         {label: "show document", component: item => item.display.document(item)},
       ],
       overlayComponents: [
-        {label: "edit properties", component: item => item.display.editor(item)},
-        {label: "modify user", component: item => item.display.builder(item)}
+        {label: "edit properties", component: (item, close, alert) => item.display.editor(item, close, alert)},
+        {label: "modify user", component: (item, close, alert) => item.display.builder(item, close, alert)}
       ]
     }
   }

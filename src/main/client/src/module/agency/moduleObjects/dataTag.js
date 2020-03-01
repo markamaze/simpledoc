@@ -87,7 +87,7 @@ const prototype = agencyState => ({
           </div>
         </div>
       </div>,
-    builder: (dataTag) => {
+    builder: (dataTag, close, alert) => {
       function Builder(props){
         const [tempDataTag, updateTempDataTag] = React.useState(props.dataTag)
 
@@ -138,7 +138,7 @@ const prototype = agencyState => ({
 
                   </div>
 
-                  { tempDataTag.storage.handlers.call(tempDataTag) }
+                  { tempDataTag.storage.handlers.call(tempDataTag, close, alert) }
 
                 </div>
       }
@@ -164,15 +164,15 @@ const displayProps = agencyState => ({
         display: <div className="container-item">{dataTag.dataTag_label}</div>
       })),
       listActions: [
-        {label: "New DataTag", action: () => {
-          let newDataTag = agencyObject("dataTag", {id: "new_object", dataTag_label: "new dataTag", dataTag_tagType: "agent"}, err=>{console.log(err)})
-          return newDataTag.display.builder(newDataTag)
+        {label: "New DataTag", action: (close, alert) => {
+          let newDataTag = agencyObject("dataTag", {id: "new_object", dataTag_label: "new dataTag", dataTag_tagType: "agent"}, alert)
+          return newDataTag.display.builder(newDataTag, close, alert)
         }}],
       drawerComponents: [
         {label: "document", component: item => item.data.display.document(item.data)},
       ],
       overlayComponents: [
-        {label: "modify", component: item => item.data.display.builder(item.data)}
+        {label: "modify", component: (item, close, alert) => item.data.display.builder(item.data, close, alert)}
       ]
     }
   },

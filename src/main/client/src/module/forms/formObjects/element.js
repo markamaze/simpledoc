@@ -59,7 +59,8 @@ const prototype = getFormState => ({
     },
     value_properties: {
       setValue: function(valueProperties){
-        if(valueProperties === null || valueProperties === undefined) throw "missing required property: Forms.Element.value_properties"
+        if(valueProperties === null || valueProperties === undefined) this.value_properties = {}
+        // throw "missing required property: Forms.Element.value_properties"
         else if(!this.properties.value_properties.validate(valueProperties)) throw "invalid property: Forms.Element.value_properties"
         else this.value_properties = valueProperties
         return true
@@ -87,9 +88,14 @@ const prototype = getFormState => ({
     }
   },
   display: {
-    document: element => {},
+    document: element => {
+      return <div className="container-item">{element.key}</div>
+    },
     editor: element => {},
-    creator: element => {}
+    builder: element => {
+
+      return <div>element builder</div>
+    }
   },
   typeFunctions: {}
 })

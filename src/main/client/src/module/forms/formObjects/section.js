@@ -67,10 +67,74 @@ const prototype = getFormState => ({
     }
   },
   display: {
-    document: section => {},
+    document: section => {
+      return  <div className="document">
+                <div className="header">{section.label}</div>
+                <div className="container-fill">
+                  { section.layout_ids.map(id => getFormState().layout[id])
+                      .map( layout => <div className="container-row">{layout.display.document(layout)}</div>) }
+                </div>
+              </div>
+    },
     editor: section => {},
-    builder: section => {
-      return <div>section builder</div>
+    builder: (section, updateSection) => {
+      function Creator(props){
+        const [tempSection, updateTempSection] = React.useState(props.section)
+        const updateHandler = newState => updateTempSection(Object.assign(Object.create(Object.getPrototypeOf(tempSection)), tempSection, {...newState}))
+
+        const addLayout = () => {
+          let sectionState = {
+            id: "new_object",
+            label: "new section",
+            form_id: tempSection.form_id,
+            section_id: tempSection.id
+          }
+          let newLayout = formObject("layout", sectionState, err => {throw err})
+
+          updateHandler({
+            layout_ids: [...tempSection.layout_ids, newLayout.id],
+            new_object: tempSection.new_object ? [...tempSection.new_object, newLayout] : [newLayout]
+          })
+        }
+        const removeLayout = layout_id => {
+          updateHandler({
+            layout_ids: tempSection.layout_ids.filter( id => id !== layout_id ),
+            new_object: tempSection.new_object ? tempSection.new_object.filter( object => object.id !== layout_id ) : []
+          })
+        }
+        const updateLayout = layout => {
+          console.log("update layout", layout)
+        }
+        return  <div className="document">
+                  <div className="container-row">
+                    <div className="container-item item-label">Update Title:</div>
+                    <input type="text" value={tempSection.label}
+                            onChange={()=>updateHandler({label: event.target.value})} />
+                    <button onClick={() => addLayout()}>Add Layout</button>}
+                  </div>
+
+                  <div className="container-fill">
+
+                    <header className="container-row border-bottom">{tempSection.label}</header>
+
+                    {
+                      tempSection.layout_ids.map( id =>
+                        <div className="container-row border-bottom">
+                          <div className="container-row">
+                            <button onClick={() => removeLayout(id)}>Remove Layout</button>
+                          </div>
+                          { id.substring(0,2) === "n-" ?
+                              tempSection.new_object.find( obj => obj.id === id).display.builder(tempSection.new_object.find(obj=>obj.id===id))
+                              : getFormState().layout[id].display.builder(getFormState().layout[id], layout => updateLayout(layout)) }
+                        </div>)
+                    }
+
+                  </div>
+
+                </div>
+      }
+
+      return <Creator section={section} />
     }
   },
   typeFunctions: {}

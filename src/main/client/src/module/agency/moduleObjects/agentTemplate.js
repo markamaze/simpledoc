@@ -41,7 +41,6 @@ const prototype = agencyState => ({
     card: template => {
       let store = agencyState()
       return  <div className="agentTemplate container-row">
-                <div className="container-item item-label">Position:</div>
                 <div className="container-item">{ template.agentTemplate_label }</div>
                 <div className="container-item">
                 {
@@ -74,11 +73,10 @@ const prototype = agencyState => ({
                 </div>
               </div>
     },
-    builder: (template, updateHandler) => {
+    builder: (template, close, alert) => {
       function Builder(props){
         const [tempTemplate, updateTempTemplate] = React.useState(props.agentTemplate)
-        const updateHandler = newState => props.updateHandler ? props.updateHandler(newState) :
-          updateTempTemplate(Object.assign(Object.create(Object.getPrototypeOf(tempTemplate)), tempTemplate, newState))
+        const updateHandler = newState => updateTempTemplate(Object.assign(Object.create(Object.getPrototypeOf(tempTemplate)), tempTemplate, newState))
 
         const toggleDataTag = dataTag => {
           tempTemplate.agentTemplate_dataTag_ids.includes(dataTag.id) ?
@@ -110,12 +108,12 @@ const prototype = agencyState => ({
 
                   </div>
 
-                  { props.updateHandler ? null : tempTemplate.storage.handlers.call(tempTemplate) }
+                  { tempTemplate.storage.handlers.call(tempTemplate, close, alert) }
 
                 </div>
       }
 
-      return <Builder agentTemplate={template} updateHandler={updateHandler} />
+      return <Builder agentTemplate={template} />
 
     }
   },
@@ -145,15 +143,15 @@ const displayProps = agencyState => ({
         data: template,
         display: <div className="container-item">{template.agentTemplate_label}</div>
       })),
-      listActions: [{label: "New Template", action: () => {
-        let newTemplate = agencyObject("agentTemplate", {id: "new_object", agentTemplate_label: "new template"}, err=>{throw err})
-        return newTemplate.display.builder(newTemplate)
+      listActions: [{label: "New Template", action: (close, alert) => {
+        let newTemplate = agencyObject("agentTemplate", {id: "new_object", agentTemplate_label: "new template"}, alert)
+        return newTemplate.display.builder(newTemplate, close, alert)
       }}],
       drawerComponents: [
         {label: "document", component: item => item.data.display.document(item.data)},
       ],
       overlayComponents: [
-        {label: "modify", component: item => item.data.display.builder(item.data)}
+        {label: "modify", component: (item, close, alert) => item.data.display.builder(item.data, close, alert)}
       ]
     }
   }

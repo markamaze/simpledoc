@@ -1,11 +1,6 @@
 import styled from 'styled-components'
-// import colors from '../colors'
-const colors = {
-  one: '#C09F80',
-  two: '#76323F',
-  three: '#565656',
-  four: '#D7CEC7'
-}
+import colors from '../colors'
+
 
 export default colors
 

@@ -12,39 +12,49 @@ export function loadAgencyStore(){
   }, err => err.printStackTrace())
 }
 
-export function createAgencyObjects(objectSet, failure){
+export function createAgencyObjects(objectSet, success, failure){
   post(`/Agency`, objectSet, function(request){
     let result = JSON.parse(request.response)
-    if(result.error) failure(result.error)
-    else store.dispatch({
-      type: "WRITE_AGENCY_OBJECTS",
-      payload: objectSet
-    })
-  })
-}
+    if(result.error) failure(`create object unsuccessful: ${result.error}`)
+    else {
+      store.dispatch({
+        type: "WRITE_AGENCY_OBJECTS",
+        payload: objectSet
+      })
+      success ? success() : null
+    }
 
-export function updateAgencyObjects(objectSet, failure){
-  put(`/Agency`, objectSet, function(request){
-    let result = JSON.parse(request.response)
-
-    if(result.error) failure(result.error)
-    else store.dispatch({
-      type: "WRITE_AGENCY_OBJECTS",
-      payload: objectSet,
-      failure: failure
-    })
   }, failure)
 }
 
-export function removeAgencyObjects(objectSet, failure){
-  remove(`/Agency`, objectSet, function(request){
+export function updateAgencyObjects(objectSet, success, failure){
+  put(`/Agency`, objectSet, function(request){
     let result = JSON.parse(request.response)
 
-    if(result.error) failure(result.error)
-    else store.dispatch({
-      type: "DELETE_AGENCY_OBJECTS",
-      payload: objectSet,
-      failure: failure
-    })
-  }, )
+    if(result.error) failure(`update unsuccessful: ${result.error}`)
+    else {
+      store.dispatch({
+        type: "WRITE_AGENCY_OBJECTS",
+        payload: objectSet,
+        failure: failure
+      })
+      success ? success() : null
+    }
+  }, failure)
+}
+
+export function removeAgencyObjects(objectSet, success, failure){
+  !confirm("are you sure you want to permanently delete this?") ? null
+    : remove(`/Agency`, objectSet, function(request){
+        let result = JSON.parse(request.response)
+
+        if(result.error) failure(`could not delete object: ${result.error}`)
+        else {
+          store.dispatch({
+            type: "DELETE_AGENCY_OBJECTS",
+            payload: objectSet
+          })
+          success()
+        }
+      }, failure)
 }

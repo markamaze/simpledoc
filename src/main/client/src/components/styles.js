@@ -22,8 +22,8 @@ export const ListWrapper = styled.div`
     display: flex;
     flex-direction: column;
     min-width: 30%;
-    background: ${colors.three};
-    color: ${colors.four};
+    background: ${colors.two};
+    color: ${colors.one};
     justify-content: space-between;
     align-self: stretch;
   }
@@ -65,9 +65,9 @@ export const ListWrapper = styled.div`
     display: flex;
     flex-grow: 1;
     flex-direction: column;
-    background: ${colors.four};
-    color: ${colors.three};
-    border: solid thin ${colors.four};
+    background: ${colors.one};
+    color: ${colors.two};
+    border: solid thin ${colors.one};
     padding: 1rem 2rem;
     overflow: auto;
   }

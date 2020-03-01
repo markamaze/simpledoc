@@ -7,6 +7,7 @@ export default function List(props){
   const [showOverlay, setOverlay] = React.useState(false)
   const [drawerComponent, setDrawerComponent] = React.useState(false)
   const [selectedItem, setSelectedItem] = React.useState(null)
+  const [showbody, togglebody] = React.useState(props.collapsable ? false : true)
 
   const updateSelectedItem = item => {
     if(selectedItem === item) setSelectedItem(null)
@@ -62,7 +63,7 @@ export default function List(props){
     </div>
 
   const loadOverlayHandlers = item => props.overlayComponents.map( overlayComponent =>
-    <div className="action-handler" onClick={() => setOverlay(overlayComponent.component(item))}>{overlayComponent.label}</div>)
+    <div className="action-handler" onClick={() => setOverlay(overlayComponent.component(item, ()=>setOverlay(false), (message) => window.alert(message)))}>{overlayComponent.label}</div>)
 
   const loadTableDrawer = (item) => {
     if(props.drawerComponents === null) return null
@@ -116,7 +117,7 @@ export default function List(props){
     <div className="list-actions">
       {
         props.listActions.map(item =>
-          <div className="action-handler" onClick={() => setOverlay(item.action())}>{item.label}</div> )
+          <div className="action-handler" onClick={() => setOverlay(item.action(()=>setOverlay(false), message => window.alert(message)))}>{item.label}</div> )
       }
     </div>
 
@@ -124,11 +125,11 @@ export default function List(props){
   try {
     return  <ListWrapper className={`list ${props.className}`} style={props.style}>
               <div className="list-header-container">
-                { props.headerComponent ? <div className="list-header">{props.headerComponent}</div> : null }
+                { props.headerComponent ? <div className="list-header" onClick={() => props.collapsable ? togglebody(!showbody) : console.log("hi")}>{props.headerComponent}</div> : null }
                 { props.listActions && props.listActions.length > 0 ? loadListActions() : null }
               </div>
-              { props.tableData ? buildList() : null }
-              { props.root && props.nodeBranch ? <div className="tree">{buildTree(props.root, 0)}</div> : null }
+              { showbody && props.tableData ? buildList() : null }
+              { showbody && props.root && props.nodeBranch ? <div className="tree">{buildTree(props.root, 0)}</div> : null }
               { props.footerComponent ? <div className="list-footer">{props.footerComponent}</div> : null }
               { showOverlay ? loadOverlay() : null }
             </ListWrapper>
