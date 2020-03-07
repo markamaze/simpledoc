@@ -1,6 +1,7 @@
 import React from 'react'
 import * as validationTool from './validationTool'
 import { formObject } from './formObject'
+import List from '../../../components/List'
 
 
 
@@ -105,39 +106,62 @@ const prototype = getFormState => ({
         const updateLayout = layout => {
           console.log("update layout", layout)
         }
-        return  <div className="document">
-                  <div className="container-row">
-                    <div className="container-item item-label">Update Title:</div>
-                    <input type="text" value={tempSection.label}
-                            onChange={()=>updateHandler({label: event.target.value})} />
-                    <button onClick={() => addLayout()}>Add Layout</button>}
-                  </div>
 
-                  <div className="container-fill">
+        return  <List className="container document"
+                  headerComponent={<div className="">{tempSection.label}</div>}
+                  columns={[{selector: "display"}]}
+                  tableData={tempSection.typeFunctions.getLayouts(tempSection).map(layout => ({display: layout.display.builder(layout), data: layout}))}
+                  listActions={[{label: "add layout", action: () => addLayout() }]}
+                  drawerComponents={[
+                    {label: "rename", component: () => {} },
+                    {label: "delete section", component: () => {} }
+                  ]} />
 
-                    <header className="container-row border-bottom">{tempSection.label}</header>
-
-                    {
-                      tempSection.layout_ids.map( id =>
-                        <div className="container-row border-bottom">
-                          <div className="container-row">
-                            <button onClick={() => removeLayout(id)}>Remove Layout</button>
-                          </div>
-                          { id.substring(0,2) === "n-" ?
-                              tempSection.new_object.find( obj => obj.id === id).display.builder(tempSection.new_object.find(obj=>obj.id===id))
-                              : getFormState().layout[id].display.builder(getFormState().layout[id], layout => updateLayout(layout)) }
-                        </div>)
-                    }
-
-                  </div>
-
-                </div>
+        // return  <div className="document">
+        //           <div className="container-row">
+        //             <div className="container-item item-label">Update Title:</div>
+        //             <input type="text" value={tempSection.label}
+        //                     onChange={()=>updateHandler({label: event.target.value})} />
+        //             <button onClick={() => addLayout()}>Add Layout</button>}
+        //           </div>
+        //
+        //           <div className="container-fill">
+        //
+        //             <header className="container-row border-bottom">{tempSection.label}</header>
+        //
+        //             {
+        //               tempSection.layout_ids.map( id =>
+        //                 <div className="container-row border-bottom">
+        //                   <div className="container-row">
+        //                     <button onClick={() => removeLayout(id)}>Remove Layout</button>
+        //                   </div>
+        //                   { id.substring(0,2) === "n-" ?
+        //                       tempSection.new_object.find( obj => obj.id === id).display.builder(tempSection.new_object.find(obj=>obj.id===id))
+        //                       : getFormState().layout[id].display.builder(getFormState().layout[id], layout => updateLayout(layout)) }
+        //                 </div>)
+        //             }
+        //
+        //           </div>
+        //
+        //         </div>
       }
 
       return <Creator section={section} />
     }
   },
-  typeFunctions: {}
+  typeFunctions: {
+    getLayouts: section => {
+      let store = getFormState()
+      let layouts = []
+
+      section.layout_ids.forEach( id => {
+        if(id.substring(0,2) === "n-") layouts = [...layouts, section.new_object.find(obj => obj.id === id)]
+        else layouts = [...layouts, store.layout[id] ]
+      })
+
+      return layouts
+    }
+  }
 })
 
 

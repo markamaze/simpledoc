@@ -344,7 +344,6 @@ const displayProps = agencyState => ({
     list: {
       root: Object.values(agencyState["structuralNode"]).find(node => node.id === node.structuralNode_parent_id),
       nodeBranch: node => node.typeFunctions.getChildren(node),
-      // columns: [{selector: "structuralNode_label"}],
       iconComponent: node => node.display.card(node),
       // drawerComponents: [{label: "card", component: item => item.display.card(item)}],
       overlayComponents: [

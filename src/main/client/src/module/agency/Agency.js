@@ -10,11 +10,13 @@ function AgencyPage(props){
   const agencyState = useSelector(state => (state.agency))
   const displayProps = agencyTypeData("structuralNode", agencyState).component.list
 
-  return  <AgencyPageWrapper id="agency-module" className="module-wrapper">
+  return  <div className="">
             <ErrorBoundary displayName="AgencyPage" >
-              <List {...displayProps} headerComponent={<div className="page-header">Agency Overview</div>}/>
+              <List {...displayProps}
+                  className=""
+                  headerComponent={<div className="page-header">Agency Overview</div>}/>
             </ErrorBoundary>
-            </AgencyPageWrapper>
+          </div>
 }
 
 function SupplementalDataManagerPage(props){
@@ -24,19 +26,17 @@ function SupplementalDataManagerPage(props){
   const assignmentProps = agencyTypeData("assignment", agencyState).component.list
   const propertyProps = agencyTypeData("property", agencyState).component.list
 
-  return  <AgencyPageWrapper id="agency-module-page-dataTagsManager" className="module-wrapper">
+  return  <AgencyPageWrapper className="module-wrapper">
           <ErrorBoundary displayName="dataTagsManagerPage">
-
-            <List className="container-row border-bottom" {...dataTagProps} headerComponent={<div className="item-label page-header">DataTags</div>}/>
-
-
-            <List className="container-row border-bottom" {...templateProps} headerComponent={<div className="item-label page-header">Agent Templates</div>} />
+            <List className="container" {...dataTagProps} headerComponent={<div className="page-header">DataTags</div>}/>
 
 
-            <List className="container-row border-bottom" {...assignmentProps} headerComponent={<div className="item-label page-header">Agency Assignments</div>} />
+            <List className="container" {...templateProps} headerComponent={<div className="page-header">Agent Templates</div>} />
+
+            <List className="container" {...assignmentProps} headerComponent={<div className="page-header">Agency Assignments</div>} />
 
 
-            <List className="container-row" {...propertyProps} headerComponent={<div className="item-label page-header">Agency Properties</div>} />
+            <List className="container" {...propertyProps} headerComponent={<div className="page-header">Agency Properties</div>} />
 
           </ErrorBoundary>
           </AgencyPageWrapper>
@@ -49,7 +49,9 @@ function UsersManagerPage(props){
 
   return  <AgencyPageWrapper id="agency-module-page-UsersManagerPage" className="module-wrapper">
           <ErrorBoundary displayName="UsersManagerPage">
-            <List {...displayProps} headerComponent={<div className="page-header">Manage Agency Users</div>} />
+            <List {...displayProps}
+                className=""
+                headerComponent={<div className="page-header">Manage Agency Users</div>} />
           </ErrorBoundary>
           </AgencyPageWrapper>
 

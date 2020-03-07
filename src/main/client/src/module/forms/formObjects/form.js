@@ -1,6 +1,7 @@
 import React from 'react'
 import * as validationTool from './validationTool'
 import { formObject } from './formObject'
+import List from '../../../components/List'
 
 
 const prototype = getFormState => ({
@@ -67,7 +68,7 @@ const prototype = getFormState => ({
                 form editor
               </div>
     },
-    builder: (form) => {
+    builder: (form, close, alert) => {
       function Creator(props){
         const [tempForm, updateTempForm] = React.useState(props.form)
         const updateHandler = newState => updateTempForm(Object.assign(Object.create(Object.getPrototypeOf(tempForm)), tempForm, {...newState}))
@@ -95,45 +96,61 @@ const prototype = getFormState => ({
           console.log("update section", section)
         }
 
-        return  <div className="document">
-                  <header>Modify Form</header>
-                  <div className="container-row">
-                    <div className="container-item item-label">Update Title:</div>
-                    <input type="text" value={tempForm.label}
-                            onChange={()=>updateHandler({label: event.target.value})} />
-                    <button onClick={() => addSection()}>Add Section</button>}
-                  </div>
+        return  <List className="document"
+                  headerComponent={<div className="">{tempForm.label}</div>}
+                  columns={[{selector: "display"}]}
+                  tableData={tempForm.typeFunctions.getSections(tempForm).map(section => ({display: section.display.builder(section), data: section}))}
+                  listActions={[{label: "add section", action: () => addSection()}]}
+                  drawerComponents={[
+                    {label: "rename", component: () => {} },
+                    {label: "delete section", component: () => {} }
+                  ]} />
 
-                  <div className="container-fill">
+        // return  <div className="document">
+        //           <header>Modify Form</header>
+        //           <div className="container-row">
+        //             <div className="container-item item-label">Update Title:</div>
 
-                    <header className="container-row border-bottom">{tempForm.label}</header>
-
-                    {
-                      tempForm.section_ids.map( id =>
-                        <div className="container-row border-bottom">
-                          <div className="container-row">
-                            <button onClick={() => removeSection(id)}>Remove Section</button>
-                          </div>
-                          { id.substring(0,2) === "n-" ?
-                              tempForm.new_object.find( obj => obj.id === id).display.builder(tempForm.new_object.find(obj=>obj.id===id))
-                              : getFormState().section[id].display.builder(getFormState().section[id], section => updateSection(section)) }
-                        </div>)
-                    }
-
-                  </div>
-
-                  { tempForm.storage.handlers.call(tempForm) }
-
-                </div>
+        //             <button onClick={() => addSection()}>Add Section</button>}
+        //           </div>
+        //
+        //           <div className="container-fill">
+        //
+        //             <header className="container-row border-bottom">{tempForm.label}</header>
+        //
+        //             {
+        //               tempForm.section_ids.map( id =>
+        //                 <div className="container-row border-bottom">
+        //                   <div className="container-row">
+        //                     <button onClick={() => removeSection(id)}>Remove Section</button>
+        //                   </div>
+        //                   { id.substring(0,2) === "n-" ?
+        //                       tempForm.new_object.find( obj => obj.id === id).display.builder(tempForm.new_object.find(obj=>obj.id===id))
+        //                       : getFormState().section[id].display.builder(getFormState().section[id], section => updateSection(section)) }
+        //                 </div>)
+        //             }
+        //
+        //           </div>
+        //
+        //           { tempForm.storage.handlers.call(tempForm) }
+        //
+        //         </div>
       }
 
       return <Creator form={form} />
     }
   },
   typeFunctions: {
-    formSections: function(){
+    getSections: form => {
       let formStore = getFormState()
-      return this.section_ids.map(id => formStore['section'][id]).map(section => section.loadSection())
+      let sections = []
+
+      form.section_ids.forEach(id => {
+        if(id.substring(0,2) === "n-") sections = [...sections, form.new_object.find(obj => obj.id === id)]
+        else sections = [...sections, formStore.section[id]]
+      })
+
+      return sections
     }
   }
 })

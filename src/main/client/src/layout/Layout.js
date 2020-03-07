@@ -1,9 +1,6 @@
 import React from 'react'
 import { createBrowserHistory } from 'history'
 
-import { BodyWrapper, BodyViewport, HeaderWrapper, FooterWrapper } from './layoutStyles'
-
-
 
 
 function Header(props){
@@ -19,21 +16,21 @@ function Header(props){
     setMenuState(false)
   }
 
-  return  <HeaderWrapper>
-            <div className="header">
-              <header onClick={() => updateRoute("/")}>Simpledoc</header>
+  return  <div className={props.className}>
+            <div className="row">
+              <header className="col-8" onClick={() => updateRoute("/")}>Simpledoc</header>
               {
                 !menuState
-                  ? <div className="selected-module"
+                  ? <div className="col-4 text-right selected-module"
                           onClick={() => setMenuState(true)}>
                       {activeModuleRoute().title}
                     </div>
-                  : <div className="module-menu">
+                  : <div className="fixed-top d-flex align-items-center flex-column p-3 h-100 bg-dark text-light">
                         {
                           Object.values(props.routes).map(moduleRoute =>
-                            <div className="module-menu-item" onClick={() => updateRoute(moduleRoute.path)}>
+                            <h4 onClick={() => updateRoute(moduleRoute.path)}>
                               {moduleRoute.title}
-                            </div>)
+                            </h4>)
                         }
                       </div>
               }
@@ -41,23 +38,23 @@ function Header(props){
 
             {
               activeModuleRoute().routes !== undefined ?
-                <div className="subheader">
+                <div className="row d-flex flex-row justify-content-between px-4 py-1">
                   {
                     Object.values(activeModuleRoute().routes).map(route =>
-                      <div className={"subheader-item"}
+                      <div className={""}
                             onClick={()=>updateRoute(route.path)}>{route.title}</div>)
                   }
                 </div>
                 : null
             }
-          </HeaderWrapper>
+          </div>
 }
 
 function Footer(props){
 
-  return <FooterWrapper className="footer_container">
-            <p>A learning project developed by: MARK A MAZE</p>
-          </FooterWrapper>
+  return <div className={props.className}>
+            <div>A learning project developed by: MARK A MAZE</div>
+          </div>
 }
 
 export default function Layout(props){
@@ -86,18 +83,16 @@ export default function Layout(props){
     else throw new Error("could not find default route in given path")
   }
 
-  return  <BodyWrapper >
+  return  <div className="fixed-top container d-flex flex-column h-100 p-0" >
               <Header
+                  className="flex-grow-0 bg-dark text-light p-2"
+                  style={{overflow: "auto"}}
                   routes={props.modules}
                   pushHistory={(path, state)=> history.push(path, state) }
                   location={location}
                   pathArray={pathArray} />
-              <BodyViewport className="module-viewport">
-                {
-                  activePageComponent()
-                }
-              </BodyViewport>
-              <Footer />
-            </BodyWrapper>
+              <div className="flex-grow-1 bg-light text-dark p-2 overflow-auto">{activePageComponent()}</div>
+              <Footer className="flex-grow-0 bg-dark text-light p-2"/>
+            </div>
 
 }

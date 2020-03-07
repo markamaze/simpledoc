@@ -1,5 +1,4 @@
 import React from 'react'
-import { ListWrapper } from './styles'
 
 
 
@@ -20,25 +19,29 @@ export default function List(props){
   const isItemSelected = item => selectedItem === item
 
   const addRow = (item, loadingFn) =>
-    <div className={`table-row${isItemSelected(item) ? "-active" : ""}`}>
-      <div className="row">
-        { item.selectable === false ? null : <div className="expand-row-icon">{`${isItemSelected(item) ? '<' : '>'}`}</div> }
-        {
-          props.columns.map( column =>
-            <div className="row-cell" onClick={()=> item.selectable === false ? null : updateSelectedItem(item)}>
-              {column.selectorIsFunction ? item[column.selector]() : item[column.selector]}
-            </div>)
-        }
-      </div>
+    <div className={`table-row${isItemSelected(item) ? "-active" : ""} flex-column`}>
+      <div className="d-flex flex-row">
+      { item.selectable === false ? null : <div className="expand-row-icon px-2">{`${isItemSelected(item) ? '<' : '>'}`}</div> }
+      {
+        props.iconComponent ?
+          <div className="icon-cell flex-grow-1" onClick={() => updateSelectedItem(item)}>{ props.iconComponent(item) }</div>
+          : props.columns.map( column =>
+              <div className="table-cell flex-grow-1 border-bottom" onClick={()=> item.selectable === false ? null : updateSelectedItem(item)}>
+                {column.selectorIsFunction ? item[column.selector]() : item[column.selector]}
+              </div>)
+      }
+
+
       {
         props.overlayComponents && isItemSelected(item) ? //load set of action creators that will set overlay with a component
-          <div className="row-expanded">
-            {
-              props.overlayComponents.length > 0 ? <div className="list-overlay-options">{loadOverlayHandlers(item)}</div> : null
-            }
-          </div>
-          : null
+        <div className="table-row-expanded">
+        {
+          props.overlayComponents.length > 0 ? <div className="list-overlay-options">{loadOverlayHandlers(item)}</div> : null
+        }
+        </div>
+        : null
       }
+      </div>
       {
         props.drawerComponents && isItemSelected(item) ? //load drawer as tabbed pages inside drawer when item is selectedItem
           props.drawerComponents.length > 0 ? loadingFn(item) : null
@@ -47,20 +50,6 @@ export default function List(props){
 
     </div>
 
-  const addIcon = item =>
-    <div className="icon">
-      <div className="icon-wrapper" onClick={() => updateSelectedItem(item)}>{ props.iconComponent(item) }</div>
-      {
-        props.overlayComponents && isItemSelected(item) ?
-          props.overlayComponents.length > 0 ? <div className="list-overlay-options">{loadOverlayHandlers(item)}</div> : null
-          : null
-      }
-      {
-        props.drawerComponents && isItemSelected(item) ?
-          props.drawerComponents.length > 0 ? <div className="row-drawer">{loadTableDrawer(item)}</div> : null
-          : null
-      }
-    </div>
 
   const loadOverlayHandlers = item => props.overlayComponents.map( overlayComponent =>
     <div className="action-handler" onClick={() => setOverlay(overlayComponent.component(item, ()=>setOverlay(false), (message) => window.alert(message)))}>{overlayComponent.label}</div>)
@@ -82,77 +71,61 @@ export default function List(props){
             </div>
   }
 
-// props.nodeBranch(item).map(child => buildTree(child))
   const buildTree = (node, depth) =>
-    <div className="tree-node">
-      {props.iconComponent ? addIcon(node) : addRow(node, (item) => loadTableDrawer(item) )}
-      {props.nodeBranch(node).length > 0 ? <div className="tree-branch">{props.nodeBranch(node, ++depth).map( child => buildTree(child))}</div> : null}
+    <div className="tree-node border-left border-top m-3 d-flex flex-column">
+      { addRow(node, (item) => loadTableDrawer(item) ) }
+      { props.nodeBranch(node).length > 0 ? <div className="tree-node-branch">{props.nodeBranch(node).map( child => buildTree(child))}</div> : null }
     </div>
 
   const buildList = () =>
-    props.iconComponent ?
-      <div className="icons">{ props.tableData.map(item=>addIcon(item))}</div>
-      : <div className="table">
-          {
-            props.columns.filter(colObj => colObj.label === undefined ? false : true ).length > 0 ?
-              <div className="table-header row">
-                { props.columns.map( column =>
-                    <div className="table-header-column row-cell">{column.label}</div>) }
-              </div>
-              : null
-          }
-          <div className="table-body">
-            { props.tableData && props.tableData.length > 0 ? props.tableData.map( item => addRow(item, loadTableDrawer)) : "no data"}
-          </div>
-        </div>
+    <div className="list">
+      <div className="list-header">
+        {
+          props.iconComponent ? null
+            : props.columns.filter(colObj => colObj.label === undefined ? false : true ).length > 0 ?
+                props.columns.map( column => <div className="table-header-column">{column.label}</div> )
+                : null
+        }
+      </div>
+
+      <div className="list-body">
+        { props.tableData && props.tableData.length > 0 ? props.tableData.map( item => addRow(item, loadTableDrawer)) : "no data"}
+      </div>
+
+    </div>
 
 
   const loadOverlay = () =>
-    <div className="list-overlay">
+    <div className="list-overlay fixed-top h-100 w-100 bg-light color-dark p-3 overflow-auto">
       <div className="list-overlay-close" onClick={() => setOverlay(false)} >x</div>
       <div className="list-overlay-body">{ showOverlay }</div>
     </div>
 
   const loadListActions = () =>
-    <div className="list-actions">
-      {
         props.listActions.map(item =>
-          <div className="action-handler" onClick={() => setOverlay(item.action(()=>setOverlay(false), message => window.alert(message)))}>{item.label}</div> )
-      }
-    </div>
+          <div className="action-handler text-right" onClick={() => setOverlay(item.action(()=>setOverlay(false), message => window.alert(message)))}>{item.label}</div> )
 
 
   try {
-    return  <ListWrapper className={`list ${props.className}`} style={props.style}>
-              <div className="list-header-container">
-                { props.headerComponent ? <div className="list-header" onClick={() => props.collapsable ? togglebody(!showbody) : console.log("hi")}>{props.headerComponent}</div> : null }
-                { props.listActions && props.listActions.length > 0 ? loadListActions() : null }
+    return  <div className={`list d-flex flex-column border border-dark p-2 m-2 bg-light text-dark flex-grow-1 ${props.className}`} style={props.style}>
+              {
+                props.headerComponent ?
+                  <div className="list-header bg-dark text-light p-1 d-flex flex-row">
+                    <div className="col-8" onClick={() => props.collapsable ? togglebody(!showbody) : null}>{props.headerComponent}</div>
+                    { props.listActions && props.listActions.length > 0 ? <div className="col-4 font-italic font-weight-light text-right">{loadListActions()}</div> : null }
+                  </div>
+                  : null
+              }
+              <div className="list-body flex-grow-1">
+              { showbody && props.tableData ?
+                  buildList()
+                  : showbody && props.root && props.nodeBranch ? buildTree(props.root, 0) : null
+              }
               </div>
-              { showbody && props.tableData ? buildList() : null }
-              { showbody && props.root && props.nodeBranch ? <div className="tree">{buildTree(props.root, 0)}</div> : null }
-              { props.footerComponent ? <div className="list-footer">{props.footerComponent}</div> : null }
+              { props.footerComponent ? <div className="">{props.footerComponent}</div> : null }
               { showOverlay ? loadOverlay() : null }
-            </ListWrapper>
+            </div>
   } catch(error) {
     console.trace(error)
     throw new Error(`${error}: Error building List`)}
 }
-
-/*List.propTypes = {
-  root: {},
-  nodeBranch: ()=>{} ,
-
-  columns: {
-    limited: [],
-    expanded: []
-  },
-  limited: boolean,
-  iconComponent: {},
-  tableData: [],
-
-  listActions: [],
-  drawerComponents: [],
-  overlayComponents: [],
-  headerComponent: {},
-  footerComponent: {}
-}*/
