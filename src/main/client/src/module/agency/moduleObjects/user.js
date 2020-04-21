@@ -53,32 +53,24 @@ const prototype = agencyState => ({
       return  <div className="user container-row">{user.username}</div>
     },
     document: user => {
-      return  <div className="user document">
+      return  <div className="user container">
                 <header>{`User: ${user.username}`}</header>
-
-                <div className="container-fill">
-
-                  <List className="container-row"
-                      headerComponent={<div className="container-item item-label">User Info:</div>}
-                      columns={[{selector: "label"},{selector:"display"}]}
-                      tableData={[{label: "Username:", display: user.username, selectable: false}]} />
-
-                  <List className="container-row"
-                      headerComponent={<div className="container-item item-label">Active Agents:</div>}
+                <div className="row">
+                  <List className="col-md-6"
+                      headerComponent={<div>Active Agents:</div>}
                       columns={[{selector:"display"}]}
                       tableData={user.typeFunctions.getUserAgents(user).map(agent => ({display: agent.typeFunctions.getDisplayLabel(agent), data: agent}))}
                       drawerComponents={[{component: item => item.data.display.document(item.data)}]} />
 
-                  <List className="container-row"
+                  <List className="col-md-6"
                       headerComponent={<div>Properties:</div>}
                       tableData={user.typeFunctions.getProperties(user).map(property => ({display: property.display.document(property, user.property_values[property.id])}))}
                       columns={[{selector: "display"}]} />
-
                 </div>
               </div>
 
     },
-    editor: (user, close, alert) => {
+    editor: (user, success, failure) => {
       function Editor(props) {
         const [tempUser, updateTempUser] = React.useState(props.user)
         const updateHandler = newState => updateTempUser(Object.assign(Object.create(Object.getPrototypeOf(tempUser)), tempUser, newState))
@@ -101,13 +93,13 @@ const prototype = agencyState => ({
 
                   </div>
 
-                  { tempUser.storage.handlers.call(tempUser, close, alert) }
+                  { tempUser.storage.handlers.call(tempUser, success, failure) }
 
                 </div>
       }
       return <Editor user={user} />
     },
-    builder: (user, close, alert) => {
+    builder: (user, success, failure) => {
       function Builder(props){
         const [tempUser, updateTempUser] = React.useState(props.user)
         const updateHandler = newState => updateTempUser(Object.assign(Object.create(Object.getPrototypeOf(tempUser)), tempUser, newState))
@@ -134,7 +126,7 @@ const prototype = agencyState => ({
 
                   </div>
 
-                  { tempUser.storage.handlers.call(tempUser, close, alert) }
+                  { tempUser.storage.handlers.call(tempUser, success, failure) }
 
                 </div>
       }

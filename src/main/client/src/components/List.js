@@ -60,7 +60,7 @@ export default function List(props){
     else if(props.drawerComponents.length === 1) return props.drawerComponents[0].component(item)
     else if(!drawerComponent) setDrawerComponent(props.drawerComponents[0].component(item))
 
-    return  <div className="row-drawer">
+    return  <div className="row-drawer position-absolute bg-primary">
               <div className="row-drawer-tabs">
                 { props.drawerComponents.map( component =>
                     <div className="row-drawer-tab" onClick={() => setDrawerComponent(component.component(item))}>{component.label}</div>) }
@@ -97,7 +97,7 @@ export default function List(props){
 
   const loadOverlay = () =>
     <div className="list-overlay fixed-top h-100 w-100 bg-light color-dark p-3 overflow-auto">
-      <div className="list-overlay-close" onClick={() => setOverlay(false)} >x</div>
+      <button type="button" className="btn-secondary btn-sm" onClick={() => setOverlay(false)} >close</button>
       <div className="list-overlay-body">{ showOverlay }</div>
     </div>
 

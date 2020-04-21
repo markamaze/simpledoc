@@ -155,7 +155,7 @@ public class StorageControl {
 		String type = resource_path.get(1);
 		String call = factory_helper.getStorageCall("queryResource", type, null);
 		
-		CallableStatement cs = connection.prepareCall(call);
+ 		CallableStatement cs = connection.prepareCall(call);
 		
 		cs.setObject(1, UUID.fromString(resource_path.get(2)));
 		ResultSet storage_result = cs.executeQuery();

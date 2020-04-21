@@ -102,11 +102,11 @@ const agencyObjectPrototype = (objectPrototype) => ({
 
   storage: {
     handlers: function(success, failure){
-      return  <div className="storage-handlers" key={`storage-handlers-${this.id}`}>
-                <div className="storage-handler-item"
+      return  <div className="storage-handlers d-flex flex-row justify-content-around btn-group" key={`storage-handlers-${this.id}`}>
+                <div className="storage-handler-item btn-primary px-4"
                       key={this.storage.save.key.call(this)}
                       onClick={()=>this.storage.save.action.call(this, success, failure)}>{this.storage.save.label}</div>
-                <div className="storage-handler-item"
+                <div className="storage-handler-item btn-danger px-4"
                       key={this.storage.delete.key.call(this)}
                       onClick={()=>this.storage.delete.action.call(this, success, failure)}>{this.storage.delete.label}</div>
               </div>
@@ -122,12 +122,6 @@ const agencyObjectPrototype = (objectPrototype) => ({
                     objectSet = [...this.new_object]
                     delete this.new_object
                     objectSet = [this, ...objectSet]
-                    //.map( agencyObject => {
-                    //   if(agencyObject.id.substring(0,2) === 'n-')
-                    //   agencyObject.properties.id.setValue.call(agencyObject, agencyObject.id.substring(2))
-                    //
-                    //   return agencyObject
-                    // })
                   }
                   else objectSet = [this]
 
@@ -136,7 +130,7 @@ const agencyObjectPrototype = (objectPrototype) => ({
 
                   // return result && result.error ? failure(result) : true
 
-                } catch(err){ throw err }}
+                } catch(err){ failure(err) }}
     },
     delete: {
       label: "Delete",

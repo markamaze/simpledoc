@@ -57,6 +57,16 @@ const prototype = getFormState => ({
       getObject: function(){ return this.key },
       validate: key => { return true }
     },
+    value_type: {
+      setValue: function(type){
+        if(type === null || type === undefined) this.value_type = "text"
+        else if(!this.properties.value_type.validate(type)) throw "invalid property: Forms.Element.value_type"
+        else this.value_type = value
+        return true
+      },
+      getObject: function(){ return this.value_type },
+      validate: type => true
+    },
     value_properties: {
       setValue: function(valueProperties){
         if(valueProperties === null || valueProperties === undefined) this.value_properties = {}
@@ -88,16 +98,57 @@ const prototype = getFormState => ({
     }
   },
   display: {
-    document: element => {
-      return <div className="container-item">{element.key}</div>
+    card: (element, submission) =>
+      <div>{submission.value}</div>,
+    document: (element, submission) => {
+      return <div className="container-item row p-0 m-0" style={{lineHeight: "1rem"}}>
+                <label className="col-6">{element.key}</label>
+                <div className="col-6">{submission.value}</div>
+              </div>
     },
-    editor: element => {},
-    builder: element => {
+    editor: (element, updater, submission) => {
+      function Editor(props){
+        const [displayEditorTools, toggleEditorTools] = React.useState(false)
 
-      return <div>element builder</div>
+        const getInputElement = () => {
+          switch(props.element.value_type){
+            case "text":
+              return <input type="text" value={props.submission.value} onChange={() => props.updateValue({value: event.target.value})} />
+
+            default: <div>404 error: unknown element value type</div>
+          }
+        }
+
+        return <div className="container-item row p-0 m-0" style={{lineHeight: "1rem"}}>
+                  <label className="col-6">{element.key}</label>
+                  <div className="col-6">{getInputElement()}</div>
+                </div>
+      }
+
+      return <Editor element={element} updateValue={updater} submission={submission} />
+    },
+    builder: (element, updateElement) => {
+      function Builder(props){
+        const [tempElement, updateTempElement] = React.useState(props.element)
+        const updateHandler = newState => {
+          updateElement(Object.assign(Object.create(Object.getPrototypeOf(tempElement)), tempElement, {...newState}))
+        }
+
+        return  <div>
+                  <div className="row p-0 m-0">
+                    <input className="px-1 my-1" style={{lineHeight: "1"}} onChange={() => updateHandler({key: event.target.value})} placeholder="Set Key"/>
+
+                    <select className="px-1 my-1" style={{lineHeight: "1"}}>
+                      <option value="">Set Type</option>
+                    </select>
+                  </div>
+                </div>
+      }
+
+      return <Builder element={element} />
     }
   },
-  typeFunctions: {}
+  tools: {}
 })
 
 

@@ -57,7 +57,15 @@ public class FormsService implements ServiceModule {
 	
 	
 	private ResourceResponse publicServices(ResourceRequest request, StorageControl storage) {
-		// TODO Auto-generated method stub
+		//url has path -> /Forms/service/*
+
+		//forms services would be:
+		//		subscribe to a form
+		//		unsubscribe from a form
+		//		check submission compliance
+		//		
+		
+		
 		return null;
 	}
 	
@@ -134,7 +142,6 @@ public class FormsService implements ServiceModule {
 				else {
 					String type = item.getType();
 					List<String> resource = new ArrayList<String>();
-					resource.add(id);
 					resource.add("Forms");
 					switch(type) {
 						case "FORMS.FORM":
@@ -146,16 +153,18 @@ public class FormsService implements ServiceModule {
 						case "FORMS.SUBMISSION":
 							resource.add("submission");
 							break;
-						case "FORMS.SECTIONS":
+						case "FORMS.SECTION":
 							resource.add("section");
 							break;
 						case "FORMS.LAYOUT":
 							resource.add("layout");
 							break;
-						case "FORMS.ELEMENTS":
+						case "FORMS.ELEMENT":
 							resource.add("element");
 							break;
 					}
+					resource.add(id);
+					
 					currentObj = storage.queryResource(resource, Collections.emptyMap(), factory);
 					currentObj.update(item.getObjectData());
 				}

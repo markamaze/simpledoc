@@ -41,34 +41,43 @@ export function loadSubmissions(){
   }, function() { console.log("error loading submissions")})
 }
 
-export function createFormObject(objectSet, failure){
+export function createFormObjects(objectSet, success, failure){
   post(`/Forms`, objectSet, function(request){
     let result = JSON.parse(request.response)
-    if(result.error) failure(result.error)
+
+    if(result.error) failure(`create object unsuccessful: ${result.error}`)
     else store.dispatch({
-      type: "CREATE_FORM_OBJECTS",
-      payload: objectSet
+      type: "WRITE_FORM_OBJECTS",
+      payload: objectSet,
+      success: success,
+      failure: failure
     })
-  })
+  }, failure)
 }
 
-export function updateFormObject(objectSet, failure){
+export function updateFormObjects(objectSet, success, failure){
   put(`/Forms`, objectSet, function(request){
-  let result = JSON.parse(request.response)
-  if(result.error) failure(result.error)
-  else store.dispatch({
-    type: "UPDATE_FORM_OBJECTS",
-    payload: objectSet
-  })
-})
-}
-export function deleteFormObject(objectSet, failure){
-  remove(`/Forms`, objectSet, function(request){
     let result = JSON.parse(request.response)
-    if(result.error) failure(result.error)
+
+    if(result.error) failure(`update unsuccessful: ${result.error}`)
     else store.dispatch({
-      type: "DELETE_FORM_OBJECTS",
-      payload: objectSet
+      type: "WRITE_FORM_OBJECTS",
+      payload: objectSet,
+      success: success,
+      failure: failure
     })
-  })
+  }, failure)
+}
+export function removeFormObjects(objectSet, success, failure){
+  !confirm("are you sure you want to permanently delete this?") ? null
+    : remove(`/Forms`, objectSet, function(request){
+        let result = JSON.parse(request.response)
+
+        if(result.error) failure(`could not delete object: ${result.error}`)
+        else store.dispatch({
+          type: "DELETE_FORM_OBJECTS",
+          payload: objectSet,
+          failure: failure
+        })
+      }, failure)
 }

@@ -3,7 +3,8 @@ CREATE TABLE forms.elements (
   form_id UUID,
   section_id UUID,
   layout_id UUID,
-  key TEXT,
+  key TEXT[],
+  value_type TEXT,
   value_properties JSON,
   completion_rules JSON,
   security_settings JSON
@@ -16,14 +17,15 @@ CREATE OR REPLACE PROCEDURE forms.create_element (
   _form_id UUID,
   _section_id UUID,
   _layout_id UUID,
-  _key TEXT,
+  _key TEXT[],
+  _value_type TEXT,
   _value_properties JSON,
   _completion_rules JSON,
   _security_settings JSON )
 LANGUAGE SQL
 AS $PROCEDURE$
-  INSERT INTO forms.elements( id, form_id, section_id, layout_id, key, value_properties, completion_rules, security_settings )
-  VALUES (_id, _form_id, _section_id, _layout_id, _key, _value_properties, _completion_rules, _security_settings);
+  INSERT INTO forms.elements( id, form_id, section_id, layout_id, key, value_type, value_properties, completion_rules, security_settings )
+  VALUES (_id, _form_id, _section_id, _layout_id, _key, _value_type, _value_properties, _completion_rules, _security_settings);
 $PROCEDURE$;
 
 
@@ -33,7 +35,8 @@ CREATE OR REPLACE PROCEDURE forms.update_element (
   _form_id UUID,
   _section_id UUID,
   _layout_id UUID,
-  _key TEXT,
+  _key TEXT[],
+  _value_type TEXT,
   _value_properties JSON,
   _completion_rules JSON,
   _security_settings JSON )
@@ -47,6 +50,7 @@ AS $procedure$
   section_id = _section_id,
   layout_id = _layout_id,
   key = _key,
+  value_type = _value_type,
   value_properties = _value_properties,
   completion_rules = _completion_rules,
   security_settings = _security_settings
@@ -74,7 +78,8 @@ RETURNS TABLE(
   form_id UUID,
   section_id UUID,
   layout_id UUID,
-  key TEXT,
+  key TEXT[],
+  value_type TEXT,
   value_properties JSON,
   completion_rules JSON,
   security_settings JSON
@@ -83,7 +88,7 @@ LANGUAGE sql STABLE
 AS $function$
 
   SELECT (
-    id, form_id, section_id, layout_id, key, value_properties, completion_rules, security_settings
+    id, form_id, section_id, layout_id, key, value_type, value_properties, completion_rules, security_settings
   ) FROM forms.elements
 
 $function$;

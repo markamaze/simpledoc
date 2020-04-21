@@ -25,7 +25,7 @@ import simpledoc.services.ModuleObject;
 public class Section extends ModuleObject {
   private String label;
   private UUID form_id;
-  private Set<UUID> layout_ids;
+  private Map<String, UUID> layout_ids;
   private Map<String, String> completion_rules;
   private Map<String, String> security_settings;
 
@@ -41,42 +41,53 @@ public class Section extends ModuleObject {
 
 
   private void setLabel(Object object) throws ServiceErrorException {
-	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Section.label");
-	  
-	  else if(object instanceof String) {
-		  if(FormsValidator.validateString(object, 1, 24, true, true)) this.label = (String) object;
-	  }
-	  
+	  if(FormsValidator.validateString(object, 1, 24, true, true)) this.label = (String) object;	  
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Section.label");
   }
   private void setFormId(Object object) throws ServiceErrorException {
-	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Section.form_id");
-	  
-	  else if(object instanceof UUID || object instanceof String) {
-		  UUID uuid = FormsValidator.validateUUIDString(object);
-		  if(uuid != null) this.form_id = uuid;
-	  }
+	  UUID uuid = FormsValidator.validateUUIDString(object);
+	  if(uuid != null) this.form_id = uuid;  
 	  
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Section.form_id");
   }
   private void setLayoutIds(Object object) throws ServiceErrorException, SQLException {
-	  Set<UUID> layout_ids = new HashSet<UUID>();
+	  Map<String, UUID> layout_ids = new HashMap<String, UUID>();
 	  
 	  if(object == null) this.layout_ids = layout_ids;
 	  
-	  else if(object instanceof PgArray) {
-		  this.layout_ids = new HashSet<UUID>(Arrays.asList((UUID[])((PgArray)object).getArray()));
-	  }
-	  
-	  else if(object instanceof ArrayList) {
-		  ((ArrayList<?>)object).forEach( item -> {
-			  if(item instanceof UUID) {
-				  UUID uuid = FormsValidator.validateUUIDString(object);
-				  if(uuid != null) layout_ids.add((UUID)item);
-			  }
-		  });
+	  else if(object instanceof Map) {
+		  for(Entry<?,?> kv: ((Map<?,?>)object).entrySet()) {
+			  String position = (String)kv.getKey();
+			  UUID uuid = FormsValidator.validateUUIDString(kv.getValue());
+			  if(uuid == null) throw new ServiceErrorException("invalid uuid sent to property: Forms.Section.layout_ids");
+			  
+			  layout_ids.put(position, uuid);
+		  }
 		  this.layout_ids = layout_ids;
 	  }
+	  
+	  else if(object instanceof PGobject) {
+			JSONObject asJson = new JSONObject(((PGobject)object).getValue());
+			for(Entry<?,?> rule : asJson.toMap().entrySet() ) {
+				String position = rule.getKey().toString();
+				UUID uuid = FormsValidator.validateUUIDString(rule.getValue());
+				layout_ids.put(position, uuid);
+			};
+			this.layout_ids = layout_ids;
+	  }
+	  
+//	  else if(object instanceof PgArray) {
+//		  this.layout_ids = new HashSet<UUID>(Arrays.asList((UUID[])((PgArray)object).getArray()));
+//	  }
+//	  
+//	  else if(object instanceof ArrayList) {
+//			for(Object id : (ArrayList<?>)object) {
+//				UUID uuid = FormsValidator.validateUUIDString(id);
+//				if(uuid != null) layout_ids.add(uuid);
+//				else throw new ServiceErrorException("invalid id in dataTag list");
+//			}
+//		  this.layout_ids = layout_ids;
+//	  }
 	  
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Section.layout_ids");
   }
@@ -132,7 +143,7 @@ public class Section extends ModuleObject {
 
   public String getLabel() { return this.label; }
   public UUID getFormId() { return this.form_id; }
-  public Set<UUID> getLayoutIds() { return this.layout_ids; }
+  public Map<String, UUID> getLayoutIds() { return this.layout_ids; }
   public Map<String, String> getCompletionRules() { return this.completion_rules; }
   public Map<String, String> getSecuritySettings() { return this.security_settings; }
 
@@ -157,7 +168,7 @@ public class Section extends ModuleObject {
     try {
       setLabel(resultSet.getString("label"));
       setFormId(resultSet.getObject("form_id"));
-      setLayoutIds(resultSet.getArray("layout_ids"));
+      setLayoutIds(resultSet.getObject("layout_ids"));
       setCompletionRules(resultSet.getObject("completion_rules"));
       setSecuritySettings(resultSet.getObject("security_settings"));
     } catch(SQLException err) { throw new ServiceErrorException(err + "could not read storage result for Section"); }
@@ -181,11 +192,18 @@ public class Section extends ModuleObject {
       securitySettingsPGObj.setType("json");
       securitySettingsPGObj.setValue(new JSONObject(this.getSecuritySettings()).toString());
 
-
-      statement.setObject(1, this.getId());
+      PGobject layoutIdsPGObj = new PGobject();
+      layoutIdsPGObj.setType("json");
+      layoutIdsPGObj.setValue(new JSONObject(this.getLayoutIds()).toString());
+      
+	  UUID uuid;
+	  if(this.getId().startsWith("n-")) uuid = FormsValidator.validateUUIDString(this.getId().substring(2));
+	  else uuid = FormsValidator.validateUUIDString(this.getId());
+	  
+      statement.setObject(1, uuid);
       statement.setString(2, this.getLabel());
       statement.setObject(3, this.getFormId());
-      statement.setArray(4, connection.createArrayOf("UUID", this.getLayoutIds().toArray()));
+      statement.setObject(4, layoutIdsPGObj);
       statement.setObject(5, completionRulesPGObj );
       statement.setObject(6, securitySettingsPGObj );
     } catch(SQLException err) { throw new ServiceErrorException(err + "error setting storage statement for Section"); }

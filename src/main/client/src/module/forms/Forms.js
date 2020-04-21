@@ -10,7 +10,7 @@ function FormsPage(props){
 
   return  <div className="container-sm" >
             <ErrorBoundary displayName="FormsPage" >
-              <List className="document" {...displayProps} headerComponent={<div className="page-header">Forms Manager</div>}/>
+              <List className="" {...displayProps} headerComponent={<div className="page-header">Forms Manager</div>}/>
             </ErrorBoundary>
           </div>
 }

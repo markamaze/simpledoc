@@ -5,9 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 
 import org.json.JSONArray;
@@ -23,18 +27,20 @@ public class Element extends ModuleObject {
   private UUID form_id;
   private UUID section_id;
   private UUID layout_id;
-  private String key;
-  private List<Object> value_properties;
-  private List<Object> completion_rules;
-  private List<Object> security_settings;
+  private Set<String> key;
+  private String value_type;
+  private Map<String, String> value_properties;
+  private Map<String, String> completion_rules;
+  private Map<String, String> security_settings;
 
   Element(String id, String type) { super(id, type); }
-  Element(String id, String type, Map<String, Object> data) throws ServiceErrorException {
+  Element(String id, String type, Map<String, Object> data) throws ServiceErrorException, SQLException {
     super(id, type);
     setFormId(data.get("form_id"));
     setSectionId(data.get("section_id"));
     setLayoutId(data.get("layout_id"));
     setElementKey(data.get("key"));
+    setValueType(data.get("value_type"));
     setValueProperties(data.get("value_properties"));
     setCompletionRules(data.get("completion_rules"));
     setSecuritySettings(data.get("security_settings"));
@@ -42,85 +48,119 @@ public class Element extends ModuleObject {
 
 
   private void setFormId(Object object) throws ServiceErrorException {
-	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Element.form_id");
-	  
-	  else if(object instanceof UUID) {
-		  UUID uuid = FormsValidator.validateUUIDString(object);
-		  if(uuid != null) this.form_id = uuid;
-	  }
-	  
+	  UUID uuid = FormsValidator.validateUUIDString(object);
+	  if(uuid != null) this.form_id = uuid;
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.form_id");
   }
   private void setSectionId(Object object) throws ServiceErrorException {
-	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Element.section_id");
-	  
-	  else if(object instanceof UUID) {
-		  UUID uuid = FormsValidator.validateUUIDString(object);
-		  if(uuid != null) this.section_id = uuid;
-	  }
-	  
+	  UUID uuid = FormsValidator.validateUUIDString(object);
+	  if(uuid != null) this.section_id = uuid;	  
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.section_id");
   }
   private void setLayoutId(Object object) throws ServiceErrorException {
-	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Element.section_id");
-	  
-	  else if(object instanceof UUID) {
-		  UUID uuid = FormsValidator.validateUUIDString(object);
-		  if(uuid != null) this.layout_id = uuid;
-	  }
-	  
+	  UUID uuid = FormsValidator.validateUUIDString(object);
+	  if(uuid != null) this.layout_id = uuid;	  
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.section_id");
   }
-  private void setElementKey(Object object) throws ServiceErrorException {
-	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Element.key");
+  private void setElementKey(Object object) throws ServiceErrorException, SQLException {
+	  Set<String> keySet = new HashSet<String>();
 	  
-	  else if(object instanceof String) {
-		  if(FormsValidator.validateString(object, 1, 24, true, true)) this.key = (String) object;
-	  }
-	  
-	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.key");
-  }
-  private void setValueProperties(Object object) throws ServiceErrorException {
-	  List<Object> valueProperties = new ArrayList<Object>();
-	  
-	  if(object == null) this.value_properties = valueProperties;
-	  
-	  else if(object instanceof PGobject) {
-		  System.out.println("is PGobject");
+	  if(object instanceof ArrayList) {
+		  for(Object key: (ArrayList<?>)object) {
+			  if(key instanceof String) 
+				  keySet.add((String)key);
+			  else if(key instanceof ArrayList && ((ArrayList<?>)key).size() == 2) 
+				  keySet.add(new JSONArray((ArrayList<?>)key).toString());
+			  else throw new ServiceErrorException("invalid key structure sent to property: Forms.Element.key");
+		  }
+		  this.key = keySet;
 	  }
 	  
 	  else if(object instanceof PgArray) {
-		  System.out.println("is PgArray");
+		  for(Object key_set : Arrays.asList(((PgArray)object).getArray()) )
+			  if(key_set instanceof String[])
+				  for(String key : (String[])key_set) keySet.add(key);
+			
+		  this.key = keySet;
+	  }
+	  
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.key");
+  }
+  private void setValueType(Object object) throws ServiceErrorException {
+	  if(object instanceof String) this.value_type = object.toString();
+	  
+	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.value_type");
+  }
+  private void setValueProperties(Object object) throws ServiceErrorException {
+	   
+	  Map<String, String> valueProperties = new HashMap<String, String>();
+	  
+	  if(object == null) this.value_properties = valueProperties;
+	  
+	  else if(object instanceof Map) {
+		  ((Map<?,?>) object).forEach((key, value) -> {
+			  if(key instanceof String && value instanceof String) {
+				  valueProperties.put((String)key, (String)value);
+			  }
+		  });
+		  this.value_properties = valueProperties;
+	  }
+	  
+	  else if(object instanceof PGobject) {
+			JSONObject asJson = new JSONObject(((PGobject)object).getValue());
+			for(Entry<?,?> rule : asJson.toMap().entrySet() ) { 
+				valueProperties.put(rule.getKey().toString(), rule.getValue().toString());
+			};
+			this.value_properties = valueProperties;	
 	  }
 	  
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.value_properties");
   }
   private void setCompletionRules(Object object) throws ServiceErrorException {
-	  List<Object> completionRules = new ArrayList<Object>();
+	  Map<String, String> completionRules = new HashMap<String, String>();
 	  
 	  if(object == null) this.completion_rules = completionRules;
 	  
-	  else if(object instanceof PgArray) {
-		  System.out.println("is PGArray");
+	  else if(object instanceof Map) {
+		  ((Map<?,?>) object).forEach((key, value) -> {
+			  if(key instanceof String && value instanceof String) {
+				  completionRules.put((String)key, (String)value);
+			  }
+		  });
+		  this.completion_rules = completionRules;
 	  }
 	  
 	  else if(object instanceof PGobject) {
-		  System.out.println("is PGobject");
+			JSONObject asJson = new JSONObject(((PGobject)object).getValue());
+			for(Entry<?,?> rule : asJson.toMap().entrySet() ) { 
+				completionRules.put(rule.getKey().toString(), rule.getValue().toString());
+			};
+			this.completion_rules = completionRules;	  
 	  }
 	  
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.completion_rules");
   }
   private void setSecuritySettings(Object object) throws ServiceErrorException {
-	  List<Object> securitySettings = new ArrayList<Object>();
+	  Map<String, String> securitySettings = new HashMap<String, String>();
 	  
 	  if(object == null) this.security_settings = securitySettings;
 	  
-	  else if(object instanceof PgArray) {
-		  System.out.println("is PGArray");
+	  else if(object instanceof Map) {
+		  ((Map<?,?>) object).forEach((key, value) -> {
+			  if(key instanceof String && value instanceof String) {
+				  securitySettings.put((String)key, (String)value);
+			  }
+		  });
+		  this.security_settings = securitySettings;
 	  }
 	  
 	  else if(object instanceof PGobject) {
-		  System.out.println("is PGobject");
+			JSONObject asJson = new JSONObject(((PGobject)object).getValue());
+			for(Entry<?,?> rule : asJson.toMap().entrySet() ) { 
+				securitySettings.put(rule.getKey().toString(), rule.getValue().toString());
+			};
+			this.security_settings = securitySettings;	
 	  }
 	  
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Element.security_settings");
@@ -130,23 +170,25 @@ public class Element extends ModuleObject {
   public UUID getFormId() { return this.form_id; }
   public UUID getSectionId() { return this.section_id; }
   public UUID getLayoutId() { return this.layout_id; }
-  public String getElementKey() { return this.key; }
-  public List<Object> getValueProperties() { return this.value_properties; }
-  public List<Object> getCompletionRules() { return this.completion_rules; }
-  public List<Object> getSecuritySettings() { return this.security_settings; }
+  public Set<String> getElementKey() { return this.key; }
+  public String getValueType() { return this.value_type; }
+  public Map<String, String> getValueProperties() { return this.value_properties; }
+  public Map<String, String> getCompletionRules() { return this.completion_rules; }
+  public Map<String, String> getSecuritySettings() { return this.security_settings; }
 
 
   @Override
-  public boolean update(Map<String, Object> data) throws ServiceErrorException{
+  public boolean update(Map<String, Object> data) throws ServiceErrorException, SQLException{
     for(Entry<String, Object> entry: data.entrySet()){
       Object key = entry.getKey();
-      if(key == "form_id") setFormId(entry.getValue());
-      else if(key == "section_id") setSectionId(entry.getValue());
-      else if(key == "layout_id") setLayoutId(entry.getValue());
-      else if(key == "key") setElementKey(entry.getValue());
-      else if(key == "value_properties") setValueProperties(entry.getValue());
-      else if(key == "completion_rules") setCompletionRules(entry.getValue());
-      else if(key == "security_settings") setSecuritySettings(entry.getValue());
+      if(key.equals("form_id")) setFormId(entry.getValue());
+      else if(key.equals("section_id")) setSectionId(entry.getValue());
+      else if(key.equals("layout_id")) setLayoutId(entry.getValue());
+      else if(key.equals("key")) setElementKey(entry.getValue());
+      else if(key.equals("value_type")) setValueType(entry.getValue());
+      else if(key.equals("value_properties")) setValueProperties(entry.getValue());
+      else if(key.equals("completion_rules")) setCompletionRules(entry.getValue());
+      else if(key.equals("security_settings")) setSecuritySettings(entry.getValue());
       else throw new ServiceErrorException("unknown property in Element");
     }
     return true;
@@ -159,7 +201,8 @@ public class Element extends ModuleObject {
       setFormId(resultSet.getObject("form_id"));
       setSectionId(resultSet.getObject("section_id"));
       setLayoutId(resultSet.getObject("layout_id"));
-      setElementKey(resultSet.getString("key"));
+      setElementKey(resultSet.getArray("key"));
+      setValueType(resultSet.getString("value_type"));
       setValueProperties(resultSet.getObject("value_properties"));
       setCompletionRules(resultSet.getObject("completion_rules"));
       setSecuritySettings(resultSet.getObject("security_settings"));
@@ -174,30 +217,34 @@ public class Element extends ModuleObject {
     PreparedStatement statement = null;
 
     try {
-      if(type == "create") statement = connection.prepareStatement("call forms.create_element(?,?,?,?,?,?,?,?)");
-      else if(type == "update") statement = connection.prepareStatement("call forms.update_element(?,?,?,?,?,?,?,?)");
+      if(type == "create") statement = connection.prepareStatement("call forms.create_element(?,?,?,?,?,?,?,?,?)");
+      else if(type == "update") statement = connection.prepareStatement("call forms.update_element(?,?,?,?,?,?,?,?,?)");
 
       PGobject valuePropertiesPGObj = new PGobject();
       valuePropertiesPGObj.setType("json");
-      valuePropertiesPGObj.setValue(new JSONArray(this.getValueProperties()).toString());
+      valuePropertiesPGObj.setValue(new JSONObject(this.getValueProperties()).toString());
 
       PGobject completionRulesPGObj = new PGobject();
       completionRulesPGObj.setType("json");
-      completionRulesPGObj.setValue(new JSONArray(this.getCompletionRules()).toString());
+      completionRulesPGObj.setValue(new JSONObject(this.getCompletionRules()).toString());
 
       PGobject securitySettingsPGObj = new PGobject();
       securitySettingsPGObj.setType("json");
-      securitySettingsPGObj.setValue(new JSONArray(this.getSecuritySettings()).toString());
+      securitySettingsPGObj.setValue(new JSONObject(this.getSecuritySettings()).toString());
 
-
-      statement.setObject(1, this.getId());
+	  UUID uuid;
+	  if(this.getId().startsWith("n-")) uuid = FormsValidator.validateUUIDString(this.getId().substring(2));
+	  else uuid = FormsValidator.validateUUIDString(this.getId());
+	  
+      statement.setObject(1, uuid);
       statement.setObject(2, this.getFormId());
       statement.setObject(3, this.getSectionId());
       statement.setObject(4, this.getLayoutId());
-      statement.setString(5, this.getElementKey());
-      statement.setObject(6, valuePropertiesPGObj );
-      statement.setObject(7, completionRulesPGObj );
-      statement.setObject(8, securitySettingsPGObj );
+      statement.setArray(5, connection.createArrayOf("TEXT", this.getElementKey().toArray()));
+      statement.setString(6, this.getValueType());
+      statement.setObject(7, valuePropertiesPGObj );
+      statement.setObject(8, completionRulesPGObj );
+      statement.setObject(9, securitySettingsPGObj );
     } catch(SQLException err) { throw new ServiceErrorException(err + "error setting storage statement for FormSubmission"); }
 
     return statement;
@@ -213,6 +260,7 @@ public class Element extends ModuleObject {
     json_result.put("section_id", this.getSectionId());
     json_result.put("layout_id", this.getLayoutId());
     json_result.put("key", this.getElementKey());
+    json_result.put("value_type", this.getValueType());
     json_result.put("value_properties", this.getValueProperties());
     json_result.put("completion_rules", this.getCompletionRules());
     json_result.put("security_settings", this.getSecuritySettings());

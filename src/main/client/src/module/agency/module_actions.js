@@ -16,14 +16,12 @@ export function createAgencyObjects(objectSet, success, failure){
   post(`/Agency`, objectSet, function(request){
     let result = JSON.parse(request.response)
     if(result.error) failure(`create object unsuccessful: ${result.error}`)
-    else {
-      store.dispatch({
-        type: "WRITE_AGENCY_OBJECTS",
-        payload: objectSet
-      })
-      success ? success() : null
-    }
-
+    else store.dispatch({
+      type: "WRITE_AGENCY_OBJECTS",
+      payload: objectSet,
+      success: success,
+      failure: failure
+    })
   }, failure)
 }
 
@@ -32,14 +30,12 @@ export function updateAgencyObjects(objectSet, success, failure){
     let result = JSON.parse(request.response)
 
     if(result.error) failure(`update unsuccessful: ${result.error}`)
-    else {
-      store.dispatch({
-        type: "WRITE_AGENCY_OBJECTS",
-        payload: objectSet,
-        failure: failure
-      })
-      success ? success() : null
-    }
+    else store.dispatch({
+      type: "WRITE_AGENCY_OBJECTS",
+      payload: objectSet,
+      success: success,
+      failure: failure
+    })
   }, failure)
 }
 
@@ -49,12 +45,11 @@ export function removeAgencyObjects(objectSet, success, failure){
         let result = JSON.parse(request.response)
 
         if(result.error) failure(`could not delete object: ${result.error}`)
-        else {
-          store.dispatch({
-            type: "DELETE_AGENCY_OBJECTS",
-            payload: objectSet
-          })
-          success()
-        }
+        else store.dispatch({
+          type: "DELETE_AGENCY_OBJECTS",
+          payload: objectSet,
+          success: success,
+          failure: failure
+        })
       }, failure)
 }

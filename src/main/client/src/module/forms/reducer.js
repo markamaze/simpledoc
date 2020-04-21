@@ -14,51 +14,54 @@ const initialState = {
 export default function form_reducer(state=initialState, action) {
   switch(action.type) {
     case "LOAD_FORM_STORE": {
-      let newState = Object.assign({}, state)
-      action.payload.forEach( form_object => {
-        let newformObject = formObject(form_object.type, {...form_object}, err=> {throw err})
-        Object.assign(newState, {[`${form_object.type}`]: Object.assign(newState[form_object.type], {[`${form_object.id}`]:newformObject} )})
-      })
-      return newState
+      try{
+        let newState = Object.assign({}, state)
+        action.payload.forEach( form_object => {
+          let newformObject = formObject(form_object.type, {...form_object}, err=> {throw err})
+          Object.assign(newState, {[`${form_object.type}`]: Object.assign(newState[form_object.type], {[`${form_object.id}`]:newformObject} )})
+        })
+        console.log(newState)
+        action.success ? action.success() : null
+
+        return newState
+      } catch(err) {
+        console.log(err)
+        return state
+      }
     }
 
-    case "CREATE_FORM_OBJECTS": {
-      let newState = Object.assign({}, state)
-      let newObjects = action.payload
+    case "WRITE_FORM_OBJECTS": {
+      try{
+        let newState = Object.assign({}, state)
+        let updatedObjects = action.payload
 
-      newObjects.forEach(formObject => {
-        let newObject = { [`${formObject.id}`]: formObject }
-        let newTypeSet = Object.assign({}, newState[formObject.type()], newObject)
-        newState = Object.assign({}, newState, { [`${formObject.type()}`] : newTypeSet})
-      })
-
-      return newState
-    }
-
-    case "UPDATE_FORM_OBJECTS": {
-      let newState = Object.assign({}, state)
-      let updatedObjects = action.payload
-
-      updatedObjects.forEach(formObject => {
-        let updatedObject = { [`${formObject.id}`]: formObject }
-        let newTypeSet = Object.assign({}, newState[formObject.type()], updatedObject)
-        newState = Object.assign({}, newState, { [`${formObject.type()}`] : newTypeSet})
-      })
-
-      return newState
+        updatedObjects.forEach(formObject => {
+          let updatedObject = { [`${formObject.id}`]: formObject }
+          let newTypeSet = Object.assign({}, newState[formObject.type()], updatedObject)
+          newState = Object.assign({}, newState, { [`${formObject.type()}`] : newTypeSet})
+        })
+        action.success ? action.success() : null
+        return newState
+      } catch(err){
+        action.payload.failure(`error writing to store: ${err}`)
+        return state
+      }
     }
 
     case "DELETE_FORM_OBJECTS": {
-      let newState = Object.assign({}, state)
-      let removeObjects = action.payload
+      try {
+        let newState = Object.assign({}, state)
+        let removeObjects = action.payload
 
-      removeObjects.forEach(formObject => {
-        let newTypeSet = Object.assign({}, newState[formObject.type()])
-        delete newTypeSet[`${formObject.id}`]
-        newState = Object.assign({}, newState, { [`${formObject.type()}`] : newTypeSet})
-      })
-
-      return newState
+        removeObjects.forEach(formObject => {
+          delete newState[formObject.type()][formObject.id]
+        })
+        action.success ? action.success() : null
+        return newState
+      } catch(err){
+        action.payload.failure(`error deleting form object: ${err}`)
+        return state
+      }
     }
     default: return state
 

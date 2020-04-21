@@ -19,10 +19,10 @@ import simpledoc.exceptions.StorageErrorException;
 import simpledoc.exceptions.UnsupportedServiceRequest;
 import simpledoc.services.ModuleObject;
 import simpledoc.services.ModuleObjectData;
+import simpledoc.services.ModuleObjectFactory;
 import simpledoc.services.ServiceModule;
 
 public class AgencyService implements ServiceModule {
-	
 	//need to add handling of an id in the third position of the resource_path
 	
 	private <T extends ModuleObject> ResourceResponse handleGET(ResourceRequest request, StorageControl storage) throws ServiceErrorException, StorageErrorException {
@@ -197,7 +197,16 @@ public class AgencyService implements ServiceModule {
 	}
 
 	private ResourceResponse publicServices(ResourceRequest request, StorageControl storage) {
-		// TODO Auto-generated method stub
+		//url has path -> /Agency/service/*
+		
+		//this is the entry point into a modules services to be used outside the module.
+		//
+		//Agency's only public service is to provide subsets of the agency as defined by the filter
+		
+		//This is where subscriptions will be handled.
+		//	given the incoming request (subscription), the module will need to decide what action to take moving forward
+		//	
+
 		return null;
 	}
 

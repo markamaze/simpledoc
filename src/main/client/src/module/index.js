@@ -13,4 +13,4 @@ export default module = {
     path: "/",
     component: state => <div>Hello Home</div>,
     services: [ ]
-  }, agency, forms, workspace }
+  }, forms, workspace }

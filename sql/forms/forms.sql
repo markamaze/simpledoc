@@ -1,7 +1,7 @@
 CREATE TABLE forms.forms (
   id UUID,
   label TEXT,
-  section_ids UUID[],
+  section_ids JSON,
   completion_rules JSON,
   security_settings JSON
 );
@@ -11,7 +11,7 @@ CREATE TABLE forms.forms (
 CREATE OR REPLACE PROCEDURE forms.create_form (
   _id UUID,
   _label TEXT,
-  _section_ids UUID[],
+  _section_ids JSON,
   _completion_rules JSON,
   _security_settings JSON)
 LANGUAGE SQL
@@ -27,7 +27,7 @@ $PROCEDURE$;
 CREATE OR REPLACE PROCEDURE forms.update_form (
   _id UUID,
   _label TEXT,
-  _section_ids UUID[],
+  _section_ids JSON,
   _completion_rules JSON,
   _security_settings JSON
 )
@@ -63,7 +63,7 @@ CREATE OR REPLACE FUNCTION forms.query_forms_collection(
 RETURNS TABLE(
   id UUID,
   label TEXT,
-  section_ids UUID[],
+  section_ids JSON,
   completion_rules JSON,
   security_settings JSON
 )

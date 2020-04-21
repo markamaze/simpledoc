@@ -49,7 +49,7 @@ const prototype = getFormState => ({
     element_ids: {
       setValue: function(ids){
         if(ids === null || ids === undefined) this.element_ids = []
-        else if(!this.properties.layout_ids.validate(ids)) throw "invalid property: Forms.Layout.element_ids"
+        else if(!this.properties.element_ids.validate(ids)) throw "invalid property: Forms.Layout.element_ids"
         else this.element_ids = ids
         return true
       },
@@ -66,7 +66,7 @@ const prototype = getFormState => ({
     },
     display_settings: {
       setValue: function(displaySettings){
-        if(displaySettings === null || displaySettings === undefined) this.display_settings = {}
+        if(displaySettings === null || displaySettings === undefined) this.display_settings = { display_type: "pairs" }
         else if(!this.properties.display_settings.validate(displaySettings)) throw "invalid property: Forms.Layout.display_settings"
         else this.display_settings = displaySettings
         return true
@@ -75,73 +75,382 @@ const prototype = getFormState => ({
     }
   },
   display: {
-    document: layout => {
-      return  <div className="document">
-                <div className="container-fill">
-                  { element.element_ids.map(id => getFormState().element[id])
-                      .map( element => <div className="container-row">{element.display.document(element)}</div>) }
-                </div>
-              </div>
+    document: (layout, submissionId) => {
+      switch(layout.display_settings.display_type){
+        case "pairs": return  <Pairs
+                                  elementDisplay={ element => element.display.document(element) }
+                                  layout={layout}
+                                  submissionId={submissionId} />
+
+        case "grid": return <Grid
+                                elementDisplay={ element => element.display.document(element) }
+                                layout={layout}
+                                submissionId={submissionId} />
+
+        case "table": return  <Table
+                                  elementDisplay={ element => element.display.document(element) }
+                                  layout={layout}
+                                  submissionId={submissionId} />
+        default: return <div>404 error</div>
+      }
     },
-    editor: layout => {},
-    builder: (layout, updater) => {
-      function Creator(props){
-        const [tempLayout, updateTempSection] = React.useState(props.layout)
-        const updateHandler = newState =>  updateTempSection(Object.assign(Object.create(Object.getPrototypeOf(tempLayout)), tempLayout, {...newState}))
 
-        const addElement = () => {
-          let elementState = {
-            id: "new_object",
-            key: "new element",
-            form_id: tempLayout.form_id,
-            section_id: tempLayout.section_id,
-            layout_id: tempLayout.id
-          }
-          let newElement = formObject("element", elementState, err => {throw err})
+    editor: (layout, updater, submission) => {
+      function Editor(props){
+        const [displayEditorTools, toggleEditorTools] = React.useState(false)
 
-          updateHandler({
-            element_ids: [...tempLayout.element_ids, newElement.id],
-            new_object: tempLayout.new_object ? [...tempLayout.new_object, newElement] : [newElement]
-          })
-        }
-        const removeElement = element_id => {
-          updateHandler({
-            element_ids: tempLayout.element_ids.filter( id => id !== element_id ),
-            new_object: tempLayout.new_object ? tempLayout.new_object.filter( object => object.id !== element_id ) : []
-          })
+        const layoutEditorTools = () => {
+          return  <div className={`row m-0 p-2 justify-content-between bg-dark text-light d-flex flex-column`}
+                      style={{position: "fixed", top: "0", left: "0", height: "100%",
+                              width: "100%", opacity: ".9", overflow: "auto", zIndex: "5"}}>
+
+                    <button className="align-self-start" onClick={() => toggleBuilderTools(false)}>&times;</button>
+                    <div className="flex-grow-1 container m-5">
+                      allows user to display rules and security settings here?
+                    </div>
+                  </div>
         }
 
-        return  <div className="document">
-                  <div className="container-row">
-                    <div className="container-item item-label">Set Layout Type:</div>
-                    <select value={tempLayout.layout_type}>
-                      <option></option>
-                    </select>
-                    <button onClick={() => addElement()}>Add Element</button>}
-                  </div>
+        switch(tempLayout.display_settings.display_type){
+          case "pairs": return  <Pairs
+                                    elementDisplay={ element => element.display.editor(element, props.updateValue, props.submission) }
+                                    layout={props.layout}
+                                    openTools={() => toggleEditorTools(true)}
+                                    tools={displayEditorTools? layoutEditorTools() : null} />
 
-                  <div className="container-fill">
+          case "grid": return <Grid
+                                  elementDisplay={ element => element.display.editor(element, props.updateValue, props.submission) }
+                                  layout={props.layout}
+                                  openTools={() => toggleEditorTools(true)}
+                                  tools={displayEditorTools ? layoutEditorTools() : null} />
 
-                    {
-                      tempLayout.element_ids.map( id =>
-                        <div className="container-row border-bottom">
-                          <div className="container-row">
-                            <button onClick={() => removeElement(id)}>Remove Element</button>
-                          </div>
-                          { id.substring(0,2) === "n-" ?
-                              tempLayout.new_object.find( obj => obj.id === id).display.builder(tempLayout.new_object.find(obj=>obj.id===id))
-                              : getFormState().element[id].display.builder(getFormState().element[id]) }
-                        </div>)
-                    }
-
-                  </div>
-                </div>
+          case "table": return  <Table
+                                    elementDisplay={ element => element.display.editor(element, props.updateValue, props.submission) }
+                                    layout={props.layout}
+                                    openTools={() => toggleEditorTools(true)}
+                                    tools={displayEditorTools ? layoutEditorTools() : null} />
+          default: return <div>404 error</div>
+        }
       }
 
-      return <Creator layout={layout} />
+      return <Editor layout={layout} updateValue={updater} submission={submission} />
+    },
+
+    builder: (layout, updater) => {
+      function Builder(props){
+        const [tempLayout, updateTempLayout] = React.useState(props.layout)
+        const [displayBuilderTools, toggleBuilderTools] = React.useState(false)
+
+        const updateHandler = newState =>  {
+          updateTempLayout(Object.assign(Object.create(Object.getPrototypeOf(tempLayout)), tempLayout, {...newState}))
+        }
+        const updateLayoutType = (value) => {
+          let updatedSettings = tempLayout.display_settings
+
+          if(value === "pairs")
+            updatedSettings = Object.assign({}, updatedSettings, {
+              display_type: "pairs",
+              keys: generateKeySet(0)
+            })
+
+          else if(value === "grid")
+            updatedSettings = Object.assign({}, updatedSettings, {
+              display_type: "grid",
+              primary_keys: tempLayout.display_settings.primary_keys ? tempLayout.display_settings.primary_keys : generateKeySet(0),
+              secondary_keys: tempLayout.display_settings.secondary_keys ? tempLayout.display_settings.secondary_keys : generateKeySet(1)
+            })
+
+          else if(value === "table")
+            updatedSettings = Object.assign({}, updatedSettings, {
+              display_type: "table",
+              primary_keys: tempLayout.display_settings.primary_keys ? tempLayout.display_settings.primary_keys : generateKeySet(0),
+              secondary_key_def: tempLayout.display_settings.secondary_key_def ? tempLayout.display_settings.secondary_key_def : "index"
+            })
+
+          updateHandler({display_settings: updatedSettings})
+        }
+
+        const generateLayoutElements = () => {
+            switch(tempLayout.display_settings.display_type){
+              case "pairs": {
+
+                break
+              }
+              case "grid": {
+                let elements = tempLayout.tools.getElements(tempLayout)
+                let createElements = []
+                let removeElements = []
+
+                if(!tempLayout.display_settings.primary_keys ||
+                    !tempLayout.display_settings.secondary_keys) return null
+
+                props.layout.tools.orderedPropertySet(tempLayout.display_settings.primary_keys).forEach( ([pkpos, pk]) => {
+                  props.layout.tools.orderedPropertySet(tempLayout.display_settings.secondary_keys).forEach( ([skpos, sk]) => {
+                    let elementIndex = elements.findIndex( element => element.key[0] === pk && element.key[1] === sk )
+
+                    if(elementIndex === -1) createElements.push((formObject("element", {
+                      id: "new_object",
+                      key: [pk, sk],
+                      form_id: tempLayout.form_id,
+                      section_id: tempLayout.section_id,
+                      layout_id: tempLayout.id,
+                    }, () => console.log("success"), err => {throw err})))
+                    else elements.splice(elementIndex, 1)
+                  })
+                })
+
+                if(elements.length > 0){
+                  elements.forEach( element => {
+                    removeElements.push(element)
+                  })
+                }
+
+                let updatedElementSet = []
+                let updatedElementIdSet = []
+
+
+                if(createElements.length > 0 || removeElements.length > 0) {
+                  updatedElementIdSet = [...tempLayout.element_ids.filter(id => !removeElements.find(element => element.id === id)),
+                                        ...createElements.map(element => element.id)]
+
+                  updatedElementSet = [...tempLayout.elements.filter( element => !removeElements.find( el => el.id === element.id)), ...createElements]
+
+
+                  updateHandler({
+                    element_ids: updatedElementIdSet,
+                    elements: updatedElementSet
+                  })
+                }
+                break
+              }
+              case "table": {
+                break
+              }
+            }
+          }
+        const generateKeySet = (key_position) => {
+          let elements = tempLayout.tools.getElements(tempLayout)
+          let keys = []
+
+          elements.forEach( element => {
+            element.keys && element.keys.length > key_position ?
+              keys = [ ...keys, element.keys[key_position] ] : keys
+          })
+          return keys
+        }
+
+        const layoutBuilderTools = type => {
+          return  <div className={`row m-0 p-2 justify-content-between bg-dark text-light d-flex flex-column`}
+                      style={{position: "fixed", top: "0", left: "0", height: "100%",
+                              width: "100%", opacity: ".9", overflow: "auto", zIndex: "5"}}>
+
+                    <button className="align-self-start" onClick={() => toggleBuilderTools(false)}>&times;</button>
+                    <div className="flex-grow-1 container m-5">
+
+                      <div className="row m-1 p-2 bg-light text-dark">
+                        <label className="col-sm-6">Modify Layout Label</label>
+                        <input
+                            type="text"
+                            className="col-sm-6"
+                            onChange={() => updateHandler({label: event.target.value})}
+                            placeholder="update layout label" />
+                      </div>
+
+                      <div className="row m-1 p-2 bg-light text-dark">
+                        <label className="col-sm-6">Set Layout Type:</label>
+                        <div className="col-sm-6 d-flex flex-row justify-content-around">
+                          <div className={`flex-grow-1 text-center ${type === "pairs" ? "bg-dark text-light" : ""}`}
+                              onClick={() => updateLayoutType("pairs")}>Pairs</div>
+                          <div className={`flex-grow-1 text-center ${type === "grid" ? "bg-dark text-light" : ""}`}
+                              onClick={() => updateLayoutType("grid")}>Grid</div>
+                          <div className={`flex-grow-1 text-center ${type === "table" ? "bg-dark text-light" : ""}`}
+                              onClick={() => updateLayoutType("table")}>Table</div>
+                        </div>
+                      </div>
+
+                      { type === "pairs" ? pairsBuilderTools() : null }
+                      { type === "grid" ? gridBuilderTools() : null }
+                      { type === "table" ? tableBuilderTools() : null }
+
+
+                    </div>
+                    <button onClick={() => props.updateLayout(tempLayout)}>Continue</button>
+                  </div>
+        }
+        const pairsBuilderTools = () => {
+          return  <div>
+                    <button className="btn-sm font-italic" onClick={() => tempLayout.settings.display.addToProperty("keys", "new key")}>add element</button>
+                  </div>
+        }
+        const gridBuilderTools = () => {
+          return  <div>
+                    <div>
+                      <button onClick={() => tempLayout.settings.display.addToProperty("primary_keys", "key")}>add primary key</button>
+                      {
+                        tempLayout.tools.orderedPropertySet(tempLayout.display_settings.primary_keys).map( ([pos, pk]) =>
+                          <div>
+                            <input type="text" value={pk} onChange={() => tempLayout.settings.display.replaceInProperty("primary_keys", pk, event.target.value)} />
+                            <button onClick={() => tempLayout.settings.display.removeFromProperty("primary_keys", pk)}>x</button>
+                            <button onClick={() => tempLayout.settings.display.shiftProperty("primary_keys", pos, "up")}>up</button>
+                            <button onClick={() => tempLayout.settings.display.shiftProperty("primary_keys", pos, "down")}>down</button>
+                            {
+                              tempLayout.display_settings.gridInputVariable === "primary" ?
+                                <select onChange={() => setKeyInputType(pk, event.target.value)}>
+                                  <option value=""></option>
+                                  <option value="text">Text</option>
+                                  <option value="date">Date</option>
+                                  <option value="time">Time</option>
+                                  <option value="subscribed-group-a">Subscribed group A</option>
+                                  <option value="subscribed-group-b">Subscribed group B</option>
+                                </select> : null
+                            }
+                          </div>)
+                      }
+                    </div>
+                    <div>
+                      <button onClick={() => tempLayout.settings.display.addToProperty("secondary_keys", "key")}>add secondary key</button>
+                      {
+                        tempLayout.tools.orderedPropertySet(templayout.display_settings.secondary_keys).map( ([pos, sk]) =>
+                          <div>
+                            <input type="text" value={sk} onChange={() => tempLayout.settings.display.replaceInProperty("secondary_keys", sk, event.target.value)} />
+                            <button onClick={() => tempLayout.settings.display.removeFromProperty("secondary_keys", sk)}>x</button>
+                            <button onClick={() => tempLayout.settings.display.shiftProperty("secondary_keys", pos, "up")}>up</button>
+                            <button onClick={() => tempLayout.settings.display.shiftProperty("secondary_keys", pos, "down")}>down</button>
+                            {
+                              tempLayout.display_settings.gridInputVariable === "secondary" ?
+                                <select onChange={() => setKeyInputType(pk, event.target.value)}>
+                                  <option value=""></option>
+                                  <option value="text">Text</option>
+                                  <option value="date">Date</option>
+                                  <option value="time">Time</option>
+                                  <option value="subscribed-group-a">Subscribed group A</option>
+                                  <option value="subscribed-group-b">Subscribed group B</option>
+                                </select> : null
+                            }
+                          </div>)
+                      }
+                    </div>
+                  </div>
+        }
+        const tableBuilderTools = () => {
+          let secondaryKeyDef = tempLayout.display_settings.secondary_key_def
+          return  <div>
+                    <div>
+                      <button onClick={() => tempLayout.settings.display.addToProperty("primary_keys", "new column")}>add table column</button>
+                      {
+                        tempLayout.tools.orderedPropertySet(tempLayout.display_settings.primary_keys).map( ([pos, pk]) =>
+                          <div>
+                            <input type="text" value={pk} onChange={() => tempLayout.settings.display.replaceInProperty("primary_keys", event.target.value, pos)} />
+                            <button onClick={() => tempLayout.settings.display.removeFromProperty("primary_keys", pos)}>x</button>
+                            <button onClick={() => tempLayout.settings.display.shiftProperty("primary_keys", pos, "up")}>up</button>
+                            <button onClick={() => tempLayout.settings.display.shiftProperty("primary_keys", pos, "down")}>down</button>
+                          </div>)
+                      }
+                    </div>
+
+                    <div>
+                      <label>Set row definition</label>
+                      <div>
+                        <div onClick={() => replaceInProperty("secondary_key_def", "index")}
+                            className={`${secondaryKeyDef === "index" ? "bg-light text-dark" : ""}`}>index</div>
+                        <div onClick={() => replaceInProperty("secondary_key_def", "timestamp")}
+                            className={`${secondaryKeyDef === "timestamp" ? "bg-light text-dark" : ""}`}>timestamp</div>
+                      </div>
+                    </div>
+
+                  </div>
+        }
+
+
+        generateLayoutElements()
+
+        switch(tempLayout.display_settings.display_type){
+          case "pairs": return  <Pairs
+                                    layout={tempLayout}
+                                    updater={updateHandler}
+                                    openTools={() => toggleBuilderTools(true)}
+                                    tools={displayBuilderTools ? layoutBuilderTools("pairs") : null} />
+
+          case "grid": return <Grid
+                                  layout={tempLayout}
+                                  updater={updateHandler}
+                                  openTools={() => toggleBuilderTools(true)}
+                                  tools={displayBuilderTools ? layoutBuilderTools("grid") : null} />
+
+          case "table": return  <Table
+                                    layout={tempLayout}
+                                    updater={updateHandler}
+                                    openTools={() => toggleBuilderTools(true)}
+                                    tools={displayBuilderTools ? layoutBuilderTools("table") : null} />
+          default: return <div>404 error</div>
+        }
+      }
+
+      return <Builder layout={layout} updateLayout={updater} />
     }
   },
-  typeFunctions: {}
+  tools: {
+    buildTree: layout => {
+      let elements = layout.tools.getElements(layout)
+      return Object.assign(Object.create(Object.getPrototypeOf(layout)), layout, {elements: elements})
+    },
+    flatten: layout => {
+      let _layout = Object.assign(Object.create(Object.getPrototypeOf(layout)), layout)
+      let _elements = _layout.elements ? _layout.elements : []
+      delete _layout.elements
+      let flatMap = [ _layout ]
+
+      _elements.forEach(element => {
+        flatMap = [...flatMap, element]
+      })
+
+      return flatMap
+    },
+    getElements: layout => {
+      let formStore = getFormState()
+      let elements = []
+
+      layout.element_ids.forEach( id => {
+        let foundElement = formStore.element[id] ? formStore.element[id] : layout.elements.find(obj => obj.id === id)
+
+        elements = [...elements, foundElement ]
+      })
+      return elements
+    },
+    orderedPropertySet: obj => {
+      //assumes obj structure is -> {position: value}
+      //returns ordered pairs [[pos, val], ...]
+      let ordered = []
+      let size = Object.entries(obj).length
+      let index = 1
+
+      while(index <= size){
+        ordered.push( [index, obj[index]] )
+        ++index
+      }
+
+      return ordered
+    }
+  },
+
+  settings: {
+    display: {
+      addToProperty: (property, value) => {
+
+        //Operations on display_settings properties with structure -> { position : value }
+        // const addToProperty = (display_settings_property, value) => {
+        //   let keyObj = { [`${Object.keys(tempLayout.display_settings[display_settings_property]).length}`] : value }
+        //   let keySet = Object.assign({}, tempLayout.display_settings[display_settings_property], keyObj)
+        //   let updatedSettings = Object.assign({}, tempLayout.display_settings, {[`${display_settings_property}`]: keySet})
+        //
+        //   updateHandler({display_settings: updatedSettings})
+        // }
+      },
+      removeFromProperty: (property, position) => {},
+      replaceInProperty: (property, value, position) => {},
+      shiftProperty: (property, position, direction) => {}
+    }
+  }
 })
 
 
@@ -149,6 +458,76 @@ const displayProps = getFormState => ({
   displayKey: "",
   component: {}
 })
+
+function Pairs(props){
+
+  const elementDisplay = element => {
+    if(props.builder) return element.display.builder(element, props.updater)
+    else if(props.editor) return element.display.editor(element, props.updater)
+    else if(props.document) return element.display.document(element)
+    else return element.display.card(element)
+  }
+
+  return  <div className="">
+            <h7 style={{zIndex: "5"}}
+                onClick={() => props.openTools ? props.openTools() : null}>{props.layout.label}</h7>
+
+            <div className="d-flex flex-column bg-light">
+              {
+                props.layout.tools.getElements(props.layout).map( element => {
+                  return  <div className="d-flex flex-row">{elementDisplay(element)}</div>
+                })
+              }
+            </div>
+            { props.tools ? props.tools : null }
+          </div>
+}
+
+function Grid(props){
+
+
+  let primaryKeys = props.layout.tools.orderedPropertySet(props.layout.display_settings.primary_keys)
+  let secondaryKeys = props.layout.tools.orderedPropertySet(props.layout.display_settings.secondary_keys)
+  let columnCount = primaryKeys.length + 1
+  let elements = props.layout.tools.getElements(props.layout)
+
+  return  <div className="container">
+            <h7 className="row"
+                style={{zIndex: "5"}}
+                onClick={() => props.openTools ? props.openTools() : null}>{props.layout.label}</h7>
+
+            <div className="row">
+              <div className={`col-xs flex-grow-1 border-right border-bottom`}></div>
+              { primaryKeys.map( ([pos, pk]) => <div className={`col-xs flex-grow-2 text-center border-bottom`}>{pk}</div>) }
+            </div>
+            { secondaryKeys.map( ([pos, sk]) =>
+                <div className="row">
+                  <div className="col-xs flex-grow-1 text-center border-right">{sk}</div>
+                  {
+                    elements && elements.length > 0 ? primaryKeys.map( pk => <div className="col-xs flex-grow-2 text-center">{elements.find( element => element.key[0] === pk && element.key[1] === sk).value_type}</div>) : null
+                  }
+                </div> )}
+
+            { props.tools ? props.tools : null }
+          </div>
+
+
+}
+
+function Table(props){
+
+  return  <div>
+          <h7 style={{zIndex: "5"}}
+              onClick={() => props.openTools ? props.openTools() : null}>{props.layout.label}</h7>
+          <div className="">
+            <div>_|</div>
+            {
+              Object.entries(props.layout.display_settings.primary_keys).map( ([pos, pk]) =>
+                <div>{pk}</div>)
+            }
+          </div>
+        </div>
+}
 
 
 export { prototype, displayProps }

@@ -2,7 +2,7 @@ CREATE TABLE forms.sections (
   id UUID,
   label TEXT,
   form_id UUID,
-  layout_ids UUID[],
+  layout_ids JSON,
   completion_rules JSON,
   security_settings JSON
 );
@@ -13,7 +13,7 @@ CREATE OR REPLACE PROCEDURE forms.create_section (
   _id UUID,
   _label TEXT,
   _form_id UUID,
-  _layout_ids UUID[],
+  _layout_ids JSON,
   _completion_rules JSON,
   _security_settings JSON )
 LANGUAGE SQL
@@ -28,7 +28,7 @@ CREATE OR REPLACE PROCEDURE forms.update_section (
   _id UUID,
   _label TEXT,
   _form_id UUID,
-  _layout_ids UUID[],
+  _layout_ids JSON,
   _completion_rules JSON,
   _security_settings JSON )
 LANGUAGE sql
@@ -65,7 +65,7 @@ RETURNS TABLE(
   id UUID,
   label TEXT,
   form_id UUID,
-  layout_ids UUID[],
+  layout_ids JSON,
   completion_rules JSON,
   security_settings JSON
 )

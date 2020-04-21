@@ -23,7 +23,7 @@ import simpledoc.services.ModuleObject;
 
 public class Form extends ModuleObject {
   private String label;
-  private Set<UUID> section_ids;
+  private Map<String, UUID> section_ids;
   private Map<String, String> completion_rules;
   private Map<String, String> security_settings;
 
@@ -38,60 +38,55 @@ public class Form extends ModuleObject {
 
 
   private void setLabel(Object object) throws ServiceErrorException {
-	  if(object == null) throw new ServiceErrorException("missing required property: Forms.Form.label");
-	  
-	  else if(object instanceof String) {
-		  if(FormsValidator.validateString(object, 1, 24, true, true)) this.label = (String) object;
-	  }
-	  
+	  if(FormsValidator.validateString(object, 1, 24, true, true)) this.label = (String) object;
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Form.label");
   }
   private void setSectionIds(Object object) throws ServiceErrorException, SQLException {
-	  Set<UUID> sections = new HashSet<UUID>();
+	  Map<String, UUID> sections = new HashMap<String, UUID>();
 		
 	  if(object == null) this.section_ids = sections; 
 	  
-	  else if(object instanceof ArrayList) {
-		for(Object id : (ArrayList<?>)object) {
-			UUID uuid = FormsValidator.validateUUIDString(id);
-			if(uuid != null) sections.add(uuid);
-			else throw new ServiceErrorException("invalid id in dataTag list");
-		}
-		this.section_ids = sections;
-	  }
-		
-	  else if(object instanceof PgArray) {
-		  JSONArray asJson = new JSONArray(((PgArray) object).getArray());
-		  if(asJson.length() > 0)
-			  for(Object entry : asJson.toList()) {
-				  UUID uuid = FormsValidator.validateUUIDString(entry);
-				  if(uuid != null) sections.add(uuid);
-				  else throw new ServiceErrorException("invalid value for property: Forms.Form.section_ids");
-			  }
+	  else if(object instanceof Map) {
+		  for(Entry<?,?> kv : ((Map<?,?>)object).entrySet()) {
+			  String position = (String)kv.getKey();
+			  UUID uuid = FormsValidator.validateUUIDString(kv.getValue());
+			  sections.put(position, uuid);
+		  }
 		  this.section_ids = sections;
 	  }
 	  
+	  else if(object instanceof PGobject) {
+			JSONObject asJson = new JSONObject(((PGobject)object).getValue());
+			for(Entry<?,?> rule : asJson.toMap().entrySet() ) {
+				String position = rule.getKey().toString();
+				UUID uuid = FormsValidator.validateUUIDString(rule.getValue());
+				sections.put(position, uuid);
+			};
+			this.section_ids = sections;
+	  }
+	  	  
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Form.section_ids");
   }
   private void setCompletionRules(Object object) throws ServiceErrorException {
-	 Map<String, String> rules = new HashMap<String, String>();
+	  Map<String, String> completionRules = new HashMap<String, String>();
 	  
-	  if(object == null) this.completion_rules = rules;
+	  if(object == null) this.completion_rules = completionRules;
 	  
 	  else if(object instanceof Map) {
-		  this.completion_rules = (Map<String, String>) object;
+		  ((Map<?,?>) object).forEach((key, value) -> {
+			  if(key instanceof String && value instanceof String) {
+				  completionRules.put((String)key, (String)value);
+			  }
+		  });
+		  this.completion_rules = completionRules;
 	  }
 	  
 	  else if(object instanceof PGobject) {
-			if(((PGobject) object).getType() == "json") {
-				JSONObject asJSON = new JSONObject(((PGobject) object).getValue());
-				if(asJSON.length() > 0)
-					for(Entry<String, Object> entry : asJSON.toMap().entrySet()) {
-						if(!FormsValidator.validateCompletionRule(entry)) throw new ServiceErrorException("invalid property value: Forms.Form.completion_rule");
-						rules.put(entry.getKey(), (String) entry.getValue());
-					}
-				this.completion_rules = rules;
-			}
+			JSONObject asJson = new JSONObject(((PGobject)object).getValue());
+			for(Entry<?,?> rule : asJson.toMap().entrySet() ) { 
+				completionRules.put(rule.getKey().toString(), rule.getValue().toString());
+			};
+			this.completion_rules = completionRules;	  
 	  }
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Form.completion_rules");
   }
@@ -101,19 +96,20 @@ public class Form extends ModuleObject {
 	  if(object == null) this.security_settings = securitySettings;
 	  
 	  else if(object instanceof Map) {
-		  this.security_settings = (Map<String, String>) object;
+		  ((Map<?,?>) object).forEach((key, value) -> {
+			  if(key instanceof String && value instanceof String) {
+				  securitySettings.put((String)key, (String)value);
+			  }
+		  });
+		  this.security_settings = securitySettings;
 	  }
 	  
 	  else if(object instanceof PGobject) {
-			if(((PGobject) object).getType() == "json") {
-				JSONObject asJSON = new JSONObject(((PGobject) object).getValue());
-				if(asJSON.length() > 0)
-					for(Entry<String, Object> entry : asJSON.toMap().entrySet()) {
-						if(!FormsValidator.validateCompletionRule(entry)) throw new ServiceErrorException("invalid property value: Forms.Form.security_settings");
-						securitySettings.put(entry.getKey(), (String) entry.getValue());
-					}
-				this.security_settings = securitySettings;
-			}
+			JSONObject asJson = new JSONObject(((PGobject)object).getValue());
+			for(Entry<?,?> rule : asJson.toMap().entrySet() ) { 
+				securitySettings.put(rule.getKey().toString(), rule.getValue().toString());
+			};
+			this.security_settings = securitySettings;	
 	  }
 	  
 	  else throw new ServiceErrorException("unhandled object type sent to property: Forms.Form.security_setting");
@@ -121,7 +117,7 @@ public class Form extends ModuleObject {
 
 
   public String getLabel() { return this.label; }
-  public Set<UUID> getSectionIds() { return this.section_ids; }
+  public Map<String, UUID> getSectionIds() { return this.section_ids; }
   public Map<String, String> getCompletionRules() { return this.completion_rules; }
   public Map<String, String> getSecuritySettings() { return this.security_settings; }
 
@@ -144,7 +140,7 @@ public class Form extends ModuleObject {
   public boolean readStorageResult(ResultSet resultSet) throws SQLException, ServiceErrorException {
     try {
       setLabel(resultSet.getString("label"));
-      setSectionIds(resultSet.getArray("section_ids"));
+      setSectionIds(resultSet.getObject("section_ids"));
       setCompletionRules(resultSet.getObject("completion_rules"));
       setSecuritySettings(resultSet.getObject("security_settings"));
     } catch(SQLException err) { throw new ServiceErrorException(err + "could not read storage result for Form"); }
@@ -169,9 +165,17 @@ public class Form extends ModuleObject {
       securitySettingsPGObj.setType("json");
       securitySettingsPGObj.setValue(new JSONObject(this.getSecuritySettings()).toString());
 
-      statement.setObject(1, this.getId());
+      PGobject sectionIdsPGObj = new PGobject();
+      sectionIdsPGObj.setType("json");
+      sectionIdsPGObj.setValue(new JSONObject(this.getSectionIds()).toString());
+      
+	  UUID uuid;
+	  if(this.getId().startsWith("n-")) uuid = FormsValidator.validateUUIDString(this.getId().substring(2));
+	  else uuid = FormsValidator.validateUUIDString(this.getId());
+	  
+      statement.setObject(1, uuid);
       statement.setString(2, this.getLabel());
-      statement.setArray(3, connection.createArrayOf("UUID", this.getSectionIds().toArray()));
+      statement.setObject(3, sectionIdsPGObj);
       statement.setObject(4, completionRulesPGObj );
       statement.setObject(5, securitySettingsPGObj );
     } catch(SQLException err) { throw new ServiceErrorException(err + "error setting storage statement for Form"); }

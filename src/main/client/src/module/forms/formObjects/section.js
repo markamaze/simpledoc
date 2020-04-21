@@ -40,7 +40,7 @@ const prototype = getFormState => ({
     },
     layout_ids: {
       setValue: function(ids){
-        if(ids === null || ids === undefined) this.layout_ids = []
+        if(ids === null || ids === undefined) this.layout_ids = {}
         else if(!this.properties.layout_ids.validate(ids)) throw "invalid property: Forms.Section.layout_ids"
         else this.layout_ids = ids
         return true
@@ -68,95 +68,189 @@ const prototype = getFormState => ({
     }
   },
   display: {
-    document: section => {
-      return  <div className="document">
-                <div className="header">{section.label}</div>
-                <div className="container-fill">
-                  { section.layout_ids.map(id => getFormState().layout[id])
-                      .map( layout => <div className="container-row">{layout.display.document(layout)}</div>) }
-                </div>
-              </div>
-    },
-    editor: section => {},
-    builder: (section, updateSection) => {
-      function Creator(props){
-        const [tempSection, updateTempSection] = React.useState(props.section)
-        const updateHandler = newState => updateTempSection(Object.assign(Object.create(Object.getPrototypeOf(tempSection)), tempSection, {...newState}))
+    document: (section, submissionId) =>
+      <div className="container">
+        <h6 className="">{section.label}</h6>
+        <div className="border">
+        {
+          section.tools.getLayouts(section).map( layout =>
+            <div className="p-2">
+              { layout.display.document(layout, submissionId) }
+            </div>)
+        }
+        </div>
+      </div>,
+    editor: (section, updater, submission) => {
+      function Editor(props){
+        const [displayEditorTools, toggleEditorTools] = React.useState(false)
 
+        const sectionEditorTools = () => {
+          return  <div className={`row m-0 p-2 justify-content-between bg-dark text-light d-flex flex-column`}
+                      style={{position: "fixed", top: "0", left: "0", height: "100%",
+                              width: "100%", opacity: ".9", overflow: "auto", zIndex: "5"}}>
+
+                    <button className="align-self-start" onClick={() => toggleEditorTools(false)}>&times;</button>
+                    <div className="flex-grow-1 container m-5">
+                      allows user to display rules and security settings here?
+                    </div>
+                  </div>
+        }
+
+        return  <div>
+                  <h6 className="font-italic p-0 m-0" style={{zIndex: "3"}} onClick={() => toggleEditorTools(true)}>{props.section.label}</h6>
+
+                  <div className="border-top">
+                  {
+                    props.section.tools.getLayouts(props.section).map( layout =>
+                        <div className="d-flex flex-row p-2 border">
+                          { layout.display.editor(layout, props.updateLayout, props.submission) }
+                        </div> )
+                  }
+                  </div>
+                  { displayEditorTools ? sectionEditorTools() : null }
+                </div>
+      }
+
+      return <Editor section={section} updateLayout={updater} submission={submission} />
+    },
+    builder: (section, updater) => {
+      function Builder(props) {
+        const [tempSection, updateTempSection] = React.useState(props.section)
+        const [displayTools, toggleTools] = React.useState(false)
+
+        const updateHandler = newState => {
+          updateTempSection(Object.assign(Object.create(Object.getPrototypeOf(tempSection)), tempSection, {...newState}))
+        }
         const addLayout = () => {
           let sectionState = {
             id: "new_object",
-            label: "new section",
+            label: "new layout",
             form_id: tempSection.form_id,
             section_id: tempSection.id
           }
           let newLayout = formObject("layout", sectionState, err => {throw err})
+          newLayout = newLayout.tools.buildTree(newLayout)
 
           updateHandler({
-            layout_ids: [...tempSection.layout_ids, newLayout.id],
-            new_object: tempSection.new_object ? [...tempSection.new_object, newLayout] : [newLayout]
+            layout_ids: Object.assign({}, tempSection.layout_ids, {[`${Object.entries(tempSection.layout_ids).length}`]: newLayout.id}),
+            layouts: [...tempSection.layouts, newLayout]
           })
         }
         const removeLayout = layout_id => {
+          let ids = getOrderedLayouts(tempSection.layout_ids)
+          let newIds = {}
+          let removePosition = ids.reduce( (result, current) => current[1] === layout_id ? current[0] : false)
+
+          let index = 0
+          while(index < ids.length){
+            let currentPosition = Object.keys(ids[index])[0]
+            if(currentPosition < removePosition) newIds[currentPosition] = ids[index]
+            else if(currentPosition > removePosition) newIds[currentPosition-1] - ids[index]
+          }
+
+
           updateHandler({
-            layout_ids: tempSection.layout_ids.filter( id => id !== layout_id ),
-            new_object: tempSection.new_object ? tempSection.new_object.filter( object => object.id !== layout_id ) : []
+            layout_ids: newIds,
+            layouts: tempSection.layouts.filter( object => object.id !== layout_id )
           })
         }
         const updateLayout = layout => {
-          console.log("update layout", layout)
+          props.updateSection(Object.assign(Object.create(Object.getPrototypeOf(tempSection)), tempSection, { layouts: [...tempSection.layouts.filter(item => item.id !== layout.id), layout]}))
         }
 
-        return  <List className="container document"
-                  headerComponent={<div className="">{tempSection.label}</div>}
-                  columns={[{selector: "display"}]}
-                  tableData={tempSection.typeFunctions.getLayouts(tempSection).map(layout => ({display: layout.display.builder(layout), data: layout}))}
-                  listActions={[{label: "add layout", action: () => addLayout() }]}
-                  drawerComponents={[
-                    {label: "rename", component: () => {} },
-                    {label: "delete section", component: () => {} }
-                  ]} />
 
-        // return  <div className="document">
-        //           <div className="container-row">
-        //             <div className="container-item item-label">Update Title:</div>
-        //             <input type="text" value={tempSection.label}
-        //                     onChange={()=>updateHandler({label: event.target.value})} />
-        //             <button onClick={() => addLayout()}>Add Layout</button>}
-        //           </div>
-        //
-        //           <div className="container-fill">
-        //
-        //             <header className="container-row border-bottom">{tempSection.label}</header>
-        //
-        //             {
-        //               tempSection.layout_ids.map( id =>
-        //                 <div className="container-row border-bottom">
-        //                   <div className="container-row">
-        //                     <button onClick={() => removeLayout(id)}>Remove Layout</button>
-        //                   </div>
-        //                   { id.substring(0,2) === "n-" ?
-        //                       tempSection.new_object.find( obj => obj.id === id).display.builder(tempSection.new_object.find(obj=>obj.id===id))
-        //                       : getFormState().layout[id].display.builder(getFormState().layout[id], layout => updateLayout(layout)) }
-        //                 </div>)
-        //             }
-        //
-        //           </div>
-        //
-        //         </div>
+        const displaySection = () =>
+          <div>
+            <h6 className="font-italic p-0 m-0" style={{zIndex: "3"}} onClick={() => toggleTools(true)}>{tempSection.label}</h6>
+
+            <div className="border-top">
+            {
+              Object.values(tempSection.layout_ids).map( layout_id => {
+                let layout = tempSection.layouts.find( layout => layout.id === layout_id)
+
+                return  <div className="d-flex flex-row p-2 border">
+                          { layout.display.builder(layout, updateLayout) }
+                        </div> })
+            }
+            </div>
+          </div>
+
+        const displayEditor = () => !displayTools ? null :
+          <div className={`row m-0 p-2 justify-content-between bg-dark text-light d-flex flex-column`}
+              style={{position: "fixed",
+                      top: "0",
+                      left: "0",
+                      height: "100%",
+                      width: "100%",
+                      opacity: ".9",
+                      overflow: "auto",
+                      zIndex: "5" }}>
+            <button className="align-self-start" onClick={() => toggleTools(false)}>&times;</button>
+            <div className="flex-grow-1 container m-5">
+
+              <div className="row m-1 p-2 bg-light text-dark">
+                <label className="col-sm-6">Update Section Title</label>
+                <input
+                    className={`col-sm-6`}
+                    onChange={() => updateHandler({label: event.target.value})}
+                    value={tempSection.label} />
+              </div>
+
+              <div className="row m-1 p-2 bg-light text-dark">
+
+                <button className="col-12 btn-sm" onClick={() => addLayout()}>add layout</button>
+
+                <div className="d-flex flex-column">
+                  {
+                    Object.values(tempSection.layout_ids).map( id =>
+                      <div className="d-flex flex-grow-1">
+                        <button className="flex-grow-1" onClick={() => moveLayout(id, "up")}>up</button>
+                        <button className="flex-grow-1" onClick={() => moveLayout(id, "down")}>down</button>
+                        <button className="flex-grow-1" onClick={() => removeLayout(id)}>delete</button>
+                        <div className="flex-grow-3">{tempSection.layouts.find(layout => layout.id === id).label}</div>
+                      </div>)
+                  }
+                </div>
+              </div>
+
+            </div>
+            <button onClick={() => props.updateSection(tempSection)}>Continue</button>
+          </div>
+
+        return  <div className="form-section d-flex flex-column flex-grow-1 p-2">
+                  {displaySection()}
+                  {displayEditor()}
+                </div>
+
       }
-
-      return <Creator section={section} />
+      return <Builder section={section} updateSection={updater}/>
     }
   },
-  typeFunctions: {
+  tools: {
+    buildTree: section => {
+      let layouts = section.tools.getLayouts(section).map( layout => layout.tools.buildTree(layout) )
+      return Object.assign(Object.create(Object.getPrototypeOf(section)), section, {layouts: layouts})
+    },
+    flatten: section => {
+      let _section = Object.assign(Object.create(Object.getPrototypeOf(section)), section)
+      let _layouts = _section.layouts ? _section.layouts : []
+      delete _section.layouts
+      let flatMap = [ _section ]
+
+      _layouts.forEach(layout => {
+        flatMap = [...flatMap, ...layout.tools.flatten(layout)]
+      })
+
+      return flatMap
+    },
     getLayouts: section => {
-      let store = getFormState()
+      let formStore = getFormState()
       let layouts = []
 
-      section.layout_ids.forEach( id => {
-        if(id.substring(0,2) === "n-") layouts = [...layouts, section.new_object.find(obj => obj.id === id)]
-        else layouts = [...layouts, store.layout[id] ]
+      Object.values(section.layout_ids).forEach( id => {
+        let foundLayout = formStore.layout[id] ? formStore.layout[id] : section.layouts.find(obj => obj.id === id)
+
+        layouts = [...layouts, foundLayout ]
       })
 
       return layouts
