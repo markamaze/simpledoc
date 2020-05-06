@@ -19,14 +19,14 @@ export default function List(props){
   const isItemSelected = item => selectedItem === item
 
   const addRow = (item, loadingFn) =>
-    <div className={`table-row${isItemSelected(item) ? "-active" : ""} flex-column`}>
+    <div key={`list-row-${item}`} className={`table-row${isItemSelected(item) ? "-active" : ""} flex-column`}>
       <div className="d-flex flex-row">
       { item.selectable === false ? null : <div className="expand-row-icon px-2">{`${isItemSelected(item) ? '<' : '>'}`}</div> }
       {
         props.iconComponent ?
           <div className="icon-cell flex-grow-1" onClick={() => updateSelectedItem(item)}>{ props.iconComponent(item) }</div>
           : props.columns.map( column =>
-              <div className="table-cell flex-grow-1 border-bottom" onClick={()=> item.selectable === false ? null : updateSelectedItem(item)}>
+              <div key={`list-item-${item}`} className="table-cell flex-grow-1 border-bottom" onClick={()=> item.selectable === false ? null : updateSelectedItem(item)}>
                 {column.selectorIsFunction ? item[column.selector]() : item[column.selector]}
               </div>)
       }
@@ -36,7 +36,7 @@ export default function List(props){
         props.overlayComponents && isItemSelected(item) ? //load set of action creators that will set overlay with a component
         <div className="table-row-expanded">
         {
-          props.overlayComponents.length > 0 ? <div className="list-overlay-options">{loadOverlayHandlers(item)}</div> : null
+          props.overlayComponents.length > 0 ? <div onClick={() => setOverlay(props.overlayComponents[0].component(selectedItem, () => setOverlay(false), (message) => window.alert(message)))} className="list-overlay-options">open</div> : null
         }
         </div>
         : null
@@ -51,8 +51,8 @@ export default function List(props){
     </div>
 
 
-  const loadOverlayHandlers = item => props.overlayComponents.map( overlayComponent =>
-    <div className="action-handler" onClick={() => setOverlay(overlayComponent.component(item, ()=>setOverlay(false), (message) => window.alert(message)))}>{overlayComponent.label}</div>)
+  // const loadOverlayHandlers = item => props.overlayComponents.map( overlayComponent =>
+  //   <div className="action-handler" onClick={() => setOverlay(overlayComponent.component(item, ()=>setOverlay(false), (message) => window.alert(message)))}>{overlayComponent.label}</div>)
 
   const loadTableDrawer = (item) => {
     if(props.drawerComponents === null) return null
@@ -63,7 +63,7 @@ export default function List(props){
     return  <div className="row-drawer position-absolute bg-primary">
               <div className="row-drawer-tabs">
                 { props.drawerComponents.map( component =>
-                    <div className="row-drawer-tab" onClick={() => setDrawerComponent(component.component(item))}>{component.label}</div>) }
+                    <div key={`list-item-drawer-component-${component}-${item}`} className="row-drawer-tab" onClick={() => setDrawerComponent(component.component(item))}>{component.label}</div>) }
               </div>
               { drawerComponent ?
                   <div className="row-drawer-component">{ drawerComponent }</div>
@@ -72,9 +72,9 @@ export default function List(props){
   }
 
   const buildTree = (node, depth) =>
-    <div className="tree-node border-left border-top m-3 d-flex flex-column">
+    <div key={`list-tree-node-${node}`} className="tree-node border-left border-top m-3 d-flex flex-column">
       { addRow(node, (item) => loadTableDrawer(item) ) }
-      { props.nodeBranch(node).length > 0 ? <div className="tree-node-branch">{props.nodeBranch(node).map( child => buildTree(child))}</div> : null }
+      { props.nodeBranch(node).length > 0 ? <div className="tree-node-branch" key={`list-tree-branch-${node}`} >{props.nodeBranch(node).map( child => buildTree(child))}</div> : null }
     </div>
 
   const buildList = () =>
@@ -83,7 +83,7 @@ export default function List(props){
         {
           props.iconComponent ? null
             : props.columns.filter(colObj => colObj.label === undefined ? false : true ).length > 0 ?
-                props.columns.map( column => <div className="table-header-column">{column.label}</div> )
+                props.columns.map( column => <div key={`list-column-${column.label}`}className="table-header-column">{column.label}</div> )
                 : null
         }
       </div>
@@ -98,12 +98,17 @@ export default function List(props){
   const loadOverlay = () =>
     <div className="list-overlay fixed-top h-100 w-100 bg-light color-dark p-3 overflow-auto">
       <button type="button" className="btn-secondary btn-sm" onClick={() => setOverlay(false)} >close</button>
+      <div>
+        {props.overlayComponents.map( componentObject =>
+          <div key={`list-overlaycomponent-${componentObject.label}`} 
+              onClick={()=> setOverlay(componentObject.component(selectedItem, ()=>setOverlay(false), (message) => window.alert(message)))}>{componentObject.label}</div>)}
+      </div>
       <div className="list-overlay-body">{ showOverlay }</div>
     </div>
 
   const loadListActions = () =>
         props.listActions.map(item =>
-          <div className="action-handler text-right" onClick={() => setOverlay(item.action(()=>setOverlay(false), message => window.alert(message)))}>{item.label}</div> )
+          <div key={`list-action-${item}`} className="action-handler text-right" onClick={() => setOverlay(item.action(()=>setOverlay(false), message => window.alert(message)))}>{item.label}</div> )
 
 
   try {

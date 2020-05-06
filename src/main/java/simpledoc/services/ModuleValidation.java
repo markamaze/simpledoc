@@ -39,7 +39,7 @@ public abstract class ModuleValidation {
     	else return false;
     	
         if(string.length() < min_len) return false;
-        else if(string.length() > max_len) return false;
+        else if(!max_len.equals(0) && string.length() > max_len) return false;
         	
         char[] test_chars = string.toCharArray();
         for(char character : test_chars) {

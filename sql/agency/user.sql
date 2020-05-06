@@ -1,23 +1,29 @@
 CREATE TABLE agency.user (
   id UUID,
   username text,
-  password text
+  password text,
+  property_values TEXT[],
+  assigned_agent_ids UUID[]
 );
 
 
 
 CREATE OR REPLACE PROCEDURE agency.create_user (
-  id UUID,
-  username TEXT,
-  password TEXT )
+  _id UUID,
+  _username TEXT,
+  _password TEXT,
+  _property_values TEXT[],
+  _assigned_agent_ids UUID[] )
 LANGUAGE sql
 AS $procedure$
   INSERT INTO agency.user (
     id,
     username,
-    password
+    password,
+    property_values,
+    assigned_agent_ids
   )
-  VALUES ( id, username, password );
+  VALUES ( _id, _username, _password, _property_values, _assigned_agent_ids );
 $procedure$;
 
 
@@ -25,14 +31,18 @@ $procedure$;
 CREATE OR REPLACE PROCEDURE agency.update_user (
   _id UUID,
   _username TEXT,
-  _password TEXT )
+  _password TEXT,
+  _property_values TEXT[],
+  _assigned_agent_ids UUID[] )
 LANGUAGE sql
 AS $procedure$
 UPDATE
   agency.user
 SET
   username = _username,
-  password = _password
+  password = _password,
+  property_values = _property_values,
+  assigned_agent_ids = _assigned_agent_ids
 WHERE
   id = _id;
 $procedure$;
@@ -55,14 +65,18 @@ CREATE OR REPLACE FUNCTION agency.query_user_collection(
 RETURNS TABLE(
   id UUID,
   username text,
-  password text )
+  password text,
+  property_values TEXT[],
+  assigned_agent_ids UUID[] )
 LANGUAGE sql STABLE
 AS $function$
 
   SELECT (
     id,
     username,
-    password
+    password,
+    property_values,
+    assigned_agent_ids
   ) FROM agency.user
 
 $function$;

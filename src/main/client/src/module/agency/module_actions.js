@@ -3,11 +3,15 @@ import { put, get, post, remove } from './agencyUtils/ajax'
 
 
 
-export function loadAgencyStore(){
+export function loadAgencyStore(getStore, services, utilities){
   get(`/Agency`, function(request){
     store.dispatch({
       type: "LOAD_AGENCY_OBJECTS",
-      payload: JSON.parse(request.response).data
+      payload: JSON.parse(request.response).data,
+      getStore: () => getStore("agency"),
+      getServices: () => services,
+      getUtilities: () => utilities,
+      failure: (err) => { throw new Error(err) }
     })
   }, err => err.printStackTrace())
 }

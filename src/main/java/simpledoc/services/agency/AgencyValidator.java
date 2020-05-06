@@ -57,13 +57,10 @@ public class AgencyValidator extends ModuleValidation {
   private boolean validateObjectType(String type) {
     switch(type){
 		case "AGENCY.AGENT":
-		case "AGENCY.AGENTTEMPLATE":
-		case "AGENCY.STRUCTURALNODE":
-		case "AGENCY.DATATAG":
+		case "AGENCY.TEMPLATE":
+		case "AGENCY.NODE":
+		case "AGENCY.TAG":
 		case "AGENCY.USER":
-		case "AGENCY.ASSIGNMENT":
-		case "AGENCY.ROLE":
-		case "AGENCY.PROPERTY":
 			return true;
       default: return false;
     }
@@ -74,26 +71,17 @@ public class AgencyValidator extends ModuleValidation {
     	case "AGENCY.AGENT":
     		fields = Agent.class.getDeclaredFields();
     		break;
-    	case "AGENCY.AGENTTEMPLATE":
-    		fields = AgentTemplate.class.getDeclaredFields();
+    	case "AGENCY.TEMPLATE":
+    		fields = Template.class.getDeclaredFields();
     		break;
-    	case "AGENCY.STRUCTURALNODE":
-    		fields = StructuralNode.class.getDeclaredFields();
+    	case "AGENCY.NODE":
+    		fields = Node.class.getDeclaredFields();
     		break;
-    	case "AGENCY.DATATAG":
-    		fields = DataTag.class.getDeclaredFields();
+    	case "AGENCY.TAG":
+    		fields = Tag.class.getDeclaredFields();
     		break;
     	case "AGENCY.USER":
     		fields = User.class.getDeclaredFields();
-    		break;
-    	case "AGENCY.ASSIGNMENT":
-    		fields = Assignment.class.getDeclaredFields();
-    		break;
-    	case "AGENCY.ROLE":
-    		fields = Role.class.getDeclaredFields();
-    		break;
-    	case "AGENCY.PROPERTY":
-    		fields = Property.class.getDeclaredFields();
     		break;
       default: return false;
 

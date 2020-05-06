@@ -4,7 +4,7 @@ import { formObject } from './formObject'
 
 
 
-const prototype = getFormState => ({
+const prototype = (getStore, services, utilities) => ({
   type: function() { return "layout"; },
   properties: {
     id: {
@@ -14,7 +14,6 @@ const prototype = getFormState => ({
         else this.id = id
         return true
       },
-      getObject: function(){ return this.id },
       validate: id => { return true }
     },
     label: {
@@ -33,7 +32,6 @@ const prototype = getFormState => ({
         else this.form_id = id
         return true
       },
-      getObject: function(){ return this.id },
       validate: id => { return true }
     },
     section_id: {
@@ -43,7 +41,6 @@ const prototype = getFormState => ({
         else this.section_id = id
         return true
       },
-      getObject: function(){ return this.id },
       validate: id => { return true }
     },
     element_ids: {
@@ -94,7 +91,6 @@ const prototype = getFormState => ({
         default: return <div>404 error</div>
       }
     },
-
     editor: (layout, updater, submission) => {
       function Editor(props){
         const [displayEditorTools, toggleEditorTools] = React.useState(false)
@@ -135,7 +131,6 @@ const prototype = getFormState => ({
 
       return <Editor layout={layout} updateValue={updater} submission={submission} />
     },
-
     builder: (layout, updater) => {
       function Builder(props){
         const [tempLayout, updateTempLayout] = React.useState(props.layout)
@@ -194,7 +189,7 @@ const prototype = getFormState => ({
                       form_id: tempLayout.form_id,
                       section_id: tempLayout.section_id,
                       layout_id: tempLayout.id,
-                    }, () => console.log("success"), err => {throw err})))
+                    }, null, null, () => console.log("success"), err => {throw err})))
                     else elements.splice(elementIndex, 1)
                   })
                 })
@@ -407,7 +402,7 @@ const prototype = getFormState => ({
       return flatMap
     },
     getElements: layout => {
-      let formStore = getFormState()
+      let formStore = getStore()
       let elements = []
 
       layout.element_ids.forEach( id => {
@@ -430,104 +425,94 @@ const prototype = getFormState => ({
       }
 
       return ordered
-    }
-  },
-
-  settings: {
-    display: {
+    },
+    displaySettings: {
       addToProperty: (property, value) => {
 
         //Operations on display_settings properties with structure -> { position : value }
         // const addToProperty = (display_settings_property, value) => {
-        //   let keyObj = { [`${Object.keys(tempLayout.display_settings[display_settings_property]).length}`] : value }
-        //   let keySet = Object.assign({}, tempLayout.display_settings[display_settings_property], keyObj)
-        //   let updatedSettings = Object.assign({}, tempLayout.display_settings, {[`${display_settings_property}`]: keySet})
-        //
-        //   updateHandler({display_settings: updatedSettings})
-        // }
-      },
+          //   let keyObj = { [`${Object.keys(tempLayout.display_settings[display_settings_property]).length}`] : value }
+          //   let keySet = Object.assign({}, tempLayout.display_settings[display_settings_property], keyObj)
+          //   let updatedSettings = Object.assign({}, tempLayout.display_settings, {[`${display_settings_property}`]: keySet})
+          //
+          //   updateHandler({display_settings: updatedSettings})
+          // }
+        },
       removeFromProperty: (property, position) => {},
       replaceInProperty: (property, value, position) => {},
       shiftProperty: (property, position, direction) => {}
+    },
+    completionSettings: {}
+  },
+  components: {
+    pairs: function Pairs(props){
+
+      const elementDisplay = element => {
+        if(props.builder) return element.display.builder(element, props.updater)
+        else if(props.editor) return element.display.editor(element, props.updater)
+        else if(props.document) return element.display.document(element)
+        else return element.display.card(element)
+      }
+
+      return  <div className="">
+                <h7 style={{zIndex: "5"}}
+                    onClick={() => props.openTools ? props.openTools() : null}>{props.layout.label}</h7>
+
+                <div className="d-flex flex-column bg-light">
+                  {
+                    props.layout.tools.getElements(props.layout).map( element => {
+                      return  <div className="d-flex flex-row">{elementDisplay(element)}</div>
+                    })
+                  }
+                </div>
+                { props.tools ? props.tools : null }
+              </div>
+    },
+    grid: function Grid(props){
+
+
+      let primaryKeys = props.layout.tools.orderedPropertySet(props.layout.display_settings.primary_keys)
+      let secondaryKeys = props.layout.tools.orderedPropertySet(props.layout.display_settings.secondary_keys)
+      let columnCount = primaryKeys.length + 1
+      let elements = props.layout.tools.getElements(props.layout)
+
+      return  <div className="container">
+                <h7 className="row"
+                    style={{zIndex: "5"}}
+                    onClick={() => props.openTools ? props.openTools() : null}>{props.layout.label}</h7>
+
+                <div className="row">
+                  <div className={`col-xs flex-grow-1 border-right border-bottom`}></div>
+                  { primaryKeys.map( ([pos, pk]) => <div className={`col-xs flex-grow-2 text-center border-bottom`}>{pk}</div>) }
+                </div>
+                { secondaryKeys.map( ([pos, sk]) =>
+                    <div className="row">
+                      <div className="col-xs flex-grow-1 text-center border-right">{sk}</div>
+                      {
+                        elements && elements.length > 0 ? primaryKeys.map( pk => <div className="col-xs flex-grow-2 text-center">{elements.find( element => element.key[0] === pk && element.key[1] === sk).value_type}</div>) : null
+                      }
+                    </div> )}
+
+                { props.tools ? props.tools : null }
+              </div>
+
+
+    },
+    table: function Table(props){
+
+      return  <div>
+              <h7 style={{zIndex: "5"}}
+                  onClick={() => props.openTools ? props.openTools() : null}>{props.layout.label}</h7>
+              <div className="">
+                <div>_|</div>
+                {
+                  Object.entries(props.layout.display_settings.primary_keys).map( ([pos, pk]) =>
+                    <div>{pk}</div>)
+                }
+              </div>
+            </div>
     }
   }
 })
 
-
-const displayProps = getFormState => ({
-  displayKey: "",
-  component: {}
-})
-
-function Pairs(props){
-
-  const elementDisplay = element => {
-    if(props.builder) return element.display.builder(element, props.updater)
-    else if(props.editor) return element.display.editor(element, props.updater)
-    else if(props.document) return element.display.document(element)
-    else return element.display.card(element)
-  }
-
-  return  <div className="">
-            <h7 style={{zIndex: "5"}}
-                onClick={() => props.openTools ? props.openTools() : null}>{props.layout.label}</h7>
-
-            <div className="d-flex flex-column bg-light">
-              {
-                props.layout.tools.getElements(props.layout).map( element => {
-                  return  <div className="d-flex flex-row">{elementDisplay(element)}</div>
-                })
-              }
-            </div>
-            { props.tools ? props.tools : null }
-          </div>
-}
-
-function Grid(props){
-
-
-  let primaryKeys = props.layout.tools.orderedPropertySet(props.layout.display_settings.primary_keys)
-  let secondaryKeys = props.layout.tools.orderedPropertySet(props.layout.display_settings.secondary_keys)
-  let columnCount = primaryKeys.length + 1
-  let elements = props.layout.tools.getElements(props.layout)
-
-  return  <div className="container">
-            <h7 className="row"
-                style={{zIndex: "5"}}
-                onClick={() => props.openTools ? props.openTools() : null}>{props.layout.label}</h7>
-
-            <div className="row">
-              <div className={`col-xs flex-grow-1 border-right border-bottom`}></div>
-              { primaryKeys.map( ([pos, pk]) => <div className={`col-xs flex-grow-2 text-center border-bottom`}>{pk}</div>) }
-            </div>
-            { secondaryKeys.map( ([pos, sk]) =>
-                <div className="row">
-                  <div className="col-xs flex-grow-1 text-center border-right">{sk}</div>
-                  {
-                    elements && elements.length > 0 ? primaryKeys.map( pk => <div className="col-xs flex-grow-2 text-center">{elements.find( element => element.key[0] === pk && element.key[1] === sk).value_type}</div>) : null
-                  }
-                </div> )}
-
-            { props.tools ? props.tools : null }
-          </div>
-
-
-}
-
-function Table(props){
-
-  return  <div>
-          <h7 style={{zIndex: "5"}}
-              onClick={() => props.openTools ? props.openTools() : null}>{props.layout.label}</h7>
-          <div className="">
-            <div>_|</div>
-            {
-              Object.entries(props.layout.display_settings.primary_keys).map( ([pos, pk]) =>
-                <div>{pk}</div>)
-            }
-          </div>
-        </div>
-}
-
-
-export { prototype, displayProps }
+export { prototype }

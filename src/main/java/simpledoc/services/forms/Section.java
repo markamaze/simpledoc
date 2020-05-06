@@ -6,19 +6,14 @@ import simpledoc.exceptions.ServiceErrorException;
 import java.util.UUID;
 
 import org.json.JSONObject;
-import org.postgresql.jdbc.PgArray;
 import org.postgresql.util.PGobject;
 
-import java.util.Set;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import simpledoc.services.ModuleObject;
 
 

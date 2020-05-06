@@ -19,13 +19,12 @@ import simpledoc.exceptions.StorageErrorException;
 import simpledoc.exceptions.UnsupportedServiceRequest;
 import simpledoc.services.ModuleObject;
 import simpledoc.services.ModuleObjectData;
-import simpledoc.services.ModuleObjectFactory;
 import simpledoc.services.ServiceModule;
 
 public class AgencyService implements ServiceModule {
 	//need to add handling of an id in the third position of the resource_path
 	
-	private <T extends ModuleObject> ResourceResponse handleGET(ResourceRequest request, StorageControl storage) throws ServiceErrorException, StorageErrorException {
+	private <T extends ModuleObject> ResourceResponse readAgencyObjects(ResourceRequest request, StorageControl storage) throws ServiceErrorException, StorageErrorException {
 		AgencyValidator validator = new AgencyValidator();
 		ResourceResponse response = new ResourceResponse();
 		AgencyFactory<T> factory = new AgencyFactory<T>();
@@ -54,7 +53,7 @@ public class AgencyService implements ServiceModule {
 
 	}
 	
-	private <T extends ModuleObject> ResourceResponse handlePUT(ResourceRequest request, StorageControl storage) throws ServiceErrorException, SQLException {
+	private <T extends ModuleObject> ResourceResponse updateAgencyObjects(ResourceRequest request, StorageControl storage) throws ServiceErrorException, SQLException {
 		AgencyValidator validator = new AgencyValidator();
 		ResourceResponse response = new ResourceResponse();
 		AgencyFactory<T> factory = new AgencyFactory<T>();
@@ -77,26 +76,17 @@ public class AgencyService implements ServiceModule {
 					case "AGENCY.AGENT":
 						resource.add("agent");
 						break;
-					case "AGENCY.AGENTTEMPLATE":
-						resource.add("agentTemplate");
+					case "AGENCY.TEMPLATE":
+						resource.add("template");
 						break;
-					case "AGENCY.STRUCTURALNODE":
-						resource.add("structuralNode");
+					case "AGENCY.NODE":
+						resource.add("node");
 						break;
-					case "AGENCY.DATATAG":
-						resource.add("dataTag");
+					case "AGENCY.TAG":
+						resource.add("tag");
 						break;
 					case "AGENCY.USER":
 						resource.add("user");
-						break;
-					case "AGENCY.ASSIGNMENT":
-						resource.add("assignment");
-						break;
-					case "AGENCY.PROPERTY":
-						resource.add("property");
-						break;						
-					case "AGENCY.ROLE":
-						resource.add("role");
 						break;
 				}
 				
@@ -118,7 +108,7 @@ public class AgencyService implements ServiceModule {
 		} catch(UnsupportedServiceRequest err) { throw new ServiceErrorException(err + "could not make changes to database"); }
 	}
 	
-	private <T extends ModuleObject> ResourceResponse handlePOST(ResourceRequest request, StorageControl storage) throws ServiceErrorException, SQLException {
+	private <T extends ModuleObject> ResourceResponse writeAgencyObjects(ResourceRequest request, StorageControl storage) throws ServiceErrorException, SQLException {
 		AgencyValidator validator = new AgencyValidator();
 		ResourceResponse response = new ResourceResponse();
 		AgencyFactory<T> factory = new AgencyFactory<T>();
@@ -142,7 +132,7 @@ public class AgencyService implements ServiceModule {
 		} catch(UnsupportedServiceRequest err) { throw new ServiceErrorException(err + "could not make changes to database"); }
 	}
 
-	private <T extends ModuleObject> ResourceResponse handleDELETE(ResourceRequest request, StorageControl storage) throws ServiceErrorException, StorageErrorException {
+	private <T extends ModuleObject> ResourceResponse deleteAgencyObjects(ResourceRequest request, StorageControl storage) throws ServiceErrorException, StorageErrorException {
 		AgencyValidator validator = new AgencyValidator();
 		ResourceResponse response = new ResourceResponse();
 		AgencyFactory<T> factory = new AgencyFactory<T>();
@@ -169,50 +159,44 @@ public class AgencyService implements ServiceModule {
 	@Override
 	public ServiceFunction moduleRoutes(List<String> resource_path) throws ServiceErrorException  {
 		String route;
+		
 		if(resource_path.size() > 1) route = resource_path.get(1);
 		else route = "";
 		
-		if(route.equals("service")) return (request, storage) -> publicServices(request, storage);
-		else return (request, storage) -> {
-			switch(request.method()) {
-				case "GET": return handleGET(request, storage);
-				case "PUT": try {
-					return handlePUT(request, storage);
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				case "POST": try {
-					return handlePOST(request, storage);
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				case "DELETE": return handleDELETE(request, storage);
-				default: throw new ServiceErrorException("invalid method on request");
-			}
-		};
-		
+		switch(route) {
+		case "notify": return (request, storage) -> subscriptionListener(request, storage);
+		default: return (request, storage) -> agencyObjectStorage(request, storage);
+		}
 		
 	}
 
-	private ResourceResponse publicServices(ResourceRequest request, StorageControl storage) {
-		//url has path -> /Agency/service/*
-		
-		//this is the entry point into a modules services to be used outside the module.
-		//
-		//Agency's only public service is to provide subsets of the agency as defined by the filter
-		
-		//This is where subscriptions will be handled.
-		//	given the incoming request (subscription), the module will need to decide what action to take moving forward
-		//	
+	private ResourceResponse agencyObjectStorage(ResourceRequest request, StorageControl storage) throws ServiceErrorException {
+		try {
+			switch(request.method()) {
+				case "GET": return readAgencyObjects(request, storage);
+				case "PUT": return updateAgencyObjects(request, storage);
+				case "POST": return writeAgencyObjects(request, storage);
+				case "DELETE": return deleteAgencyObjects(request, storage);
+				default: throw new ServiceErrorException("invalid http method");
+			}
+		} catch (SQLException e) { throw new ServiceErrorException("problem with reading from storage"); }
+	}
 
+	private ResourceResponse subscriptionListener(ResourceRequest request, StorageControl storage) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String moduleTitle() {
 		return "agency";
+	}
+
+	
+	@Override
+	public void run() {
+		
+		
 	}
 
 }

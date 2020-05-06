@@ -6,15 +6,10 @@ import modules from './module/index'
 
 var middleware = composeWithDevTools(applyMiddleware(thunk))
 
-var reducers = () => {
-	let reducersList = Object.values(modules).map(module => module.reducer)
+var setup = () => {
 	let reducers = {}
-	Object.values(modules).forEach( module => { module.onLoad() })
-
-	reducersList.forEach(reducer => {
-		reducers = {...reducers, ...reducer}
-	})
+	Object.values(modules).forEach( mod => { reducers = Object.assign(reducers, mod.reducer) })
 	return combineReducers(reducers)
 }
 
-export default createStore(reducers(), middleware)
+export default createStore(setup(), middleware)

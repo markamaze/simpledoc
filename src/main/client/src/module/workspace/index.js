@@ -10,24 +10,10 @@ export default module = {
   onLoad: () => console.log("workspace loading not build"),
   title: "Workspace",
   path: "/workspace",
-  services: [  ],
+  services: {},
+  utilities: {
+    sendToWorkspace: () => {window.alert("public service announcement: workspace-sendToWorkspace")}
+  },
   component: state => <Workspace />
 
 }
-
-
-/*
-  right now, within agency module I am importing from outside the module:
-    moduleStyles
-    store
-    DataTableWrapper
-    Overlay
-    workspace actions
-
-
-  I would like to figure out how to completly encapsulate the module w/o too much repitition of code
-*/
-const externalActions = () => ({
-  testAction: { label: "external action", action: function(){console.log("success!")}}
-})
-export { externalActions }

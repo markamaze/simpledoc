@@ -4,7 +4,7 @@ import { formObject } from './formObject'
 
 
 
-const prototype = getFormState => ({
+const prototype = (getStore, services, utilities) => ({
   type: function() { return "element"; },
   properties: {
     id: {
@@ -14,7 +14,6 @@ const prototype = getFormState => ({
         else this.id = id
         return true
       },
-      getObject: function(){ return this.id },
       validate: id => { return true }
     },
     form_id: {
@@ -24,7 +23,6 @@ const prototype = getFormState => ({
         else this.form_id = id
         return true
       },
-      getObject: function(){ return this.id },
       validate: id => { return true }
     },
     section_id: {
@@ -34,7 +32,6 @@ const prototype = getFormState => ({
         else this.section_id = id
         return true
       },
-      getObject: function(){ return this.section_id },
       validate: id => { return true }
     },
     layout_id: {
@@ -44,7 +41,6 @@ const prototype = getFormState => ({
         else this.layout_id = id
         return true
       },
-      getObject: function(){ return this.layout_id },
       validate: id => { return true }
     },
     key: {
@@ -54,7 +50,6 @@ const prototype = getFormState => ({
         else this.key = key
         return true
       },
-      getObject: function(){ return this.key },
       validate: key => { return true }
     },
     value_type: {
@@ -64,7 +59,6 @@ const prototype = getFormState => ({
         else this.value_type = value
         return true
       },
-      getObject: function(){ return this.value_type },
       validate: type => true
     },
     value_properties: {
@@ -75,7 +69,6 @@ const prototype = getFormState => ({
         else this.value_properties = valueProperties
         return true
       },
-      getObject: function(){ return this.value_properties },
       validate: props => { return true }
     },
     completion_rules: {
@@ -98,8 +91,9 @@ const prototype = getFormState => ({
     }
   },
   display: {
-    card: (element, submission) =>
-      <div>{submission.value}</div>,
+    card: (element, submission) => {
+      return <div>{submission.value}</div>
+    },
     document: (element, submission) => {
       return <div className="container-item row p-0 m-0" style={{lineHeight: "1rem"}}>
                 <label className="col-6">{element.key}</label>
@@ -148,14 +142,9 @@ const prototype = getFormState => ({
       return <Builder element={element} />
     }
   },
-  tools: {}
+  tools: {},
+  settings: {},
+  components: {}
 })
 
-
-const displayProps = getFormState => ({
-  displayKey: "",
-  component: {}
-})
-
-
-export { prototype, displayProps }
+export { prototype }

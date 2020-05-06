@@ -1,44 +1,50 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { formObject, formTypeData } from './formObjects/formObject'
+
+import { formObject } from './formObjects/formObject'
 import List from '../../components/List'
-import ErrorBoundary from './formUtils/ErrorBoundary'
 
 function FormsPage(props){
-  const formsState = useSelector(state => state.forms)
-  const displayProps = formTypeData("form", formsState).component.list
 
   return  <div className="container-sm" >
-            <ErrorBoundary displayName="FormsPage" >
-              <List className="" {...displayProps} headerComponent={<div className="page-header">Forms Manager</div>}/>
-            </ErrorBoundary>
+            <List className="d-block"
+                headerComponent={<div>Forms</div>}
+                tableData={Object.values(useSelector(state => state.forms.form))}
+                columns={[{label: "Form Title", selector: "label"}]}
+                listActions={[
+                  { label: "create form", action: () => {
+                      let newForm = formObject( "form",
+                                                {id: "new_object", label: "new form"},
+                                                () => useSelector(state => state),
+                                                props.services,
+                                                props.utilities,
+                                                error => console.log(error))
+                      return newForm.display.builder(newForm)
+                  }},
+                  { label: "send list to workspace", action: () => { props.utilities.sendToWorkspace(this) }}
+                ]}
+                overlayComponents={[
+                  {label: "show form", component: item => item.display.document(item)},
+                  {label: "modify", component: item => item.display.builder(item)},
+                  {label: "subscriptions", component: item => item.component.subscriptions(item)}
+                ]} />
           </div>
 }
 
 function FormSetsPage(props){
-  const formsState = useSelector(state => state.forms)
-  const displayProps = formTypeData("formSet", formsState).component.list
+  const formSetData = useSelector(state => state.forms).formSet
 
   return  <div className="container-sm" >
-            hello form sets
+            { formSetDisplays("formSet").component.list(formSetData, <div className="page-header">FormSet Manager</div>) }
           </div>
 }
 
 function SubmissionsPage(props){
-  const formsState = useSelector(state => state.forms)
-  const displayProps = formTypeData("submission", formsState).component.list
+  const formSubmissionData = useSelector(state => state.forms).submission
 
   return  <div className="container-sm" >
-            hello form submissions
+            { formSetDisplays("submission").component.list(formSubmissionData, <div className="page-header">Submissions</div>) }
           </div>
 }
 
-function ComplianceCheckPage(props){
-  const formsState = useSelector(state => state.forms)
-
-  return  <div className="container-sm" >
-            controls for monitoring compliance of subscribscriptions?
-          </div>
-}
-
-export { FormsPage, FormSetsPage, SubmissionsPage, ComplianceCheckPage }
+export { FormsPage, FormSetsPage, SubmissionsPage }

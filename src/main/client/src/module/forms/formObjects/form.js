@@ -4,7 +4,7 @@ import { formObject } from './formObject'
 import List from '../../../components/List'
 
 
-const prototype = getFormState => ({
+const prototype = (getStore, services, utilities) => ({
   type: function() { return "form" },
   properties: {
     id: {
@@ -54,16 +54,17 @@ const prototype = getFormState => ({
     }
   },
   display: {
-    document: form =>
-      <div className="container">
-        <h4 className="text-center">{form.label}</h4>
-        {
-          form.tools.getSections(form).map( section =>
-            <div className="p-2">
-              { section.display.document(section) }
-            </div>)
-        }
-      </div>,
+    document: form => {
+      return  <div className="container">
+                <h4 className="text-center">{form.label}</h4>
+                {
+                  form.tools.getSections(form).map( section =>
+                    <div className="p-2">
+                      { section.display.document(section) }
+                    </div>)
+                }
+              </div>
+    },
     editor: (form, updateHandler) => {
       return  <List className="d-block"
                   headerComponent={<div className="">{form.label}</div>}
@@ -84,7 +85,7 @@ const prototype = getFormState => ({
             label: "new section",
             form_id: tempForm.id
           }
-          let newSection = formObject("section", sectionState, err => {throw err})
+          let newSection = formObject("section", sectionState, null, null, err => {throw err})
           newSection = newSection.tools.buildTree(newSection)
 
           updateHandler({
@@ -236,7 +237,7 @@ const prototype = getFormState => ({
       return flatMap
     },
     getSections: form => {
-      let formStore = getFormState()
+      let formStore = getStore()
       let sections = []
 
       Object.values(form.section_ids).forEach(id => {
@@ -246,31 +247,29 @@ const prototype = getFormState => ({
       })
 
       return sections
-    }
-  }
-})
-
-
-const displayProps = formState => ({
-  displayKey: "label",
+    },
+    display: {},
+    completion: {}
+  },
   component: {
-    list: {
-      columns: [{label: "Form Title", selector: "label"}],
-      tableData: Object.values(formState.form),
-      listActions: [
-        { label: "create form", action: () => {
-            let newForm = formObject("form", {id: "new_object", label: "new form"}, () => console.log("success"), error => console.log(error))
-            return newForm.display.builder(newForm)
-        }}
-      ],
-      overlayComponents: [
-        {label: "show form", component: item => item.display.document(item)},
-        {label: "show editor", component: item => item.display.editor(item)},
-        {label: "modify", component: item => item.display.builder(item)}
-      ]
-    }
+    subscriptions: item => {
+      return  <div>
+                <div>Subscribe this module to a service</div>
+
+                { Object.entries(services()).map( ([label, component]) =>
+                  <div onClick={() => console.log(component(item))}
+                      style={{fontSize: ".6rem"}}>{label}</div>) }
+
+
+              </div>
+    },
+    serviceSettings: item => {},
+    securitySettings: item => {},
+    completionSettings: item => {},
+    availableServices: item => {},
+    submissions: item => {},
+    searchBar: item => {}
   }
 })
 
-
-export { prototype, displayProps }
+export { prototype }

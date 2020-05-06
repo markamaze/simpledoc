@@ -1,9 +1,9 @@
 import React from 'react'
 import { agencyObject } from './agencyObject'
+import List from '../../../components/List'
 
 
-
-const prototype = agencyState => ({
+const prototype = (getStore, services, utilities) => ({
   type: () => "property",
   properties: {
     id: {
@@ -13,7 +13,6 @@ const prototype = agencyState => ({
         else this.id = id
         return true
       },
-      getObject: function(){ return this.id },
       validate: ()=>{ return true }
     },
     property_key: {
@@ -24,7 +23,6 @@ const prototype = agencyState => ({
         else this.property_key = key
         return true
       },
-      getObject: function(){ return this.property_key },
       validate: ()=>{ return true }
     },
     property_value_type: {
@@ -35,105 +33,67 @@ const prototype = agencyState => ({
         else this.property_value_type = type
         return true
       },
-      getObject: function(){ return this.property_value_type},
       validate: ()=>{ return true }
-    },
-    // property_value:{
-    //   setValue: function(value){
-    //     if(value === null || value === undefined) this.property_value = null
-    //     else if(!this.properties.property_value.validate(value)) throw "invalid property: Agency.Property.property_value"
-    //     else this.property_value = value
-    //     return true
-    //   },
-    //   validate: () => {return true}
-    // }
+    }
   },
   display: {
     card: property => {
-      return  <div className="property container-item">{property.property_key}</div>
+      return  <div className="container-item">{property.agencyTools.getDisplayLabel(property)}</div>
     },
     document: (property, value) => {
-      return  <div className="property container-row">
-                <div className="container-item">{property.property_key}:</div>
+      return  <div className="container-row">
+                <div className="container-item">{property.agencyTools.getDisplayLabel(property)}:</div>
                 <div className="container-item">{`${value ? value : ""}`}</div>
               </div>
     },
-    // editor: (property, value, updateHandler) => {
-    //   function Editor(props){
-    //     const [tempValue, updateTempValue] = React.useState(props.value ? props.value : "")
-    //
-    //     const setValue = () => props.updateHandler({[`${props.property.id}`]:tempValue})
-    //
-    //     return  <div className="property container-row">
-    //               <div className="container-item item-label">{props.property.property_key}</div>
-    //               <input className="container-item"
-    //                   type="text"
-    //                   value={value}
-    //                   onChange={() => updateHandler(event.target.value)} />
-    //             </div>
-    //   }
-    //
-    //   return <Editor property={property} value={value} updateHandler={updateHandler}/>
-    // },
     builder: (property, close, alert) => {
       function Builder(props){
         const [tempProperty, updateTempProperty] = React.useState(props.property)
 
-        const updateHandler = newState => updateTempProperty(Object.assign(Object.create(Object.getPrototypeOf(tempProperty)), tempProperty, {...newState}))
+        const updateHandler = newState =>
+          updateTempProperty(tempProperty.moduleTools.updateObject(newState, tempProperty))
 
-        return  <div className="property document">
-                  <header>Modify Property</header>
-                  <div className="container-fill">
-                    <div className="container-row border-bottom">
-                      <div className="container-item item-label">Set Key</div>
-                      <input className="container-item container-fill"
-                          type="text"
-                          onChange={()=> updateHandler({property_key: event.target.value})}
-                          value={tempProperty.property_key} />
-                    </div>
-
-                    <div className="container-row border-bottom">
-                      <div className="container-item item-label">Set Value Type</div>
-                      <select className="container-item container-fill"
-                          onChange={() => updateHandler({property_value_type: event.target.value})}
-                          value={tempProperty.property_value_type}>
-                        <option value=""></option>
-                        <option value="string">String</option>
-                        <option value="number">Number</option>
-                        <option value="time">Time</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  { tempProperty.storage.handlers.call(tempProperty, close, alert) }
-                </div>
+        return  <List className="container"
+                    headerComponent={<div>Modify Property</div>}
+                    tableData={[
+                      tempProperty.components.setKey(tempProperty, updateHandler),
+                      tempProperty.components.setValueType(tempProperty, updateHandler)
+                    ]}
+                    footerComponent={ tempProperty.storage.handlers.call(tempProperty, close, alert) }
+                    iconComponent={ item => item } />
       }
 
       return <Builder property={property} />
     }
-  }
-})
+  },
+  tools: {},
+  components: {
+    setKey: (property, updateHandler) => {
 
+      return  <div className="container-row border-bottom">
+                <div className="container-item item-label">Set Key</div>
+                <input className="container-item container-fill"
+                    type="text"
+                    onChange={()=> updateHandler({property_key: event.target.value})}
+                    value={property.property_key} />
+              </div>
+    },
+    setValueType: (property, updateHandler) => {
 
-const displayProps = agencyState => ({
-  displayKey: "property_key",
-  component: {
-    list: {
-      columns: [{selector: "display"}],
-      tableData: Object.values(agencyState.property).map(property => ({data: property, display: property.display.document(property)})),
-      listActions: [
-        {label: "New Property", action: (close, alert) => {
-          let newProperty = agencyObject("property", {id: "new_object", }, alert)
-          return newProperty.display.builder(newProperty, close, alert)
-        }}
-      ],
-      overlayComponents: [
-        {label: "modify", component: (item, close, alert) => item.data.display.builder(item.data, close, alert)}
-      ]
+      return  <div className="container-row border-bottom">
+                <div className="container-item item-label">Set Value Type</div>
+                <select className="container-item container-fill"
+                    onChange={() => updateHandler({property_value_type: event.target.value})}
+                    value={property.property_value_type}>
+                  <option value=""></option>
+                  <option value="string">String</option>
+                  <option value="number">Number</option>
+                  <option value="time">Time</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
     }
   }
 })
 
-
-export { prototype, displayProps }
+export { prototype }

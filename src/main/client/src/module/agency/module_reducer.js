@@ -1,15 +1,11 @@
-// import { user } from './moduleObjects/user'
 import { agencyObject } from './moduleObjects/agencyObject'
 
 const initialState = {
-  structuralNode: {},
-  agentTemplate: {},
+  node: {},
+  template: {},
   agent: {},
-  dataTag: {},
-  user: {},
-  assignment: {},
-  role: {},
-  property: {}
+  tag: {},
+  user: {}
 }
 
 
@@ -20,7 +16,7 @@ export default function agency_reducer(state=initialState, action) {
       try{
         let newState = Object.assign({}, state)
         action.payload.forEach( agency_object => {
-          let newAgencyObject = agencyObject(agency_object.type, {...agency_object}, action.payload.failure)
+          let newAgencyObject = agencyObject(agency_object.type, {...agency_object}, action.getStore, action.getServices, action.getUtilities, action.failure)
           Object.assign(newState, {[`${agency_object.type}`]: Object.assign(newState[agency_object.type],  {[`${agency_object.id}`]:newAgencyObject} )})
         })
         console.log(newState)
@@ -28,7 +24,7 @@ export default function agency_reducer(state=initialState, action) {
 
         return newState
       } catch(err) {
-        err.printStackTrace()
+        console.log(err)
         return state
       }
     }

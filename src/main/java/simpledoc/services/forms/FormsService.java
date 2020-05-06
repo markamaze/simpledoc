@@ -33,44 +33,26 @@ public class FormsService implements ServiceModule {
 		if(resource_path.size() > 1) route = resource_path.get(1);
 		else route = "";
 		
-		if(route.equals("service")) return (request, storage) -> publicServices(request, storage);
-		else return (request, storage) -> {
-				switch(request.method()) {
-					case "GET": return handleGET(request, storage);
-					case "PUT": try {
-						return handlePUT(request, storage);
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					case "POST": try {
-						return handlePOST(request, storage);
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					case "DELETE": return handleDELETE(request, storage);
-					default: throw new ServiceErrorException("invalid method on request");
-				}
-		};
+		switch(route) {
+			case "subscribe": return (request, storage) -> subscribeToFormObject(request, storage);
+			case "unsubscribe": return (request, storage) -> unsubscribeFromFormObject(request, storage);
+			case "notify": return (request, storage) -> subscriptionListener(request, storage);
+			default: return (request, storage) -> formObjectStorage(request, storage);
+		}
 	}
-	
-	
-	private ResourceResponse publicServices(ResourceRequest request, StorageControl storage) {
-		//url has path -> /Forms/service/*
-
-		//forms services would be:
-		//		subscribe to a form
-		//		unsubscribe from a form
-		//		check submission compliance
-		//		
-		
-		
+	private ResourceResponse formObjectStorage(ResourceRequest request, StorageControl storage) {
+		try {
+			switch(request.method()) {
+				case "GET": return readFormObjects(request, storage);
+				case "PUT": return updateFormObjects(request, storage);
+				case "POST": return writeFormObjects(request, storage);
+				case "DELETE": return deleteFormObjects(request, storage);
+				default: throw new ServiceErrorException("invalid method on request");
+			}
+		} catch (ServiceErrorException | SQLException e) { e.printStackTrace(); }
 		return null;
 	}
-	
-	
-	private <T extends ModuleObject> ResourceResponse handleGET(ResourceRequest request, StorageControl storage) throws ServiceErrorException, StorageErrorException {
+	private <T extends ModuleObject> ResourceResponse readFormObjects(ResourceRequest request, StorageControl storage) throws ServiceErrorException, StorageErrorException {
 		FormsValidator validator = new FormsValidator();
 		ResourceResponse response = new ResourceResponse();
 		FormsFactory<T> factory = new FormsFactory<T>();
@@ -97,8 +79,7 @@ public class FormsService implements ServiceModule {
 			return response.setResponse(response_string, 200);
 		} catch(UnsupportedServiceRequest err) { throw new ServiceErrorException(err + "could not validate data"); }
 	}
-	
-	private <T extends ModuleObject> ResourceResponse handlePOST(ResourceRequest request, StorageControl storage) throws ServiceErrorException, SQLException {
+	private <T extends ModuleObject> ResourceResponse writeFormObjects(ResourceRequest request, StorageControl storage) throws ServiceErrorException, SQLException {
     	FormsValidator validator = new FormsValidator();
     	ResourceResponse response = new ResourceResponse();
     	FormsFactory<T> factory = new FormsFactory<T>();
@@ -123,7 +104,7 @@ public class FormsService implements ServiceModule {
 		} catch(UnsupportedServiceRequest err) { throw new ServiceErrorException(err + "could not validate data"); }
 	}
 
-	private <T extends ModuleObject> ResourceResponse handlePUT(ResourceRequest request, StorageControl storage) throws ServiceErrorException, SQLException {
+	private <T extends ModuleObject> ResourceResponse updateFormObjects(ResourceRequest request, StorageControl storage) throws ServiceErrorException, SQLException {
     	FormsValidator validator = new FormsValidator();
 		ResourceResponse response = new ResourceResponse();
 		Set<T> working_data = new HashSet<T>();
@@ -178,7 +159,7 @@ public class FormsService implements ServiceModule {
 		} catch(UnsupportedServiceRequest err) { throw new ServiceErrorException(err + "could not validate data"); }
 	}
 	
-	private <T extends ModuleObject> ResourceResponse handleDELETE(ResourceRequest request, StorageControl storage) throws ServiceErrorException, StorageErrorException {
+	private <T extends ModuleObject> ResourceResponse deleteFormObjects(ResourceRequest request, StorageControl storage) throws ServiceErrorException, StorageErrorException {
 		FormsValidator validator = new FormsValidator();
 		ResourceResponse response = new ResourceResponse();
 		Map<String, UUID> working_data = new HashMap<String, UUID>();
@@ -197,6 +178,35 @@ public class FormsService implements ServiceModule {
 	
 			return response.setResponse("\"All objects successfully removed from storage\"", 200);
 		} catch(UnsupportedServiceRequest err) { throw new ServiceErrorException(err + "could not validate data"); }
+	}
+	
+	private ResourceResponse subscribeToFormObject(ResourceRequest request, StorageControl storage) {
+		
+		return null;
+	}
+	
+	private ResourceResponse unsubscribeFromFormObject(ResourceRequest request, StorageControl storage) {
+		
+		return null;
+	}
+	
+	
+	//
+	public ResourceResponse subscriptionListener(ResourceRequest request, StorageControl storage) {
+		// TODO Auto-generated method stub
+		//	if the state of a subscription changes, where a formObject is the subscriber
+		//		the subscription module will call this function. Not exactly sure what for though.
+		return null;
+	}
+	
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		//	ongoing monitoring of state of the subscriptions
+		//		possible state: in compliance, upcoming, active, overdue, does not comply
+		//	execute actions defined in each subscription's parameters, based on it's state
+		//	notify subscriber of state changes
+		
 	}
 	
 }

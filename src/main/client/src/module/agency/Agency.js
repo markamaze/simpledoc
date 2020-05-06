@@ -2,76 +2,115 @@ import React from 'react'
 import List from '../../components/List'
 import { useSelector } from 'react-redux'
 import { AgencyPageWrapper } from './module_styles'
-import ErrorBoundary from './agencyUtils/ErrorBoundary'
-import { agencyTypeData } from './moduleObjects/agencyObject'
+import { agencyObject } from './moduleObjects/agencyObject'
 
 function AgencyPage(props){
-
-  const agencyState = useSelector(state => (state.agency))
-  const displayProps = agencyTypeData("structuralNode", agencyState).component.list
-
-  return  <div className="">
-            <ErrorBoundary displayName="AgencyPage" >
-              <List {...displayProps}
-                  className=""
-                  headerComponent={<div className="page-header">Agency Overview</div>}/>
-            </ErrorBoundary>
-          </div>
+  let allNodes = Object.values(useSelector(state => state.agency.node))
+  return  <AgencyPageWrapper className="module-wrapper">
+            <List className="d-block"
+                headerComponent={<div className="page-header">Agency Overview</div>}
+                root={allNodes.find(node => node.id === node.parent_id)}
+                nodeBranch={node => node.tools.getChildren(node)}
+                listActions={[
+                  {
+                    label: `${allNodes.length === 0 ? "build agency" : ""}`,
+                    action: (close, alert) => {
+                      let newRootNode = agencyObject("node", {id: "new_object", parent_id: "root", label: "agency root"}, () => useSelector(state => state.agency), props.services, props.utilities, alert)
+                      return allNOdes.length === 0 ? null : newRootNode.display.builder(newRootNode, close, alert) }
+                  }
+                ]}
+                iconComponent={node => node.display.card(node)}
+                drawerComponents={[]}
+                overlayComponents={[
+                  {label: "document", component: (item) => item.display.document(item)},
+                  {label: "editor", component: (item, close, alert) => item.display.editor(item, close, alert)},
+                  {label: "builder", component: (item, close, alert) => item.display.builder(item, close, alert)}
+                ]} />
+          </AgencyPageWrapper>
 }
 
-function SupplementalDataManagerPage(props){
-  const agencyState = useSelector(state => (state.agency))
-  const dataTagProps = agencyTypeData("dataTag", agencyState).component.list
-  const templateProps = agencyTypeData("agentTemplate", agencyState).component.list
-  const assignmentProps = agencyTypeData("assignment", agencyState).component.list
-  const propertyProps = agencyTypeData("property", agencyState).component.list
-
+function TagManagerPage(props){
   return  <AgencyPageWrapper className="module-wrapper">
-          <ErrorBoundary displayName="dataTagsManagerPage">
-            <List className="container" {...dataTagProps} headerComponent={<div className="page-header">DataTags</div>}/>
+            <List className="container"
+                headerComponent={<div className="page-header">Agent Tags</div>}
+                tableData={useSelector(state => Object.values(state.agency.tag).filter( tag => tag.tagType === "agent"))}
+                iconComponent={item => <div>{item.label}</div>}
+                listActions={[
+                  {label: "+", action: (close, alert) => {
+                    let newDataTag = agencyObject("tag", {id: "new_object", label: "new tag", tagType: "agent"}, () => useSelector(state => state.agency), props.services, props.utilities, alert)
+                    return newDataTag.display.builder(newDataTag, close, alert)
+                  }}]}
+                drawerComponents={[
+                  {label: "document", component: item => item.display.document(item)},
+                ]}
+                overlayComponents={[
+                  {label: "modify", component: (item, close, alert) => item.display.builder(item, close, alert)}
+                ]} />
 
+            <List className="container"
+                headerComponent={<div className="page-header">Node Tags</div>}
+                tableData={useSelector(state => Object.values(state.agency.tag).filter(tag => tag.tagType === "structural"))}
+                iconComponent={item => <div>{item.label}</div>}
+                listActions={[
+                  {label: "+", action: (close, alert) => {
+                    let newDataTag = agencyObject("tag", {id: "new_object", label: "new tag", tagType: "structural"}, () => useSelector(state => state.agency), props.services, props.utilities, alert)
+                    return newDataTag.display.builder(newDataTag, close, alert)
+                  }}]}
+                drawerComponents={[
+                  {label: "document", component: item => item.display.document(item)},
+                ]}
+                overlayComponents={[
+                  {label: "modify", component: (item, close, alert) => item.display.builder(item, close, alert)}
+                ]} />   
+          </AgencyPageWrapper>
+}
 
-            <List className="container" {...templateProps} headerComponent={<div className="page-header">Agent Templates</div>} />
-
-            <List className="container" {...assignmentProps} headerComponent={<div className="page-header">Agency Assignments</div>} />
-
-
-            <List className="container" {...propertyProps} headerComponent={<div className="page-header">Agency Properties</div>} />
-
-          </ErrorBoundary>
+function TemplateManagerPage(props){
+  return  <AgencyPageWrapper className="module-wrapper">
+            <List className="container"
+                headerComponent={<div className="page-header">Agent Templates</div>}
+                tableData={Object.values(useSelector(state => state.agency.template))}
+                iconComponent={ item => <div>{item.label}</div> }
+                listActions={[{label: "+", action: (close, alert) => {
+                  let newTemplate = agencyObject("template", {id: "new_object", label: "new template"}, () => useSelector(state => state.agency), props.services, props.utilities, alert)
+                  return newTemplate.display.builder(newTemplate, close, alert)
+                }}]}
+                drawerComponents={[
+                  {label: "document", component: item => item.display.document(item.data)},
+                ]}
+                overlayComponents={[
+                  {label: "modify", component: (item, close, alert) => item.display.builder(item, close, alert)},
+                  {label: "subscriptions", component: (item, close, alert) => item.agencyComponents.subscriptions(item, close, alert)}
+                ]} />
           </AgencyPageWrapper>
 }
 
 function UsersManagerPage(props){
-  const agencyState = useSelector(state => (state.agency))
-  const displayProps = agencyTypeData("user", agencyState).component.list
-
-
-  return  <AgencyPageWrapper id="agency-module-page-UsersManagerPage" className="module-wrapper">
-          <ErrorBoundary displayName="UsersManagerPage">
-            <List {...displayProps}
-                className=""
-                headerComponent={<div className="page-header">Manage Agency Users</div>} />
-          </ErrorBoundary>
+  return  <AgencyPageWrapper className="module-wrapper">
+            <List className="d-block"
+                headerComponent={<div className="page-header">Manage Agency Users</div>}
+                tableData={Object.values(useSelector(state => state.agency.user))}
+                iconComponent={ item => item.display.card(item) }
+                listActions={[
+                  {label: "+", action: (close, alert) => {
+                    let newUser = agencyObject("user", {id: "new_object", username:"new user", password: "password"}, () => useSelector(state => state.agency), props.services, props.utilities, alert )
+                    return newUser.display.builder(newUser, close, alert)
+                  }}
+                ]}
+                drawerComponents={[
+                  {label: "show document", component: item => item.display.document(item)},
+                ]}
+                overlayComponents={[
+                  {label: "edit properties", component: (item, close, alert) => item.display.editor(item, close, alert)},
+                  {label: "modify user", component: (item, close, alert) => item.display.builder(item, close, alert)},
+                  {label: "subscriptions", component: (item, close, alert) => item.agencyComponents.subscriptionsList(item, null)}
+                ]} />
           </AgencyPageWrapper>
 
 }
-
-function RoleManagerPage(props){
-  const agencyState = useSelector(state => (state.agency))
-  const displayProps = agencyTypeData("role", agencyState).component.list
-
-
-  return  <AgencyPageWrapper id="agency-module-page-RoleManagerPage" className="module-wrapper">
-          <ErrorBoundary displayName="RoleManagerPage">
-            <List {...displayProps} headerComponent={<div className="page-header">Manage Agency Roles</div>} />
-          </ErrorBoundary>
-          </AgencyPageWrapper>
-
-}
-
 
 
 export { AgencyPage,
           UsersManagerPage,
-          SupplementalDataManagerPage }
+          TagManagerPage,
+          TemplateManagerPage }

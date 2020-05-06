@@ -28,7 +28,7 @@ function Header(props){
                   : <div className="fixed-top d-flex align-items-center flex-column p-3 h-100 bg-dark text-light">
                         {
                           Object.values(props.routes).map(moduleRoute =>
-                            <h4 onClick={() => updateRoute(moduleRoute.path)}>
+                            <h4 key={`header-module-menu-${moduleRoute}`} onClick={() => updateRoute(moduleRoute.path)}>
                               {moduleRoute.title}
                             </h4>)
                         }
@@ -76,10 +76,10 @@ export default function Layout(props){
     if(!found) throw new Error("could not find activePageRoute")
 
 
-    if(found.component) return found.component()
+    if(found.component) return found.component(history, props.services, props.utilities)
     let componentRoute = Object.values(found.routes).find(route => route.default)
 
-    if(componentRoute.component) return componentRoute.component()
+    if(componentRoute.component) return componentRoute.component(history, props.services, props.utilities)
     else throw new Error("could not find default route in given path")
   }
 

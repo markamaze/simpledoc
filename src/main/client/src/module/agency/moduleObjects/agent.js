@@ -1,9 +1,9 @@
 import React from 'react'
 import { agencyObject } from './agencyObject'
+import List from '../../../components/List'
 
 
-
-const prototype = agencyState => ({
+const prototype = (getStore, services, utilities) => ({
   type: () => "agent",
   properties: {
     id: {
@@ -13,7 +13,6 @@ const prototype = agencyState => ({
         else this.id = id
         return true
       },
-      getObject: function(){ return this.id},
       validate: id => { return true }
     },
     agent_user_id: {
@@ -23,7 +22,6 @@ const prototype = agencyState => ({
         else this.agent_user_id = id
         return true
       },
-      getObject: function(){ return agencyState["user"][this.agent_user_id] },
       validate: id => { return true }
     },
     structuralNode_id: {
@@ -33,7 +31,6 @@ const prototype = agencyState => ({
         else this.structuralNode_id = id
         return true
       },
-      getObject: function(){ return agencyState["structuralNode"][this.structuralNode_id] },
       validate: ()=>{ return true }
     },
     assignment_id: {
@@ -43,87 +40,45 @@ const prototype = agencyState => ({
         else this.assignment_id = id
         return true
       },
-      getObject: function(){ return agencyState["assignment"][this.assignment_id] },
       validate: ()=>{ return true }
     }
   },
   display: {
     card: agent => {
-      let state = agencyState()
-      return  <div className="agent container-row">
-                <div className="container-item">{agent.typeFunctions.getAssignedUser(agent).username}</div>
-                <div className="container-item">{agent.typeFunctions.getAssignedAgentTemplate(agent).agentTemplate_label}</div>
+      let user = agent.agencyTools.getUsers(agent)
+      let template = agent.agencyTools.getAgentTemplates(agent)
+      let node = agent.agencyTools.getStructuralNode(agent)
+      return  <div className="container-row">
+                <div className="container-item">{node.agencyTools.getDisplayLabel(node)}</div>
+                <div className="container-item">{template.agencyTools.getDisplayLabel(template)}</div>
+                <div className="container-item">{user.agencyTools.getDisplayLabel(user)}</div>
               </div>
     },
     document: agent => {
-      let assignedUser = agent.typeFunctions.getAssignedUser(agent)
-      let assignedNode = agent.typeFunctions.getAssignedNode(agent)
-      let assignedTemplate = agent.typeFunctions.getAssignedAgentTemplate(agent)
-      return  <div className="agent document">
-                <header>Agent Document</header>
+      let assignedUser = agent.tools.getAssignedUser(agent)
+      let assignedNode = agent.tools.getAssignedNode(agent)
+      let assignedTemplate = agent.tools.getAssignedAgentTemplate(agent)
 
-                <div className="container-fill">
-                  <div className="container-row border-bottom">
-                    <div className="container-item item-label">Assigned User:</div>
-                    <div className="container-item item-fill">{assignedUser.display.card(assignedUser)}</div>
-                  </div>
+      return  <List className="container"
+                  headerComponent={<header>Agent Document</header>}
+                  tableData={[
+                    { label: "assigned User", display: assignedUser.display.card(assignedUser) },
+                    { label: "assigned Node:", display: assignedNode.display.card(assignedNode) },
+                    { label: "assigned Template:", display: assignedTemplate.display.card(assignedTemplate) },
+                    { label: "chain of command", display: agent.components.showChainOfCommand(agent) },
+                    { label: "properties", display: agent.agencyComponents.propertiesList(agent) },
+                    { label: "data tags", display: agent.agencyComponents.dataTagList(agent) },
+                    { label: "subscriptions", display: agent.agencyComponents.subscriptionsList(agent) }
+                  ]}
+                  columns={[{selector: "label", selectable: false}, {selector: "display", selectable: false}]} />
 
-                  <div className="container-row border-bottom">
-                    <div className="container-item item-label">Assigned Node:</div>
-                    <div className="container-item item-fill">{assignedNode.display.card(assignedNode)}</div>
-                  </div>
-
-                  <div className="container-row">
-                    <div className="container-item item-label">Position:</div>
-                    <div className="container-item item-fill">{assignedTemplate.display.card(assignedTemplate)}</div>
-                  </div>
-
-                </div>
-              </div>
     }
   },
-  typeFunctions: {
-    getAssignedAgentTemplate: agent => agencyState().agentTemplate[agencyState().assignment[agent.assignment_id].agentTemplate_id],
-    getAssignedUser: agent => agent.agent_user_id === undefined ? null : agencyState().user[agent.agent_user_id],
-    getAssignedNode: agent => agencyState().structuralNode[agent.structuralNode_id],
-    getProperties: agent => {
-      let state = agencyState()
-      let properties = []
-
-      agent.typeFunctions.getDataTags(agent).map( dataTag => {
-        dataTag.dataTag_property_ids.forEach( id => {
-          properties = [...properties, state.property[id]]
-        })
-      })
-      return properties
-    },
-    getDataTags: agent => {
-      let state = agencyState()
-      return state.agentTemplate[state.assignment[agent.assignment_id].agentTemplate_id].agentTemplate_dataTag_ids.map( id => state.dataTag[id])
-    },
-    getAssignedNode: agent => agencyState().structuralNode[agent.structuralNode_id],
-    getDisplayLabel: agent => {
-      let title = agent.typeFunctions.getAssignedAgentTemplate(agent).agentTemplate_label
-      let user = agent.typeFunctions.getAssignedUser(agent)
-
-      return `${title}:${user.typeFunctions.getDisplayLabel(user)}`
-    }
+  tools: {},
+  components: {
+    showChainOfCommand: agent => {}
   }
 })
 
 
-const displayProps = agencyState => ({
-  displayKey: "",
-  component: {
-    list: {
-      tableData: Object.values(agencyState.agent).map(agent => ({data: agent, display: agent.display.card(agent)})),
-      columns: [{selector: "display"}],
-      drawerComponents: [
-        {label: "document", component: item => item.data.display.document(item.data)}
-      ]
-    }
-  }
-})
-
-
-export { prototype, displayProps }
+export { prototype }

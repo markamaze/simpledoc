@@ -1,162 +1,282 @@
 import React from 'react'
-
-import store from '../../../store'
-import { createAgencyObjects, updateAgencyObjects, removeAgencyObjects }  from '../module_actions'
-import uuidv4 from 'uuid/v4'
-
+import moduleObjectPrototype from '../../moduleObjectPrototype'
+import * as storageActions  from '../module_actions'
 import * as user from './user'
-import * as dataTag from './dataTag'
-import * as structuralNode from './structuralNode'
-import * as agentTemplate from './agentTemplate'
+import * as tag from './tag'
+import * as node from './node'
+import * as template from './template'
 import * as agent from './agent'
-import * as role from './role'
-import * as assignment from './assignment'
-import * as property from './property'
+import List from '../../../components/List'
 
 
 
-const agencyState = () => store.getState().agency
-
-const agencyPrototypes = {
-  user: user.prototype(agencyState),
-  dataTag: dataTag.prototype(agencyState),
-  structuralNode: structuralNode.prototype(agencyState),
-  agentTemplate: agentTemplate.prototype(agencyState),
-  agent: agent.prototype(agencyState),
-  role: role.prototype(agencyState),
-  assignment: assignment.prototype(agencyState),
-  property: property.prototype(agencyState)
+const agencyPrototypes = { user, tag, node, template, agent }
+const typeMap = {
+  agent: "AGENCY.AGENT",
+  template: "AGENCY.TEMPLATE",
+  node: "AGENCY.NODE",
+  tag: "AGENCY.TAG",
+  user: "AGENCY.USER" 
+}
+const agencyStorageHandlers = {
+  create: storageActions.createAgencyObjects,
+  update: storageActions.updateAgencyObjects,
+  remove: storageActions.removeAgencyObjects 
 }
 
-const agencyDisplayProps = {
-  user: agencyState => user.displayProps(agencyState),
-  dataTag: agencyState => dataTag.displayProps(agencyState),
-  structuralNode: agencyState => structuralNode.displayProps(agencyState),
-  agentTemplate: agencyState => agentTemplate.displayProps(agencyState),
-  agent: agencyState => agent.displayProps(agencyState),
-  role: agencyState => role.displayProps(agencyState),
-  assignment: agencyState => assignment.displayProps(agencyState),
-  property: agencyState => property.displayProps(agencyState)
-}
+const agencyComponents = (getStore, getServices) => ({
+  // assignmentsList: node => {
+  //   return  <List className="container border-bottom"
+  //               headerComponent={<div>Assignments:</div>}
+  //               tableData={node.active_assignments}
+  //               iconComponent={ ([assignment_id, agent_id]) =>
+  //                 <div>
+  //                   { getStore().assignment[assignment_id].agencyTools.getDisplayLabel(getStore().assignment[assignment_id]) }
+  //                   { agent_id === "00000000-0000-0000-0000-000000000000" ?
+  //                       "unassigned" : getStore().agent[agent_id].agencyTools.getDisplayLabel(getStore().agent[agent_id]) }
+  //                 </div>} />
+  // },
+  // assignmentManager: (node, updateHandler) => {
 
-const agencyObjectPrototype = (objectPrototype) => ({
-  ...objectPrototype,
+  //   const addAssignment = assignment_id => {
+  //     updateHandler({active_assignments: [...node.active_assignments, [assignment_id, null]]})
+  //   }
+  //   const removeAssignment = (assignment_id, agent_id) => {
+  //     updateHandler({active_assignments: node.active_assignments.filter( ([assignmentId, agentId]) => {
+  //       if(assignmentId !== assignment_id) return true
+  //       else if(agentId !== agentId) return true
+  //       else return false
+  //     } )})
+  //   }
 
-  init: function(state, onError) {
-    try{
-    let success = true, index = 0
-    let propObjects = Object.entries(objectPrototype.properties)
+  //   return  <List className="container-row border-bottom"
+  //               headerComponent={<div className="container-item item-label">Manage Assignments</div>}
+  //               tableData={[
+  //                 {label: "Add Assignment", selectable: false, input:
+  //                   <select className="container-row" value="" onChange={() => addAssignment(event.target.value)}>
+  //                     <option value=""></option>
+  //                     {
+  //                       Object.values(getStore().assignment).map( assignment =>
+  //                         <option value={assignment.id}>{assignment.agencyTools.getDisplayLabel(assignment)}</option>)
+  //                       }
+  //                   </select>
+  //                 },
+  //                 ...node.active_assignments.map( ([assignment_id, agent_id]) => ({label: getStore().assignment[assignment_id].agencyTools.getDisplayLabel(getStore().assignment[assignment_id]), selectable: false, input: <button onClick={() => removeAssignment(assignment_id, agent_id)}>X</button>}))
+  //               ]}
+  //               columns={[{selector: "label"},{selector: "input"}]} />
+  // },
+  // assignmentEditor: (node, updateHandler) => {
+  //   const createAgent = (userId, assignmentId) => {
+  //     let newAgent = agencyObject("agent", {id: "new_object", agent_user_id: userId, structuralNode_id: tempNode.id, assignment_id: assignmentId}, tempNode.services, tempNode.utilities, err=>{throw err})
 
-    if(state === null || state === undefined) success = false
-    else if(state.id === "new_object") state.id = `n-${uuidv4()}`
+  //     let updateActiveAssignment = [...tempNode.active_assignments]
 
-    while(success && index < propObjects.length){
-      let property = propObjects[index]
-      let key = property[0]
-      if(!property[1].setValue.call(this, state[key])) success = false
-      ++index
-    }
+  //     updateActiveAssignment = [[assignmentId, newAgent.id], ...updateActiveAssignment.filter( ([assignment_id, agent_id]) => {
+  //       if(assignmentId !== assignment_id) return true
+  //       else if(agent_id !== "00000000-0000-0000-0000-000000000000") return true
+  //       else return false
+  //     })]
 
 
-    return success ? this : false
-  }catch(error){onError(`${error}: failure initializing agencyObject with state: ${state}`)}
-  },
+  //     updateHandler({
+  //       new_object: tempNode.new_object ? [...tempNode.new_object, newAgent] : [newAgent],
+  //       active_assignments: updateActiveAssignment
+  //     })
+  //   }
+  //   const deactivateAgent = (assignment_id, agent_id) => console.log("deactivate agent assignment")
 
-  update: function(newState, onError){
-    try{let success = true
 
-    //check that each property is valid
-    Object.entries(newState).forEach( ([key, value]) => {
-      if(!objectPrototype.properties[key].validate.call(this, value)) success = false
-    })
+  //   return  <List className="container-row"
+  //               headerComponent={<div>Manage Agent Assignments</div>}
+  //               tableData={node.active_assignments}
+  //               iconComponent={ ([assignment_id, agent_id]) => {
+  //                 let agent;
+  //                 let assignment = getStore().assignment[assignment_id]
 
-    //if all valid, set values
-    if(success)
-      Object.entries(newState).map( property => {
-        let key = property[0]
-        let value = property[1]
-        if(!objectPrototype.properties[key].setValue.call(this, value)) success = false
-      })
+  //                 if(agent_id.substring(0,2) === 'n-') agent = node.new_object.find(obj => obj.id === agent_id)
+  //                 else if(agent_id === "00000000-0000-0000-0000-000000000000") agent = null
+  //                 else agent = getStore().agent[agent_id]
 
-    return success ? this : false}catch(error){ onError(error) }
-  },
 
-  toJSON: function(){
-    let type = this.type()
-    if(type === "agent") type = "AGENCY.AGENT"
-    else if(type === "agentTemplate") type = "AGENCY.AGENTTEMPLATE"
-    else if(type === "structuralNode") type = "AGENCY.STRUCTURALNODE"
-    else if(type === "dataTag") type = "AGENCY.DATATAG"
-    else if(type === "user") type = "AGENCY.USER"
-    else if(type === "assignment") type = "AGENCY.ASSIGNMENT"
-    else if(type === "property") type = "AGENCY.PROPERTY"
-    else throw "cannot convert to JSON: unknown agencyObject type"
+  //                 return  <div>
+  //                           {assignment.agencyTools.getDisplayLabel(assignment)}
+  //                           { agent === null ?
+  //                               <select value={""} onChange={() => createAgent(event.target.value, assignment_id)}>
+  //                                 <option value="">assign user</option>
+  //                                 {
+  //                                   Object.values(getStore().user).map( user => <option value={user.id}>{user.username}</option> )
+  //                                 }
+  //                               </select>
+  //                               : <button onClick={() => deactivateAgent(assignment_id, agent_id)}>deactivate</button>
+  //                           }
+  //                         </div>}} />
+  // },
+  dataTagManager: (node, updateHandler) => {
+    const addDataTag = dataTag_id => updateHandler({structuralNode_dataTag_ids: [...node.structuralNode_dataTag_ids, dataTag_id]})
 
-    let objectData = Object.entries(this).filter(entry => entry[0] !== "id")
-    return `{
-      \"id\":\"${this.id.toString()}\",
-      \"type\":\"${type}\",
-      \"object_data\": ${JSON.stringify(Object.fromEntries(objectData))}
-    }`
-  },
+    const removeDataTag = dataTag_id => updateHandler({structuralNode_dataTag_ids: node.structuralNode_dataTag_ids.filter(id => id !== dataTag_id)})
 
-  storage: {
-    handlers: function(success, failure){
-      return  <div className="storage-handlers d-flex flex-row justify-content-around btn-group" key={`storage-handlers-${this.id}`}>
-                <div className="storage-handler-item btn-primary px-4"
-                      key={this.storage.save.key.call(this)}
-                      onClick={()=>this.storage.save.action.call(this, success, failure)}>{this.storage.save.label}</div>
-                <div className="storage-handler-item btn-danger px-4"
-                      key={this.storage.delete.key.call(this)}
-                      onClick={()=>this.storage.delete.action.call(this, success, failure)}>{this.storage.delete.label}</div>
-              </div>
-    },
-    save: {
-      label: "Submit",
-      key: function(){return `action-creater-save-${this.type()}-${this.id}`},
-      action: function(success, failure){
-                try{
-                  let objectSet = this.new_object ? [this, ...this.new_object] : [this]
-                  let isNew = this.id.substring(0,2) === 'n-'
-                  if(this.new_object){
-                    objectSet = [...this.new_object]
-                    delete this.new_object
-                    objectSet = [this, ...objectSet]
+    return  <List className="container-row"
+                headerComponent={<div className="container-item item-label">Manage DataTags</div>}
+                tableData={[{selectable: false, label: "Add DataTag" , input: <select className="container-row" value="" onChange={() => addDataTag(event.target.value)}>
+                  <option value=""></option>
+                  {
+                    Object.values(getStore().dataTag).map( tag => <option value={tag.id}>{tag.dataTag_label}</option>)
                   }
-                  else objectSet = [this]
+                </select>},...node.structuralNode_dataTag_ids
+                  .map(tagId => getStore().dataTag[tagId])
+                  .map(tag => ({data: tag, selectable: false, input: <button onClick={()=> removeDataTag(tag.id)}>X</button>, label: tag.display.card(tag) }))]}
+                columns={[{selector: "label"}, {selector: "input"}]} />
+  },
+  dataTagList: () => {
 
-                  let result = isNew ? createAgencyObjects(objectSet, success, failure)
-                    : updateAgencyObjects(objectSet, success, failure)
+  },
+  propertiesList: item => {
+    return  <List className="container"
+                headerComponent={<div>Properties:</div>}
+                tableData={item.agencyTools.getProperties(item)}
+                iconComponent={property => property.display.document(property, item.property_values[property.id])} />
+  },
+  propertiesEditor: (item, updateHandler) => {
 
-                  // return result && result.error ? failure(result) : true
+    return  <List className="container-row border-bottom"
+                headerComponent={<div className="container-item item-label">Set Properties:</div>}
+                tableData={item.agencyTools.getProperties(item).map(property => ({
+                  property_editor:
+                    <div className="property container-row">
+                      <div className="container-item item-label">{property.property_key}</div>
+                      <input className="container-item"
+                          type="text"
+                          value={item.property_values[property.id]}
+                          onChange={() => updateHandler({property_values: Object.assign({}, item.property_values, { [`${property.id}`]: event.target.value })})} />
+                    </div>,
+                  selectable: false
+                }))}
+                columns={[{selector:"property_editor"}]} />
+  },
+  propertiesManager: (dataTag, updateHandler) => {
 
-                } catch(err){ failure(err) }}
-    },
-    delete: {
-      label: "Delete",
-      key: function(){return `action-creater-delete-${this.type()}-${this.id}`},
-      action: function(success, failure){
-                let result
-                try{
-                  result  = removeAgencyObjects([this], success, failure)
+    const toggleProperty = property_id => tempDataTag.dataTag_property_ids.includes(property_id) ?
+      updateHandler({dataTag_property_ids: tempDataTag.dataTag_property_ids.filter(id => id !== property_id)})
+      : updateHandler({dataTag_property_ids: [...tempDataTag.dataTag_property_ids, property_id]})
 
-                  return result && result.error ? failure(result) : true
-                } catch(err){ failure(err) }}
+    return  <div className="container-row border-bottom">
+              <div className="container-item item-label">Set Properties:</div>
+              <div className="container">
+                {
+                  Object.values(getStore().property).map( property =>
+                    <div className={`container-item ${dataTag.dataTag_property_ids.includes(property.id) ? "selected" : ""}`}
+                        onClick={()=> toggleProperty(property.id)}>
+                      {property.display.card(property)}
+                    </div>)
+                }
+              </div>
+            </div>
+  },
+  subscriptionsList: item => {
+    return  <List className=""
+                tableData={item.agencyTools.getSubscriptions(item)}
+                iconComponent={ item => item.display.card(item) }
+                listActions={[]}
+                drawerComponents={[]}
+                overlayComponents={[]} />
+  },
+  availableServices: (item) => {
+    function ServiceFunction(props) {
+      let [serviceElement, setServiceElement] = React.useState(null)
+      let services = getServices()
+      let serviceResult = () => {
+        //use updateHandler to update subscription info
+      }
+
+      return  <div>
+                { Object.entries(services).map( ([label, serviceFn]) =>
+                    <div onClick={() => setServiceElement(serviceFn(props.item, serviceResult))}>{label}</div>) }
+                { serviceElement === null ? null : serviceElement }
+              </div>
     }
+
+    return <ServiceFunction item={item} />
+  },
+  agentsList: user => {
+
+    return  <List className="col-md-6"
+                headerComponent={<div>Active Agents:</div>}
+                columns={[{selector:"display"}]}
+                tableData={user.agencyTools.getUserAgents(user).map(agent => ({display: agent.agencyTools.getDisplayLabel(agent), data: agent}))}
+                drawerComponents={[{component: item => item.data.display.document(item.data)}]} />
   }
 })
 
-const agencyObject = (type, state, failure) => {
+const agencyTools = (getStore) => ({
+  getSubscriptions: () => { return [] },
+  getProperties: item => {
+    let store = getStore()
+
+    switch(item.type()){
+      case "structuralNode":
+      case "user":
+        return Object.keys(item.property_values).map( propertyId => store.property[propertyId] )
+      case "agent":
+      case "agentTemplate":
+        return item.agencyTools.getDataTags(item).map( tag => {
+          tag.dataTag_property_ids.map( propertyId => store.property[propertyId] )
+        })
+      case "dataTag":
+        return item.dataTag_property_ids.map( propertyId => store.property[propertyId])
+      default: return null
+    }
+  },
+  getActiveAgents: item => {
+    switch(item.type()){
+      // case "assignment": //gets any active agents linked to this assignmentm
+      default: return null
+    }
+  },
+  getDataTags: () => { return [] },
+  getUsers: () => { return [] },
+  getAssignments: item => {
+    switch(item.type()){
+      // case "assignment": //returns the supervising assignment
+      //   return store.assignment[item.supervising_assignment_id]
+      default:
+        return null
+    }
+  },
+  getAgentTemplates: item => {
+    switch(item.type()){
+      // case "assignment": //returns the template linked to the assignment
+      //   return store.agentTemplate[item.agentTemplate_id]
+      default: return null
+    }
+  },
+  getDisplayLabel: item => {
+    switch(item.type()){
+      case "agentTemplate": return item.agentTemplate_label
+      // case "assignment": {
+
+      // }
+      case "user": return item.username
+      case "agent": return item.agencyTools.getUsers(item).username
+      case "property": return item.property_key
+    }
+  },
+  getStructuralNode: () => {},
+  getNodeBranch: () => {}
+})
+
+const agencyObject = (type, data, getStore, getServices, getUtilities, failure) => {
   try {
-    let _agencyObj = Object.create(agencyObjectPrototype(agencyPrototypes[type]))
-    _agencyObj.init(state, failure)
+    let _agencyObj = Object.create(Object.assign({},
+        {agencyComponents: agencyComponents(getStore, getServices, getUtilities)},
+        {agencyTools: agencyTools(getStore, getServices, getUtilities)},
+        agencyPrototypes[type].prototype(getStore, getServices, getUtilities),
+        moduleObjectPrototype(typeMap, agencyStorageHandlers)
+    ))
+    _agencyObj.init(data, failure)
 
     return _agencyObj
   } catch(error){ failure(new Error(`${error}: failure to create agencyObject`)) }
 }
 
-
-const agencyTypeData = (type, agencyState) => agencyDisplayProps[type](agencyState)
-
-
-export { agencyObject, agencyTypeData }
+export { agencyObject }

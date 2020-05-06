@@ -4,8 +4,7 @@ import { formObject } from './formObject'
 import List from '../../../components/List'
 
 
-
-const prototype = getFormState => ({
+const prototype = (getStore, services, utilities) => ({
   type: function() { return "section"; },
   properties: {
     id: {
@@ -68,18 +67,19 @@ const prototype = getFormState => ({
     }
   },
   display: {
-    document: (section, submissionId) =>
-      <div className="container">
-        <h6 className="">{section.label}</h6>
-        <div className="border">
-        {
-          section.tools.getLayouts(section).map( layout =>
-            <div className="p-2">
-              { layout.display.document(layout, submissionId) }
-            </div>)
-        }
-        </div>
-      </div>,
+    document: (section, submissionId) => {
+      return  <div className="container">
+                <h6 className="">{section.label}</h6>
+                <div className="border">
+                {
+                  section.tools.getLayouts(section).map( layout =>
+                    <div className="p-2">
+                      { layout.display.document(layout, submissionId) }
+                    </div>)
+                }
+                </div>
+              </div>
+    },
     editor: (section, updater, submission) => {
       function Editor(props){
         const [displayEditorTools, toggleEditorTools] = React.useState(false)
@@ -128,7 +128,7 @@ const prototype = getFormState => ({
             form_id: tempSection.form_id,
             section_id: tempSection.id
           }
-          let newLayout = formObject("layout", sectionState, err => {throw err})
+          let newLayout = formObject("layout", sectionState, null, null, err => {throw err})
           newLayout = newLayout.tools.buildTree(newLayout)
 
           updateHandler({
@@ -244,7 +244,7 @@ const prototype = getFormState => ({
       return flatMap
     },
     getLayouts: section => {
-      let formStore = getFormState()
+      let formStore = getStore()
       let layouts = []
 
       Object.values(section.layout_ids).forEach( id => {
@@ -254,15 +254,16 @@ const prototype = getFormState => ({
       })
 
       return layouts
-    }
+    },
+    completionSettings: {},
+    securitySettings: {}
+  },
+  components: {
+    securitySettings: item => {},
+    completionSettings: item => {},
+    availableServices: item => {},
+    searchBar: item => {}
   }
 })
 
-
-const displayProps = getFormState => ({
-  displayKey: "",
-  component: {}
-})
-
-
-export { prototype, displayProps }
+export { prototype }

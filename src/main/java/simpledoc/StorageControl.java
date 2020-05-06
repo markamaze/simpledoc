@@ -27,7 +27,7 @@ public class StorageControl {
   StorageControl(String dbURL) throws SQLException{
 	connection_pool = new LinkedList<Connection>();
 	
-    int pool_size = 2;
+    int pool_size = 5;
     while(pool_size > 0){
       connection_pool.add(DriverManager.getConnection(dbURL));
       --pool_size;
@@ -241,10 +241,16 @@ public class StorageControl {
   }
   
   private ResultSet performQuery(Connection connection, String call, List<String> resource_path, Map<String, String> query) throws SQLException {
+	  try {
 		CallableStatement cs = connection.prepareCall(call);
 		cs.setArray(1, connection.createArrayOf("text", resource_path.toArray()));
 		cs.setArray(2, connection.createArrayOf("text", query.keySet().toArray()));
 		cs.setArray(3, connection.createArrayOf("text", query.values().toArray()));
 		return cs.executeQuery();
+	  } catch(Exception err) { 
+		  System.out.println(err);
+		  return null;
+		}
   }
+
 }
