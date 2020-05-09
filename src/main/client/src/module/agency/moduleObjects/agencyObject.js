@@ -211,19 +211,50 @@ const agencyStorageHandlers = {
 
 const agencyComponents = ( getStore, getServices ) => ({
   showTags: tag_set => {
-    return  <div>show tags component</div>
+    let tags = getStore().getById(tag_set, "tag")
+    return  <div>
+              {
+                Array.isArray(tags) ? tags.map( tag => tag.display.card(tag) ) 
+                  : tags ? tags.display.card(tags) : null
+              }
+            </div>
   },
   showAssignments: assigned_agents => {
     return  <div>show agent assignments component</div>
   },
   showPropertyValues: (property_set, value_set) => {
-    return  <div>show property values component</div>
+    let value = id => {
+      let foundValue = value_set.find( valueString => {
+        let value = valueString.split("=")
+        if(value[0] === property[0]) return true
+        else return false
+      })
+      return foundValue.split("=")[1]
+    }
+
+    if(!Array.isArray(value_set) || value_set.length === 0) 
+      return <div>no property values</div>
+
+    return  <div>
+              { value_set.map( valueString => {
+                  let kvpair= valueString.split("=")
+                  return  <div>
+                            <span>{kvpair[1]}</span>
+                            <span>{kvpair[2]}</span>
+                          </div>
+                })
+              }
+            </div>
   },
   showPropertyKeys: property_set => {
-    return  <List className="container"
-                headerComponent={<div>Properties:</div>}
-                tableData={[property_set]}
-                iconComponent={property => <div>{property}</div>} />
+    if(!Array.isArray(property_set) || property_set.length === 0) 
+      return <div>no properties</div>
+
+    return  <div>
+              { property_set.map( propertyString => {
+                  let property= propertyString.split("=")
+              return <span>{property[1]}</span> }) }
+            </div>
   },
   showSubscriptions: subscription_set => {
     return  <div>show subscriptions component</div>
