@@ -3,9 +3,11 @@ import { agencyObject } from './moduleObjects/agencyObject'
 //tools available from agency store for getting filtered data
 let agencyToolsProto = {
   getById: function(id, type){
-    let found;
+    let found = null;
 
-    if(Array.isArray(id) && length > 0){
+    if(id === null || id === undefined) return null
+    else if(Array.isArray(id) && length === 0) return []
+    else if(Array.isArray(id) && length > 0){
       found = []
       id.forEach( _id => {
         if(type && Object.keys(initialState).includes(type)) found = [ ...found, this[type][_id] ]
@@ -36,7 +38,9 @@ let agencyToolsProto = {
     return Object.values(this.node).find(node => node.id === node.parent_id)
   },
   getTagsByType: function(type){
-    return Object.values(this.tag).filter( tag => tag.tag_type === type)
+    let foundTags = Object.values(this.tag).filter( tag => tag.tag_type === type)
+
+    return foundTags ? foundTags : []
   }
 }
 
@@ -77,7 +81,7 @@ export default function agency_reducer(state=initialState, action) {
         newObjects.forEach(agencyObject => {
           let newObject = { [`${agencyObject.id}`]: agencyObject }
           let newTypeSet = Object.assign({}, newState[agencyObject.type()], newObject)
-          newState = Object.assign({}, newState, { [`${agencyObject.type()}`] : newTypeSet})
+          newState = Object.assign(newState, { [`${agencyObject.type()}`] : newTypeSet})
         })
         action.success ? action.success() : null
         return newState
