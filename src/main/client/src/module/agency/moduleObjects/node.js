@@ -123,7 +123,7 @@ const prototype = (getStore, services, utilities) => ({
     card: node => {
       return  <div className="container-item" style={{background: "white", color: "black", padding: "1rem"}}>
                 <div className="container-item header">{node.tools.getDisplayName(node)}</div>
-                <div className="container-item">{node.agencyComponents.showTags(node)}</div>
+                <div className="container-item">{node.agencyComponents.showTags(node.tag_ids)}</div>
               </div>
     },
     document: node => {
@@ -147,7 +147,8 @@ const prototype = (getStore, services, utilities) => ({
                       </div>},
                     {label: "tags", display: node.agencyComponents.showTags(node.tools.getTags(node))},
                     {label: "assignments", display: node.agencyComponents.showAssignments(node.assignments)},
-                    {label: "properties", display: node.agencyComponents.showPropertyValues(node.tools.getProperties(node), node.property_values)},
+                    {label: "property keys", display: node.agencyComponents.showPropertyKeys(node.tools.getProperties(node))},
+                    {label: "set properties", display: node.agencyComponents.showPropertyValues(node.tools.getProperties(node), node.property_values)},
                     {label: "subscriptions", display: node.agencyComponents.showSubscriptions(node.tools.getSubscriptions(node))}
                   ]}
                   columns={[{selector: "label", selectable: false}, {selector: "display", selectable: false}]} />
