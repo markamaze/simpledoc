@@ -1,8 +1,8 @@
 CREATE TABLE agency.tag (
   id UUID,
   label TEXT,
-  tagType TEXT,
-  properties TEXT[]
+  tag_type TEXT,
+  tag_properties TEXT[]
 );
 
 
@@ -10,17 +10,17 @@ CREATE TABLE agency.tag (
 CREATE OR REPLACE PROCEDURE agency.create_tag (
   _id UUID,
   _label TEXT,
-  _tagType TEXT,
-  _properties TEXT[] )
+  _tag_type TEXT,
+  _tag_properties TEXT[] )
 LANGUAGE sql
 AS $procedure$
   INSERT INTO agency.tag (
     id,
     label,
-    tagType,
-    properties
+    tag_type,
+    tag_properties
   )
-  VALUES ( _id, _label, _tagType, _properties )
+  VALUES ( _id, _label, _tag_type, _tag_properties )
 $procedure$;
 
 
@@ -28,16 +28,16 @@ $procedure$;
 CREATE OR REPLACE PROCEDURE agency.update_tag (
   _id UUID,
   _label TEXT,
-  _tagType TEXT,
-  _properties TEXT[] )
+  _tag_type TEXT,
+  _tag_properties TEXT[] )
 LANGUAGE sql
 AS $procedure$
   UPDATE
     agency.tag
   SET
     label = _label,
-    tagType = _tagType,
-    properties = _properties
+    tag_type = _tag_type,
+    tag_properties = _tag_properties
   WHERE
     id = _id;
 $procedure$;
@@ -60,16 +60,16 @@ CREATE OR REPLACE FUNCTION agency.query_tag_collection(
 RETURNS TABLE(
   id UUID,
   label TEXT,
-  tagType TEXT,
-  properties TEXT[] )
+  tag_type TEXT,
+  tag_properties TEXT[] )
 LANGUAGE sql STABLE
 AS $function$
 
   SELECT (
     id,
     label,
-    tagType,
-    properties
+    tag_type,
+    tag_properties
   ) FROM agency.tag
 
 $function$;

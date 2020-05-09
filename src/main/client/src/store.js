@@ -4,7 +4,7 @@ import { composeWithDevTools } from 'redux-devtools-extension'
 import modules from './module/index'
 
 
-var middleware = composeWithDevTools(applyMiddleware(thunk))
+var middleware = () =>composeWithDevTools(applyMiddleware(thunk))
 
 var setup = () => {
 	let reducers = {}
@@ -12,4 +12,4 @@ var setup = () => {
 	return combineReducers(reducers)
 }
 
-export default createStore(setup(), middleware)
+export default createStore(setup(), middleware())

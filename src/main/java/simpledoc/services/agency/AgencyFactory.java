@@ -20,8 +20,8 @@ public class AgencyFactory<T extends ModuleObject> implements ModuleObjectFactor
 		switch(type){
 			case "node":
 			case "AGENCY.NODE": return (T) new Node(id, type, item.getObjectData());
-			case "template":
-			case "AGENCY.TEMPLATE": return (T) new Template(id, type, item.getObjectData());
+			case "role":
+			case "AGENCY.ROLE": return (T) new Role(id, type, item.getObjectData());
 			case "agent":
 			case "AGENCY.AGENT": return (T) new Agent(id, type, item.getObjectData());
 			case "tag":
@@ -39,8 +39,8 @@ public class AgencyFactory<T extends ModuleObject> implements ModuleObjectFactor
 		switch(type){
 			case "node":
 			case "AGENCY.NODE": return (T) new Node(id_string, type);
-			case "template":
-			case "AGENCY.TEMPLATE": return (T) new Template(id_string, type);
+			case "role":
+			case "AGENCY.ROLE": return (T) new Role(id_string, type);
 			case "agent":
 			case "AGENCY.AGENT": return (T) new Agent(id_string, type);
 			case "tag":
@@ -56,7 +56,7 @@ public class AgencyFactory<T extends ModuleObject> implements ModuleObjectFactor
 	public HashSet<String> getTypeSet() {
 		HashSet<String> types = new HashSet<String>();
 		types.add("agent");
-		types.add("template");
+		types.add("role");
 		types.add("node");
 		types.add("user");
 		types.add("tag");
@@ -70,21 +70,21 @@ public class AgencyFactory<T extends ModuleObject> implements ModuleObjectFactor
 	  switch(call) {
 		case "delete":
 		  if(type.equals("AGENCY.AGENT")) return "delete from agency.agent where id='" + id + "'";
-		  else if(type.equals("AGENCY.AGENTTEMPLATE")) return "delete from agency.agenttemplate where id='" + id + "'";
-		  else if(type.equals("AGENCY.STRUCTURALNODE")) return "delete from agency.structuralnode where id='" + id + "'";
-		  else if(type.equals("AGENCY.DATATAG")) return "delete from agency.datatag where id='" + id + "'";
+		  else if(type.equals("AGENCY.ROLE")) return "delete from agency.role where id='" + id + "'";
+		  else if(type.equals("AGENCY.NODE")) return "delete from agency.node where id='" + id + "'";
+		  else if(type.equals("AGENCY.TAG")) return "delete from agency.tag where id='" + id + "'";
 		  else if(type.equals("AGENCY.USER")) return "delete from agency.user where id='" + id + "'";
 		  else return null;
 		case "queryResource":
 		  if(type.equals("agent")) return "select * FROM agency.query_agent_resource(?)"; 
-		  else if(type.equals("template")) return "select * FROM agency.query_template_resource(?)";
+		  else if(type.equals("role")) return "select * FROM agency.query_role_resource(?)";
 		  else if(type.equals("node")) return "select * FROM agency.query_node_resource(?)";
 		  else if(type.equals("tag")) return "select * FROM agency.query_tag_resource(?)"; 
 		  else if(type.equals("user")) return "select * FROM agency.query_user_resource(?)"; 
 		  else return null;
 		case "queryCollection":
 		  if(type.equals("agent")) return "select * FROM agency.query_agent_collection(?,?,?)"; 
-		  else if(type.equals("template")) return "select * FROM agency.query_template_collection(?,?,?)";
+		  else if(type.equals("role")) return "select * FROM agency.query_role_collection(?,?,?)";
 		  else if(type.equals("node")) return "select * FROM agency.query_node_collection(?,?,?)";
 		  else if(type.equals("tag")) return "select * FROM agency.query_tag_collection(?,?,?)"; 
 		  else if(type.equals("user")) return "select * FROM agency.query_user_collection(?,?,?)"; 

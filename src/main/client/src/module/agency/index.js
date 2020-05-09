@@ -18,9 +18,9 @@ export default module = {
     searchAgency: () => {window.alert("public service announcement: Agency-searchAgency")}
   },
   routes: {
-    agency: { path: "/agency", default: true, title: "Agency", component: (state) => <Agency.AgencyPage  historyState={state} />},
-    users: { path: "/agency/users", title: "Users", component: (state) => <Agency.UsersManagerPage historyState={state} />},
-    tags: { path: "/agency/tags", title: "Tags", component: state => <Agency.TagManagerPage historyState={state} />},
-    templates: { path: "/agency/templates", title: "Templates", component: (state) => <Agency.TemplateManagerPage historyState={state} />}
+    agency: { path: "/agency", default: true, title: "Agency", component: (history) => <Agency.AgencyPage  history={history} />},
+    users: { path: "/agency/users", title: "Users", component: (history) => <Agency.UsersManagerPage history={history} />},
+    tags: { path: "/agency/tags", title: "Tags", component: history => <Agency.TagManagerPage history={history} />},
+    roles: { path: "/agency/roles", title: "Roles", component: (history) => <Agency.RoleManagerPage history={history} />}
   }
 }

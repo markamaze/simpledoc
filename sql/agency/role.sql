@@ -1,40 +1,44 @@
 CREATE TABLE agency.role (
   id UUID,
-  role_label TEXT,
-  security_code TEXT
+  label TEXT,
+  tag_ids UUID[],
+  role_type TEXT
 );
 
 
 
 CREATE OR REPLACE PROCEDURE agency.create_role (
   _id UUID,
-  _role_label TEXT,
-  _security_code TEXT )
+  _label TEXT,
+  _tag_ids UUID[],
+  _role_type TEXT )
 LANGUAGE sql
 AS $procedure$
   INSERT INTO agency.role (
     id,
-    role_label,
-    security_code
-  )
-  VALUES ( _id, _role_label, _security_code );
+    label,
+    tag_ids,
+    role_type )
+  VALUES ( _id, _label, _tag_ids, _role_type );
 $procedure$;
 
 
 
 CREATE OR REPLACE PROCEDURE agency.update_role (
   _id UUID,
-  _role_label TEXT,
-  _security_code TEXT )
+  _label TEXT,
+  _tag_ids UUID[],
+  _role_type TEXT  )
 LANGUAGE sql
 AS $procedure$
-UPDATE
-  agency.role
-SET
-  role_label = _role_label,
-  security_code = _security_code
-WHERE
-  id = _id;
+  UPDATE
+    agency.role
+  SET
+    label = _label,
+    tag_ids = _tag_ids,
+    role_type = _role_type
+  WHERE
+    id = _id;
 $procedure$;
 
 
@@ -54,15 +58,17 @@ CREATE OR REPLACE FUNCTION agency.query_role_collection(
   query_values text[] )
 RETURNS TABLE(
   id UUID,
-  role_label TEXT,
-  security_code TEXT )
+  label TEXT,
+  tag_ids UUID[],
+  role_type TEXT )
 LANGUAGE sql STABLE
 AS $function$
 
   SELECT (
     id,
-    role_label,
-    security_code
+    label,
+    tag_ids,
+    role_type
   ) FROM agency.role
 
 $function$;

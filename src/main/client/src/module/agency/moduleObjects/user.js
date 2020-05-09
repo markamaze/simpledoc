@@ -2,9 +2,13 @@ import React from 'react'
 import { agencyObject } from './agencyObject'
 import List from '../../../components/List'
 
-const validateUUID = idstring => true
-const validateString = (string) => true
 
+//TODO: move and import
+const utility = {
+  validateId: id => true, //handle flags
+  validateString: (string, params) => true,
+
+}
 
 const prototype = (getStore, services, utilities) => ({
   type: () => "user",
@@ -16,10 +20,7 @@ const prototype = (getStore, services, utilities) => ({
         else this.id = id
         return true
       },
-      validate: id => {
-        if(id.substring(0,2) === "n-") return validateUUID(id.substring(2))
-        else return validateUUID(id)
-      } 
+      validate: id => utility.validateId(id) 
     },
     username: {
       setValue: function(uname){
@@ -28,7 +29,7 @@ const prototype = (getStore, services, utilities) => ({
         else this.username = uname
         return true
       },
-      validate: username => validateString(username)
+      validate: username => utility.validateString(username, {min_len: 4, max_len: 12, allow_spaces: false, allow_special_chars: false})
     },
     password: {
       setValue: function(pword){
@@ -37,7 +38,7 @@ const prototype = (getStore, services, utilities) => ({
         else this.password = pword
         return true
       },
-      validate: pword => validateString(pword)
+      validate: pword => utility.validateString(pword, {min_len: 8, max_len: 32, allow_spaces: false, allow_special_chars: true})
     },
     property_values: {
       setValue: function(values){
@@ -47,15 +48,18 @@ const prototype = (getStore, services, utilities) => ({
         return true
       },
       validate: (kvSet)=>{
+        let store = getStore()
         if(!Array.isArray(kvSet)) return false
         if(kvSet.length === 0) return true
 
         return kvSet.reduce( (result, kvpair) => {
           if(!result) return false
+          else if(typeof kvpair !== "string") return false
 
           let pair = kvpair.split("=")
-          if(pair.length !== 2) return false
-          else if(typeof pair[0] !== 'string' || typeof pair[1] !== 'string') return false
+          if(pair.length !== 3) return false
+          else if(!utility.validateId(pair[0])) return false
+          else if(typeof pair[1] !== 'string' || typeof pair[2] !== 'string') return false
           else true
         })
       }
@@ -75,34 +79,33 @@ const prototype = (getStore, services, utilities) => ({
           if(!result) return false
           else if(!validateUUID(id)) return false
           else if(!store.agent[id]) return false
-          else if(!store.agent[id].agent_user.id !== this.id) return false
-          else return true
+          return true
         })
       }
     }
   },
   display: {
     card: user => {
-      return  <div className="container-item">{user.agencyTools.getDisplayLabel(user)}</div>
+      return  <div className="container-item">{user.tools.getDisplayName(user)}</div>
     },
     document: user => {
       return  <List className="container"
-                  headerComponent={<header>User Document</header>}
+                  headerComponent={<header>{user.display.card(user)}</header>}
                   tableData={[
-                    user.agencyComponents.agentsList(user),
-                    user.agencyComponents.propertiesList(user)
+                    user.agencyComponents.showAssignments(user.tools.getAssignedAgents(user)),
+                    user.agencyComponents.showPropertyValues(user.tools.getProperties(user), user.property_values)
                   ]}
                   iconComponent={ item => item } />
     },
     editor: (user, success, failure) => {
       function Editor(props) {
         const [tempUser, updateTempUser] = React.useState(props.user)
-        const updateHandler = newState => updateTempUser(tempUser.moduleTools.updateObject(newState, tempUser))
+        const updateHandler = newState => updateTempUser(tempUser.update(newState))
 
         return  <List className="container"
-                    headerComponent={<header>User Editor</header>}
+                    headerComponent={<header>{props.user.display.card(props.user)}</header>}
                     tableData={[
-                      tempUser.components.propertiesEditor(tempUser, updateHandler)
+                      tempUser.agencyComponents.setPropertyValues(tempUser, updateHandler)
                     ]}
                     footerComponent={tempUser.storage.handlers.call(tempUser, success, failure)}
                     iconComponent={ item => item } />
@@ -112,13 +115,13 @@ const prototype = (getStore, services, utilities) => ({
     builder: (user, success, failure) => {
       function Builder(props){
         const [tempUser, updateTempUser] = React.useState(props.user)
-        const updateHandler = newState => updateTempUser(tempUser.moduleTools.updateObject(newState, tempUser))
+        const updateHandler = newState => updateTempUser(tempUser.update(newState))
 
         return  <List className="container"
-                    headerComponent={<header>User Builder</header>}
+                    headerComponent={<header>{props.user.display.card(props.user)}</header>}
                     tableData={[
-                      tempUser.components.modifyUsername(tempUser, updateHandler),
-                      tempUser.components.resetPassword(tempUser, updateHandler)
+                      tempUser.components.setUsername(tempUser, updateHandler),
+                      tempUser.components.setPassword(tempUser, updateHandler)
                     ]}
                     footerComponent={tempUser.storage.handlers.call(tempUser, success, failure)}
                     iconComponent={ item => item } />
@@ -127,13 +130,16 @@ const prototype = (getStore, services, utilities) => ({
     }
   },
   tools: {
+    getDisplayName: user => user.username,
     getProperties: user => {
-      let store = getStore()
-      let userTags = 
+      return []
+    },
+    getAssignedAgents: user => {
+      return []
     }
   },
   components: {
-    modifyUsername: (user, updateHandler) => {
+    setUsername: (user, updateHandler) => {
 
       return  <div className="container-row border-bottom">
                 <div className="container-item item-label">Set Username</div>
@@ -143,7 +149,7 @@ const prototype = (getStore, services, utilities) => ({
                     onChange={() => updateHandler({username: event.target.value})} />
               </div>
     },
-    resetPassword: (user, updateHandler) => {
+    setPassword: (user, updateHandler) => {
 
       return  <div className="container-row border-bottom">
                 <div className="container-item item-label">Reset Password</div>
@@ -152,23 +158,8 @@ const prototype = (getStore, services, utilities) => ({
                     placeholder="enter new password"
                     onChange={() => updateHandler({password: event.target.value})} />
               </div>
-    },
-    propertiesEditor: (user, updateHandler => {
-      return  <List className="container-row border-bottom"
-                headerComponent={<div className="container-item item-label">Udate Property Values</div>}
-                tableData={item.tools.getProperties(item).map(property => ({
-                  property_editor:
-                    <div className="property container-row">
-                      <div className="container-item item-label">{property.property_key}</div>
-                      <input className="container-item"
-                          type="text"
-                          value={item.property_values[property.id]}
-                          onChange={() => updateHandler({property_values: Object.assign({}, item.property_values, { [`${property.id}`]: event.target.value })})} />
-                    </div>,
-                  selectable: false
-                }))}
-                columns={[{selector:"property_editor"}]} />
-              })
+    }
+  }
 })
 
 export { prototype }

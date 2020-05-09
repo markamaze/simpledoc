@@ -3,45 +3,52 @@ import { agencyObject } from './agencyObject'
 import List from '../../../components/List'
 
 
-const validateId = idString => true
-const validateString = string => true
+//TODO: move and import
+const utility = {
+  validateId: id => true, //handle flags
+  validateString: (string, params) => true,
 
+}
 
 const prototype = (getStore, services, utilities) => ({
   type: () => "tag",
   properties: {
     id: {
       setValue: function(id){
-        if(id === null || id === undefined) throw "missing required property: Agency.DataTag.id"
-        else if(!this.properties.id.validate(id)) throw "invalid property: Agency.DataTag.id"
+        if(id === null || id === undefined) throw "missing required property: Agency.Tag.id"
+        else if(!this.properties.id.validate(id)) throw "invalid property: Agency.Tag.id"
         else this.id = id
         return true
       },
-      validate: id => validateId(id)
+      validate: id => utility.validateId(id)
     },
     label: {
       setValue: function(label){
-        if(label === null || label === undefined) throw "missing required property: Agency.DataTag.label"
-        else if(!this.properties.label.validate(label)) throw "invalid property: Agency.DataTag.label"
+        if(label === null || label === undefined) throw "missing required property: Agency.Tag.label"
+        else if(!this.properties.label.validate(label)) throw "invalid property: Agency.Tag.label"
         else this.label = label
         return true
       },
-      validate: label => validateString(label)
+      validate: label => utility.validateString(label, {min_len: 1, max_len: 40, allow_spaces: true, allow_special_chars: true})
     },
-    tagType: {
-      setValue: function(tagType){
-        if(tagType === null || tagType === undefined) throw "missing required property: Agency.DataTag.tagType"
-        else if(!this.properties.tagType.validate(tagType)) throw "invalid property: Agency.DataTag.tagType"
-        else this.tagType = tagType
+    tag_type: {
+      setValue: function(tag_type){
+        if(tag_type === null || tag_type === undefined) throw "missing required property: Agency.Tag.tag_type"
+        else if(!this.properties.tag_type.validate(tag_type)) throw "invalid property: Agency.Tag.tag_type"
+        else this.tag_type = tag_type
         return true
       },
-      validate: tagType => tagType === "agent" || tagType === "structural"
+      validate: tag_type => {
+        let types = ["structural", "agent"]
+        return types.includes(tag_type)
+      }
     },
-    properties: {
+    tag_properties: {
       setValue: function(properties){
-        if(properties === null || properties === undefined) this.properties = []
-        else if(!this.properties.properties.validate(properties)) throw "invalid property: Agency.DataTag.properties"
-        else this.properties = properties
+        if(properties === null || properties === undefined) this.tag_properties = []
+        else if(!this.properties.tag_properties.validate(properties)) throw "invalid property: Agency.Tag.tag_properties"
+        else this.tag_properties = properties
+        return true
       },
       validate: properties => {
         if(!Array.isArray(properties)) return false
@@ -57,12 +64,10 @@ const prototype = (getStore, services, utilities) => ({
           
           propertySet = property.split("=");
           if(propertySet.length !== 3) return false
-          else if(!validateId(propertySet[0])) return false
-          else if(!validateString(propertySet[1])) return false
+          else if(!utility.validateId(propertySet[0])) return false
+          else if(!utility.validateString(propertySet[1], {min_len: 1, max_len:24, allow_spaces: true, allow_special_chars: true})) return false
           else if(!valid_property_types.includes(propertySet[2])) return false
-          else {
-            //validate structure of each property
-          }
+          return true
         })
       },
 
@@ -70,53 +75,54 @@ const prototype = (getStore, services, utilities) => ({
 
   },
   display: {
-    card: dataTag => {
-      return  <div className="dataTag container-item">
-                {dataTag.agencyTools.getDisplayLabel(dataTag)}
+    card: tag => {
+      return  <div className="tag container-item">
+                {tag.tools.getDisplayName(tag)}
               </div>
     },
-    document: dataTag => {
+    document: tag => {
 
       return  <List className="container"
-                  headerComponent={<div>DataTag Info</div>}
+                  headerComponent={<div>{tag.display.card(tag)}</div>}
                   tableData={[
-                    {label: "Tag Name", display: dataTag.agencyTools.getDisplayLabel(dataTag)},
-                    {label: "Tag Type", display: dataTag.tagType},
-                    // {label: "Tag Properties", display: dataTag.agencyComponents.propertiesList(dataTag)}
+                    {label: "Tag Name", display: tag.tools.getDisplayName(tag)},
+                    {label: "Tag Type", display: tag.components.showTagType(tag)},
+                    {label: "Tag Properties", display: tag.agencyComponents.showPropertyKeys(tag.tag_properties)}
                   ]}
                   columns={[{selector: "label", selectable: false}, {selector: "display", selectable: false}]} />
     },
-    builder: (dataTag, close, alert) => {
+    builder: (tag, close, alert) => {
       function Builder(props){
-        const [tempDataTag, updateTempDataTag] = React.useState(props.dataTag)
-        const updateHandler = newState => updateTempDataTag(tempDataTag.moduleTools.updateObject(newState, tempDataTag))
+        const [tempTag, updateTempTag] = React.useState(props.tag)
+        const updateHandler = newState => updateTempTag(tempTag.update(newState))
 
         return  <List className="container"
-                    headerComponent={<header>Modify DataTag</header>}
+                    headerComponent={<header>{props.tag.display.card(props.tag)}</header>}
                     tableData={[
-                      tempDataTag.components.setLabel(tempDataTag, updateHandler),
-                      tempDataTag.components.setTagType(tempDataTag, updateHandler),
-                      tempDataTag.components.setProperties(tempDataTag, updateHandler)
+                      tempTag.agencyComponents.setLabel(tempTag, updateHandler),
+                      tempTag.components.setTagType(tempTag, updateHandler),
+                      tempTag.components.buildProperties(tempTag, updateHandler)
                     ]}
-                    footerComponent={tempDataTag.storage.handlers.call(tempDataTag, close, alert)}
+                    footerComponent={tempTag.storage.handlers.call(tempTag, close, alert)}
                     iconComponent={ item => item } />
       }
 
-      return <Builder dataTag={dataTag} />
+      return <Builder tag={tag} />
     }
   },
   tools: {
-    getProperties: 
+    getDisplayName: tag => tag.label
   },
   components: {
-    setTagType: (dataTag, updateHandler) => {
+    showTagType: tag => <div>{tag.tag_type}</div>,
+    setTagType: (tag, updateHandler) => {
 
       return  <div className="container-row border-bottom">
-                <div className="container-item item-label">Set DataTag Type:</div>
+                <div className="container-item item-label">Set Tag Type:</div>
                 <div className="container-fill">
                   <div className="container-item">
-                    <select value={dataTag.tagType}
-                        onChange={() => updateHandler({tagType: event.target.value})} >
+                    <select value={tag.tag_type}
+                        onChange={() => updateHandler({tag_type: event.target.value})} >
                       <option value=""></option>
                       <option value="agent">Agent</option>
                       <option value="structural">Structural</option>
@@ -125,30 +131,16 @@ const prototype = (getStore, services, utilities) => ({
                 </div>
               </div>
     },
-    setLabel: (dataTag, updateHandler) => {
+    buildProperties: (tag, updateHandler) => {
+      const toggleProperty = property_id => tag.property_ids.includes(property_id) ?
+      updateHandler({property_ids: tag.property_ids.filter(id => id !== property_id)})
+      : updateHandler({property_ids: [...tag.property_ids, property_id]})
 
       return  <div className="container-row border-bottom">
-                <div className="container-item item-label">Set Label:</div>
-                <div className="container-fill">
-                  <input value={dataTag.label}
-                      onChange={() => updateHandler({label: event.target.value})} />
-                </div>
-              </div>
-    },
-    setProperties: (dataTag, updateHandler) => {
-      const toggleProperty = property_id => tempDataTag.dataTag_property_ids.includes(property_id) ?
-      updateHandler({dataTag_property_ids: tempDataTag.dataTag_property_ids.filter(id => id !== property_id)})
-      : updateHandler({dataTag_property_ids: [...tempDataTag.dataTag_property_ids, property_id]})
-
-      return  <div className="container-row border-bottom">
-                <div className="container-item item-label">Set Properties:</div>
+                <div className="container-item item-label">Build Properties:</div>
                 <div className="container">
                   {
-                    Object.values(getStore().property).map( property =>
-                      <div className={`container-item ${dataTag.dataTag_property_ids.includes(property.id) ? "selected" : ""}`}
-                          onClick={()=> toggleProperty(property.id)}>
-                        {property.display.card(property)}
-                      </div>)
+                    
                   }
                 </div>
               </div>

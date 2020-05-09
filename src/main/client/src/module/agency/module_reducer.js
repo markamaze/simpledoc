@@ -1,12 +1,52 @@
 import { agencyObject } from './moduleObjects/agencyObject'
 
-const initialState = {
+//tools available from agency store for getting filtered data
+let agencyToolsProto = {
+  getById: function(id, type){
+    let found;
+
+    if(Array.isArray(id) && length > 0){
+      found = []
+      id.forEach( _id => {
+        if(type && Object.keys(initialState).includes(type)) found = [ ...found, this[type][_id] ]
+        else Object.values(this).find( objType => {
+          let foundItem = Object.values(objType).find( item => item.id === id )
+          if(foundItem === undefined) return false
+          
+          found = [ ...found, foundItem ]
+          return true
+        })
+      })
+    }
+
+    else {
+      if(type && Object.keys(initialState).includes(type)) found = this[type][id]
+      else Object.values(this).find( objType => {
+        let foundItem = Object.values(objType).find( item => item.id === id )
+        if(foundItem === undefined) return false
+        
+        found = foundItem
+        return true
+      })
+    }
+
+    return found
+  },
+  getRootNode: function(){
+    return Object.values(this.node).find(node => node.id === node.parent_id)
+  },
+  getTagsByType: function(type){
+    return Object.values(this.tag).filter( tag => tag.tag_type === type)
+  }
+}
+
+const initialState = Object.assign(Object.create(agencyToolsProto), {
   node: {},
-  template: {},
+  role: {},
   agent: {},
   tag: {},
   user: {}
-}
+})
 
 
 
@@ -14,7 +54,7 @@ export default function agency_reducer(state=initialState, action) {
   switch(action.type) {
     case "LOAD_AGENCY_OBJECTS": {
       try{
-        let newState = Object.assign({}, state)
+        let newState = Object.assign(state)
         action.payload.forEach( agency_object => {
           let newAgencyObject = agencyObject(agency_object.type, {...agency_object}, action.getStore, action.getServices, action.getUtilities, action.failure)
           Object.assign(newState, {[`${agency_object.type}`]: Object.assign(newState[agency_object.type],  {[`${agency_object.id}`]:newAgencyObject} )})
@@ -31,7 +71,7 @@ export default function agency_reducer(state=initialState, action) {
 
     case "WRITE_AGENCY_OBJECTS": {
       try{
-        let newState = Object.assign({}, state)
+        let newState = Object.assign(state)
         let newObjects = action.payload
 
         newObjects.forEach(agencyObject => {
@@ -49,7 +89,7 @@ export default function agency_reducer(state=initialState, action) {
 
     case "DELETE_AGENCY_OBJECTS": {
       try{
-        let newState = Object.assign({}, state)
+        let newState = Object.assign(state)
         let removeObjects = action.payload
 
         removeObjects.forEach(agencyObject => {

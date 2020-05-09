@@ -3,13 +3,21 @@ import { agencyObject } from './agencyObject'
 import List from '../../../components/List'
 
 
+//TODO: move and import
+const utility = {
+  validateId: id => true, //handle flags
+  validateString: (string, params) => true,
+
+}
+
+
 const prototype = (getStore, services, utilities) => ({
   type: () => "node",
   properties: {
     id: {
       setValue: function(id){
-        if(id === null || id === undefined) throw "missing required property: Agency.StructualNode.id"
-        else if(!this.properties.id.validate(id)) throw "invalid property: Agency.StructualNode.id"
+        if(id === null || id === undefined) throw "missing required property: Agency.Node.id"
+        else if(!this.properties.id.validate(id)) throw "invalid property: Agency.Node.id"
         else this.id = id
         return true
       },
@@ -17,27 +25,28 @@ const prototype = (getStore, services, utilities) => ({
     },
     label: {
       setValue: function(label){
-        if(label === null || label === undefined) throw "missing required property: Agency.StructualNode.label"
-        else if(!this.properties.structuralNode_label.validate(label)) throw "invalid property: Agency.StructualNode.label"
-        else this.structuralNode_label = label
+        if(label === null || label === undefined) throw "missing required property: Agency.Node.label"
+        else if(!this.properties.label.validate(label)) throw "invalid property: Agency.Node.label"
+        else this.label = label
         return true
       },
       validate: ()=>{ return true }
     },
     parent_id: {
       setValue: function(id){
-        if(id === null || id === undefined) throw "missing required property: Agency.StructualNode.structuralNode_parent_id"
-        else if(!this.properties.structuralNode_parent_id.validate(id)) throw "invalid property: Agency.StructualNode.structuralNode_parent_id"
-        else this.structuralNode_parent_id = id
+        if(id === null || id === undefined) throw "missing required property: Agency.Node.parent_id"
+        else if(id === "root") this.parent_id = this.id
+        else if(!this.properties.parent_id.validate(id)) throw "invalid property: Agency.Node.parent_id"
+        else this.parent_id = id
         return true
       },
       validate: ()=>{ return true }
     },
-    dataTag_ids: {
+    tag_ids: {
       setValue: function(ids){
-        if(ids === null || ids === undefined) this.structuralNode_dataTag_ids = []
-        else if(!this.properties.structuralNode_dataTag_ids.validate(ids)) throw "invalid required property: Agency.StructualNode.structuralNode_dataTag_ids"
-        else this.structuralNode_dataTag_ids = ids
+        if(ids === null || ids === undefined) this.tag_ids = []
+        else if(!this.properties.tag_ids.validate(ids)) throw "invalid required property: Agency.Node.tag_ids"
+        else this.tag_ids = ids
         return true
       },
       validate: ()=>{ return true }
@@ -45,12 +54,13 @@ const prototype = (getStore, services, utilities) => ({
     property_values: {
       setValue: function(values){
         if(values === null || values === undefined) this.property_values = []
-        else if(!this.properties.property_values.validate(values)) throw "invalid property: Agency.StructuralNode.property_values"
+        else if(!this.properties.property_values.validate(values)) throw "invalid property: Agency.Node.property_values"
         else this.property_values = values
         return true
       },
       validate: kvSet =>{
         if(!Array.isArray(kvSet)) return false
+        if(kvSet.length === 0) return true
 
         return kvSet.reduce( (result, kvpair) => {
           if(!result) return false
@@ -62,15 +72,15 @@ const prototype = (getStore, services, utilities) => ({
         })
       }
     },
-    assignments: {
+    assignments: { //TODO: still need to rework this, along with AgencyValidator.assignment() in backend
       setValue: function(assignments){
         if(assignments === null || assignments === undefined) this.assignments = {}
         else if(!this.properties.assignments.validate(assignments)) 
-          throw "Invalid property: AGENCY.STRUCTURALNODE.ASSIGNMENTS"
+          throw "Invalid property: AGENCY.NODE.assignments"
         else this.assignments = assignments
         return true
       },
-      validate: assignments => assignments.map( assignment => {
+      validate: assignments => Object.values(assignments).map( assignment => {
         let expectedKeys = ["id","assignment_type","agentTemplate_id","active_agent_id","assignment_links"]
         let keys = Object.keys(assignment)
         
@@ -111,123 +121,122 @@ const prototype = (getStore, services, utilities) => ({
   },
   display: {
     card: node => {
-      return  <div className="container-item">
-                <div className="container-item header">{node.structuralNode_label}</div>
-                { node.agencyTools.getDataTags(node).map(tag => tag.display.card(tag)) }
+      return  <div className="container-item" style={{background: "white", color: "black", padding: "1rem"}}>
+                <div className="container-item header">{node.tools.getDisplayName(node)}</div>
+                <div className="container-item">{node.agencyComponents.showTags(node)}</div>
               </div>
     },
     document: node => {
+      let parentNode = node.tools.getParentNode(node)
+
       return  <List className="container"
-                  headerComponent={<header>StructuralNode Document</header>}
+                  headerComponent={node.display.card(node)}
                   tableData={[
-                    {label: "Node:", data: node, display: node.display.card(node), selectable: false},
-                    {label: "Parent Node:", data: node.tools.getParentNode(node), display: node.tools.getParentNode(node).display.card(node.tools.getParentNode(node)), selectable: false},
-                    {label: "Node Supervisor", selectable: false, data: <div>unknown at this time</div>},
-                    {label: "Branches", selectable: false, data:
+                    {label: "Node:", display: node.tools.getDisplayName(node), selectable: false},
+                    {label: "Parent Node:", display: parentNode.display.card(parentNode), selectable: false},
+                    {label: "Node Supervisor", selectable: false, display: <div>unknown at this time</div>},
+                    {label: "Branches", selectable: false, display:
                       <div>
                         {
                           node.new_object ?
                             [ ...node.new_object
-                                .filter(obj => obj.type() === "structuralNode" && obj.structuralNode_parent_id === node.id).map(child => child.display.card(child)),
+                                .filter(obj => obj.type() === "node" && obj.parent_id === node.id).map(child => child.display.card(child)),
                               ...node.tools.getChildren(node).map( child => child.display.card(child)) ]
                             : node.tools.getChildren(node).map( child => child.display.card(child))
                         }
                       </div>},
-                    {label: "dataTags", display: node.agencyComponents.dataTagList(node)},
-                    
-                    //TODO: refactored assignment/node structure
-                    {label: "assignments", display: node.agencyComponents.assignmentsList(node)},
-                    {label: "properties", display: node.agencyComponents.propertiesList(node)}
+                    {label: "tags", display: node.agencyComponents.showTags(node.tools.getTags(node))},
+                    {label: "assignments", display: node.agencyComponents.showAssignments(node.assignments)},
+                    {label: "properties", display: node.agencyComponents.showPropertyValues(node.tools.getProperties(node), node.property_values)},
+                    {label: "subscriptions", display: node.agencyComponents.showSubscriptions(node.tools.getSubscriptions(node))}
                   ]}
                   columns={[{selector: "label", selectable: false}, {selector: "display", selectable: false}]} />
     },
     editor: (node, close, alert) => {
       function Editor(props){
 
-        const [tempNode, updateTempNode] = React.useState(props.structuralNode)
-        const updateHandler = newState => updateTempNode(tempNode.moduleTools.updateObject(newState, tempNode))
+        const [tempNode, updateTempNode] = React.useState(props.node)
+        const updateHandler = newState => updateTempNode(tempNode.update(newState))
 
         return  <List className="container"
-                    headerComponent={<header>Node Editor</header>}
+                    headerComponent={tempNode.display.card(tempNode)}
                     tableData={[
-                      tempNode.agencyComponents.propertiesEditor(tempNode, updateHandler),
-                      tempNode.agencyComponents.assignmentEditor(tempNode, updateHandler)
+                      tempNode.display.card(tempNode),
+                      tempNode.agencyComponents.setPropertyValues(tempNode, updateHandler),
+                      tempNode.components.setAssignments(tempNode, updateHandler)
                     ]}
                     iconComponent={ item => item }
                     footerComponent={tempNode.storage.handlers.call(tempNode, close, alert)} />
       }
 
-      return <Editor structuralNode={node} />
+      return <Editor node={node} />
     },
     builder: (node, close, alert) => {
       function Builder(props){
-        const [tempNode, setTempNode] = React.useState(props.structuralNode)
+        const [tempNode, setTempNode] = React.useState(props.node)
 
-        const updateHandler = newState => setTempNode(tempNode.moduleTools.updateObject(newState, tempNode))
-
+        const updateHandler = newState => setTempNode(tempNode.update(newState))
+        console.log(tempNode.label)
 
         return  <List className="container"
-                    headerComponent={<header>Node Builder</header>}
+                    headerComponent={tempNode.display.card(tempNode)}
                     tableData={[
-                      tempNode.components.setNodeLabel(node, updateHandler),
-                      tempNode.components.setNodeParent(node, updateHandler),
-                      tempNode.components.setNodeSupervisor(node, updateHandler),
-                      tempNode.components.manageNodeBranches(node, updateHandler),
-                      tempNode.agencyComponents.assignmentManager(tempNode, updateHandler),
-                      tempNode.agencyComponents.dataTagManager(tempNode, updateHandler),
-                      tempNode.agencyComponents.availableServices(tempNode, updateHandler),
-                      tempNode.agencyComponents.subscriptionsList(tempNode, updateHandler)
+                      tempNode.agencyComponents.setLabel(tempNode, updateHandler),
+                      tempNode.components.setNodeParent(tempNode, updateHandler),
+                      tempNode.components.setNodeSupervisor(tempNode, updateHandler),
+                      tempNode.components.manageNodeBranches(tempNode, updateHandler),
+                      tempNode.components.buildAssignments(tempNode, updateHandler),
+                      tempNode.agencyComponents.setTags(tempNode, updateHandler),
+                      tempNode.agencyComponents.manageSubscriptions(tempNode, updateHandler)
                     ]}
                     iconComponent={ item => item }
                     footerComponent={tempNode.storage.handlers.call(tempNode, close, alert)} />
       }
 
-      return <Builder structuralNode={node} />
+      return <Builder node={node} />
     }
   },
+  //components/tools available to agency objects of this type
   tools: {
-    getChildren: node => Object.values(getStore().structuralNode).filter( n => n.structuralNode_parent_id === node.id && n.structuralNode_parent_id !== n.id ),
-    getParentNode: node => getStore().structuralNode[node.structuralNode_parent_id],
-    branch: function(id, allNodes){},
-    getNodeSupervisor: (id, allNodes) => {}
+    getChildren: node => Object.values(getStore().node).filter( n => n.parent_id === node.id && n.parent_id !== n.id ),
+    getParentNode: node => getStore().node[node.parent_id],
+    branch: function(id, allNodes){ return [] },
+    getNodeSupervisor: (id, allNodes) => {},
+    getTags: node => { return [] },
+    getDisplayName: node => node.label,
+    getSubscriptions: node => [],
+    getProperties: node => []
   },
   components: {
-    setNodeSupervisor: (node, updateHandler) => {},
+    setNodeSupervisor: (node, updateHandler) => {
+      return  <div>set node supervisor component</div>
+    },
     setNodeParent: (node, updateHandler) => {
 
-      if(node.id === node.structuralNode_parent_id) return <div className="container-row">Cannot reassign root</div>
+      if(node.id === node.parent_id) return <div className="container-row">Cannot reassign root</div>
 
       return  <div>
                 <select className="container-item"
-                      value={node.structuralNode_parent_id}
-                      onChange={() => updateHandler({structuralNode_parent_id: event.target.value})}>
+                      value={node.parent_id}
+                      onChange={() => updateHandler({parent_id: event.target.value})}>
                     <option value=""></option>
-                    { Object.values(getStore().structuralNode).map(node =>
-                        <option value={node.id} style={{background: `${node.id === node.structuralNode_parent_id ? "yellow" : ""}`}}>
-                          {node.structuralNode_label}
+                    { Object.values(getStore().node).map(node =>
+                        <option value={node.id} style={{background: `${node.id === node.parent_id ? "yellow" : ""}`}}>
+                          {node.label}
                         </option>) }
                 </select>
               </div>
 
-    },
-    setNodeLabel: (node, updateHandler) => {
-      return  <div>
-                <div className="container-item item-label">Set Title</div>
-                <input className="container-item"
-                    type="text"
-                    value={node.structuralNode_label}
-                    onChange={()=> updateHandler({structuralNode_label: event.target.value})}/>
-              </div>
-    },
+    },   
     manageNodeBranches: (node, updateHandler) => {
       function ManageBranches(props) {
         const [tempNewNodeLabel, updateTempNewNodeLabel] = React.useState("new node")
 
         const addBranch = () => {
-          let newNode = agencyObject("structuralNode", {id:"new_object", structuralNode_parent_id: node.id, structuralNode_label: tempNewNodeLabel}, tempNode.services, tempNode.utilities, alert)
+          let newNode = agencyObject("node", {id:"new_object", parent_id: node.id, label: tempNewNodeLabel}, getStore, node.services, node.utilities, alert)
 
           updateHandler({
-            new_object: tempNode.new_object ? [...tempNode.new_object, newNode] : [newNode]
+            new_object: node.new_object ? [...node.new_object, newNode] : [newNode]
           })
         }
 
@@ -240,6 +249,12 @@ const prototype = (getStore, services, utilities) => ({
                 </div>
       }
       return <ManageBranches node={node}/>
+    },
+    setAssignments: (node, updateHandler) => {
+      return  <div>set assignments component</div>
+    },
+    buildAssignments: (node, updateHandler) => {
+      return  <div>build assignments component</div>
     }
   }
 })

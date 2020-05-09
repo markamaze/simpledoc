@@ -29,24 +29,22 @@ public class Agent extends ModuleObject {
 	}
 	
 	private void setAgentUserId(Object object) throws ServiceErrorException {
-		UUID uuid = AgencyValidator.validateUUIDString(object);
-
-		if(uuid != null) this.agent_user_id = uuid;
-		else throw new ServiceErrorException("invalid id set for Agent.agent_user_id");
+		UUID id = AgencyValidator.validateUUIDString(object);
+		if(id == null) throw new ServiceErrorException("invalid property: Agency.Agent.agent_user_id");
+		else this.agent_user_id = id;
 	}
 	private void setNodeId(Object object) throws ServiceErrorException {
-		UUID uuid = AgencyValidator.validateUUIDString(object);
-
-		if(uuid != null) this.node_id = uuid;
-		else throw new ServiceErrorException("invalid id set for Agent.node_id");
+		UUID id = AgencyValidator.validateUUIDString(object);
+		if(id == null) throw new ServiceErrorException("invalid property: Agency.Agent.node_id");
+		else this.node_id = id;
 	}
 	private void setAssignmentId(Object object) throws ServiceErrorException {
-		UUID uuid = AgencyValidator.validateUUIDString(object);
-
-		if(uuid != null) this.assignment_id = uuid;
-		else throw new ServiceErrorException("invalid id set for Agent.assignment_id");
+		UUID id = AgencyValidator.validateUUIDString(object);
+		if(id == null) throw new ServiceErrorException("invalid property: Agency.Agent.assignment_id");
+		else this.assignment_id = id;
 	}
 
+	//TODO: see if I can eliminate these if only called within the class
 	public UUID getAgentUserId() { return this.agent_user_id; }
 	public UUID getNodeId() { return this.node_id; }
 	public UUID getAssignmentId() { return this.assignment_id; }
@@ -58,10 +56,12 @@ public class Agent extends ModuleObject {
 			String key = entry.getKey();
 			Object value = entry.getValue();
 			
-			if(key.equals("agent_user_id")) setAgentUserId(value);
-			else if(key.equals("node_id")) setNodeId(value);
-			else if(key.equals("assignment_id")) setAssignmentId(value);
-			else throw new ServiceErrorException("attempting to update unknown property: Agency.Agent.update");
+			switch(key){
+				case "agent_user_id": setAgentUserId(value); break;
+				case "node_id": setNodeId(value); break;
+				case "assignment_id": setAssignmentId(value); break;
+				default: throw new ServiceErrorException("attempting to update unknown property: Agency.Agent");
+			}
 		}
 		return true;
 		
@@ -69,27 +69,31 @@ public class Agent extends ModuleObject {
 	
 	
 	@Override
-	public boolean readStorageResult(ResultSet rs) throws ServiceErrorException, SQLException {
-		setAgentUserId(rs.getObject("agent_user_id"));
-		setNodeId(rs.getObject("node_id"));
-		setAssignmentId(rs.getObject("assignment_id"));
+	public boolean readStorageResult(ResultSet rs) throws ServiceErrorException {
+		try {	
+			setAgentUserId(rs.getObject("agent_user_id"));
+			setNodeId(rs.getObject("node_id"));
+			setAssignmentId(rs.getObject("assignment_id"));
+		} catch(SQLException err) { throw new ServiceErrorException(String.join("could not read stored data: Agent.Agent",err.getMessage())); }
+
 		return true;
 	}
 	
 	
 	@Override
-	public PreparedStatement writeStorageStatement(String type, Connection connection) throws ServiceErrorException, SQLException {
+	public PreparedStatement writeStorageStatement(String type, Connection connection) throws ServiceErrorException {
 		PreparedStatement statement = null;
-		
-		if(type.equals("create")) statement = connection.prepareCall("call agency.create_agent(?,?,?,?)");
-		else if(type.equals("update")) statement = connection.prepareCall("call agency.update_agent(?,?,?,?)");
-			
-		UUID uuid = AgencyValidator.validateUUIDString(this.getId());
-		statement.setObject(1, uuid);
-		statement.setObject(2, this.getAgentUserId());
-		statement.setObject(3, this.getNodeId());
-		statement.setObject(4, this.getAssignmentId());
-			
+		try {
+			if(type.equals("create")) statement = connection.prepareCall("call agency.create_agent(?,?,?,?)");
+			else if(type.equals("update")) statement = connection.prepareCall("call agency.update_agent(?,?,?,?)");
+				
+			UUID uuid = AgencyValidator.validateUUIDString(this.getId());
+			statement.setObject(1, uuid);
+			statement.setObject(2, this.getAgentUserId());
+			statement.setObject(3, this.getNodeId());
+			statement.setObject(4, this.getAssignmentId());
+		} catch(SQLException err) { throw new ServiceErrorException(String.join("could not write storage object: Agent.Agent", err.getMessage())); }
+
 		return statement;
 	}
 

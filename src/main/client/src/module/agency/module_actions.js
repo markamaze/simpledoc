@@ -4,7 +4,7 @@ import { put, get, post, remove } from './agencyUtils/ajax'
 
 
 export function loadAgencyStore(getStore, services, utilities){
-  get(`/Agency`, function(request){
+  get(`/agency`, function(request){
     store.dispatch({
       type: "LOAD_AGENCY_OBJECTS",
       payload: JSON.parse(request.response).data,
@@ -17,7 +17,7 @@ export function loadAgencyStore(getStore, services, utilities){
 }
 
 export function createAgencyObjects(objectSet, success, failure){
-  post(`/Agency`, objectSet, function(request){
+  post(`/agency`, objectSet, function(request){
     let result = JSON.parse(request.response)
     if(result.error) failure(`create object unsuccessful: ${result.error}`)
     else store.dispatch({
@@ -30,7 +30,7 @@ export function createAgencyObjects(objectSet, success, failure){
 }
 
 export function updateAgencyObjects(objectSet, success, failure){
-  put(`/Agency`, objectSet, function(request){
+  put(`/agency`, objectSet, function(request){
     let result = JSON.parse(request.response)
 
     if(result.error) failure(`update unsuccessful: ${result.error}`)
@@ -45,7 +45,7 @@ export function updateAgencyObjects(objectSet, success, failure){
 
 export function removeAgencyObjects(objectSet, success, failure){
   !confirm("are you sure you want to permanently delete this?") ? null
-    : remove(`/Agency`, objectSet, function(request){
+    : remove(`/agency`, objectSet, function(request){
         let result = JSON.parse(request.response)
 
         if(result.error) failure(`could not delete object: ${result.error}`)

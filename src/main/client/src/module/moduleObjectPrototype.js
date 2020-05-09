@@ -1,6 +1,7 @@
 import React from 'react'
 import uuidv4 from 'uuid/v4'
 
+//tools available to any module object
 const moduleObjectPrototype = (typeMap, storageFns) => ({
   init: function(state, onError) {
     try{
@@ -78,9 +79,10 @@ const moduleObjectPrototype = (typeMap, storageFns) => ({
                 } catch(err){ failure(err) }}
     }
   },
-  moduleTools: {
-    updateObject: (updateData, obj) => Object.assign(Object.create(Object.getPrototypeOf(obj)), obj, updateData)
+  update: function(updatedData){
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, updatedData)
   }
+
 })
 
 export default moduleObjectPrototype

@@ -34,7 +34,7 @@ public class ServiceLoader {
 		String module = resource_path.get(0);
 		
 		switch(module) {
-			case "Agency": return agency.moduleRoutes(resource_path);
+			case "agency": return agency.moduleRoutes(resource_path);
 			case "Forms": return forms.moduleRoutes(resource_path);
 			case "Communications": return communications.moduleRoutes(resource_path);
 			case "Training": return training.moduleRoutes(resource_path);

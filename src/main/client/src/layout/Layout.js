@@ -62,6 +62,7 @@ export default function Layout(props){
   const [location, setLocation] = React.useState(history.location)
   const unlisten = history.listen((location, action) => {
     setLocation(location)
+    console.log(location, action, history)
   })
 
   const pathArray = location.pathname.split("/").filter( item => item !== "" )

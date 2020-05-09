@@ -1,10 +1,14 @@
 package simpledoc.services.agency;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+
+import org.json.JSONObject;
 
 import simpledoc.exceptions.UnsupportedServiceRequest;
 import simpledoc.services.ModuleObjectData;
@@ -57,7 +61,7 @@ public class AgencyValidator extends ModuleValidation {
   private boolean validateObjectType(String type) {
     switch(type){
 		case "AGENCY.AGENT":
-		case "AGENCY.TEMPLATE":
+		case "AGENCY.ROLE":
 		case "AGENCY.NODE":
 		case "AGENCY.TAG":
 		case "AGENCY.USER":
@@ -71,8 +75,8 @@ public class AgencyValidator extends ModuleValidation {
     	case "AGENCY.AGENT":
     		fields = Agent.class.getDeclaredFields();
     		break;
-    	case "AGENCY.TEMPLATE":
-    		fields = Template.class.getDeclaredFields();
+    	case "AGENCY.ROLE":
+    		fields = Role.class.getDeclaredFields();
     		break;
     	case "AGENCY.NODE":
     		fields = Node.class.getDeclaredFields();
@@ -103,4 +107,70 @@ public class AgencyValidator extends ModuleValidation {
   
   
 
+
+
+  public static String propertyDefinition(Object property_string) {
+	String[] possibleTypes = {"string","date"};
+	List<String> typeSet = Arrays.asList(possibleTypes);
+	String[] kvpair;
+	String id, key, value_type;
+
+
+	if(property_string instanceof String) return null;
+	else kvpair = ((String)property_string).split("=");
+	
+	if(kvpair.length != 3) return null;
+	
+	if(kvpair[0].equals("new_property")) id = UUID.randomUUID().toString();
+	else id = kvpair[0];
+	key = kvpair[1];
+	value_type = kvpair[2];
+
+	if(AgencyValidator.validateUUIDString(id) == null) return null;
+	else if(!AgencyValidator.validateString(key, 1, 0, true, true)) return null;
+	else if(!typeSet.contains(value_type)) return null;
+					
+	
+	return String.join(id, "=", key, "=", value_type);
+  }
+
+  public static String tagType(Object type){
+	String[] possibleTypes = {"structural", "agent"};
+	List<String> typeSet = Arrays.asList(possibleTypes);
+	
+	if(type instanceof String && typeSet.contains(type)) return (String)type;
+	else return null;
+  }
+
+  public static String roleType(Object type){
+	String[] possibleTypes = {"supervisor","roleplayer","serviceConsumer","serviceProvider","monitor"};
+	List<String> typeSet = Arrays.asList(possibleTypes);
+	
+	if(type instanceof String && typeSet.contains(type)) return (String)type;
+	else return null;
+  }
+
+  public static String propertyValues(Object value_string) {
+	if(!(value_string instanceof String)) return null;
+	String[] kvpair = ((String)value_string).split("=");
+	if(kvpair.length != 3) return null;
+	else if(AgencyValidator.validateUUIDString(kvpair[0]) == null) return null;
+	else if(!(kvpair[1] instanceof String && kvpair[2] instanceof String)) return null;
+	return (String)value_string;
+  }
+
+  public static Map<String, Object> assignmentObject(Object assignment){
+		Map<String, Object> valid_assignment = null;
+
+
+		if(assignment instanceof Map) {
+
+		}
+
+		else if(assignment instanceof JSONObject){
+
+		}
+				
+		return valid_assignment;
+  }
 }
