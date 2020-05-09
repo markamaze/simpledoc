@@ -93,6 +93,7 @@ const prototype = (getStore, services, utilities) => ({
                   headerComponent={<header>{user.display.card(user)}</header>}
                   tableData={[
                     user.agencyComponents.showAssignments(user.tools.getAssignedAgents(user)),
+                    user.agencyComponents.showPropertyKeys(user.tools.getProperties(user)),
                     user.agencyComponents.showPropertyValues(user.tools.getProperties(user), user.property_values)
                   ]}
                   iconComponent={ item => item } />
