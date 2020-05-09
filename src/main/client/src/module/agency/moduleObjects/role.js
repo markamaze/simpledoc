@@ -101,7 +101,7 @@ const prototype = (getStore, services, utilities) => ({
   },
   tools: {
     getDisplayLabel: role => role.label,
-    getTags: role => role.tag_ids.map( id => getStore().tag[id] ),
+    getTags: role => getStore().getById(role.tag_ids, "tag"),
     getProperties: role => {
       let properties = []
       role.tools.getTags(role).forEach( tag => {
