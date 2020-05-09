@@ -1,6 +1,7 @@
 import React from 'react'
 import { agencyObject } from './agencyObject'
 import List from '../../../components/List'
+import uuidv4 from 'uuid/v4'
 
 
 //TODO: move and import
@@ -111,7 +112,8 @@ const prototype = (getStore, services, utilities) => ({
     }
   },
   tools: {
-    getDisplayName: tag => tag.label
+    getDisplayName: tag => tag.label,
+    getProperties: tag => tag.tag_properties
   },
   components: {
     showTagType: tag => <div>{tag.tag_type}</div>,
@@ -132,16 +134,36 @@ const prototype = (getStore, services, utilities) => ({
               </div>
     },
     buildProperties: (tag, updateHandler) => {
-      const toggleProperty = property_id => tag.property_ids.includes(property_id) ?
-      updateHandler({property_ids: tag.property_ids.filter(id => id !== property_id)})
-      : updateHandler({property_ids: [...tag.property_ids, property_id]})
+      let tagProperties = tag.tag_properties ? tag.tag_properties : []
+
+      const addNewProperty = event => {
+        event.preventDefault()
+        let id = uuidv4()
+        let key = event.target.children.propertyKey.value
+        let valueType = event.target.children.valueType.value
+        let propertyString = `${id}=${key}=${valueType}`
+
+        tagProperties.push(propertyString)
+        updateHandler({tag_properties: tagProperties})
+
+      }
 
       return  <div className="container-row border-bottom">
                 <div className="container-item item-label">Build Properties:</div>
                 <div className="container">
-                  {
-                    
-                  }
+
+
+                <form onSubmit={() => addNewProperty(event)}>
+                  <label>add new property</label>
+                  <input type="text" id="propertyKey" name="propertyKey" placeholder="define key" />
+                  <select id="valueType" name="valueType" placeholder="set value type">
+                    <option value="text">text</option>
+                    <option value="date">date</option>
+                  </select>
+                  <input type="submit" value="add property" />
+                </form>
+
+                { tag.agencyComponents.showPropertyKeys(tag.tag_properties) }
                 </div>
               </div>
     }
