@@ -47,9 +47,9 @@ function TagManagerPage(props){
                     return newDataTag.display.builder(newDataTag, close, alert)
                   }}]}
                 drawerComponents={[
+                  {label: "document", component: (item, close, alert) => item.display.document(item, close, alert)},
                 ]}
                 overlayComponents={[
-                  {label: "document", component: item => item.display.document(item)},
                   {label: "modify", component: (item, close, alert) => item.display.builder(item, close, alert)}
                 ]} />
 
@@ -63,9 +63,9 @@ function TagManagerPage(props){
                     return newDataTag.display.builder(newDataTag, close, alert)
                   }}]}
                 drawerComponents={[
+                  {label: "document", component: item => item.display.document(item)},
                 ]}
                 overlayComponents={[
-                  {label: "document", component: item => item.display.document(item)},
                   {label: "modify", component: (item, close, alert) => item.display.builder(item, close, alert)}
                 ]} />   
           </AgencyPageWrapper>
