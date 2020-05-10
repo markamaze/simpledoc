@@ -69,16 +69,16 @@ const prototype = (getStore, services, utilities) => ({
   },
   display: {
     card: role => {
-      return  <div className="container-item">{ role.tools.getDisplayLabel(role) }</div>
+      return  <div className="container-item">{ role.tools.getDisplayName(role) }</div>
     },
     document: role =>
       <List className="container"
-          headerComponent={<header>document</header>}
+          headerComponent={<header>Role Info: {role.tools.getDisplayName(role)}</header>}
           tableData={[ 
-            role.agencyComponents.showTags(role.tools.getTags(role)), 
-            role.components.showRoleType(role),
-            role.agencyComponents.showPropertyKeys(role.tools.getProperties(role)) ]}
-          iconComponent={ item => item } />,
+            {label: "Tags", display: role.agencyComponents.showTags(role.tools.getTags(role))}, 
+            {label: "Role Type", display: role.components.showRoleType(role)},
+            {label: "Properties", display: role.agencyComponents.showPropertyKeys(role.tools.getProperties(role))} ]}
+          iconComponent={ item => item.display } />,
     builder: (role, close, alert) => {
       function Builder(props){
         const [tempRole, updateTempRole] = React.useState(props.role)
@@ -100,7 +100,7 @@ const prototype = (getStore, services, utilities) => ({
     }
   },
   tools: {
-    getDisplayLabel: role => role.label,
+    getDisplayName: role => role.label,
     getTags: role => getStore().getById(role.tag_ids, "tag"),
     getProperties: role => {
       let properties = []
@@ -114,8 +114,41 @@ const prototype = (getStore, services, utilities) => ({
   },
   components: {
     showRoleType: role => <div>{role.role_type}</div>,
-    setRoleType: role => {
-      return  <div>set role type component</div>
+    setRoleType: (role, updateHandler) => {
+      let updateRole = event => {
+        event.preventDefault()
+
+        updateHandler({role_type: event.target.value})
+      }
+      return  <form className="d-flex flex-column p-2 m-2" onChange={() => updateRole(event)}>
+                <div className="d-flex font-weight-bold" style={{fontSize: "larger"}}>Select type of role</div>
+                
+                <div>
+                  <input className="p-2" type="radio" id="supervisor" name="roleType" value="supervisor" checked={role.role_type === "supervisor"} />
+                  <label className="p-2" for="supervisor">Supervisor: is a supervisor of a node or another within its branch of the agency</label>
+                </div>
+
+                <div>
+                  <input className="p-2" type="radio" id="roleplayer" name="roleType" value="roleplayer" checked={role.role_type === "roleplayer"}/>
+                  <label className="p-2" for="roleplayer">RolePlayer: holds a position within a node</label>
+                </div>
+
+                <div>
+                  <input className="p-2" type="radio" id="monitor" name="roleType" value="monitor" checked={role.role_type === "monitor"}/>
+                  <label className="p-2" for="monitor">Monitor: has access for purpose of monitoring data</label>
+                </div>
+
+                <div>
+                  <input className="p-2" type="radio" id="serviceConsumer" name="roleType" value="serviceConsumer" checked={role.role_type === "serviceConsumer"}/>
+                  <label className="p-2" for="serviceConsumer">Service Consumer: role for those that recieve services provided by the node</label>
+                </div>
+
+                <div>
+                  <input className="p-2" type="radio" id="serviceProvider" name="roleType" value="serviceProvider" checked={role.role_type === "serviceProvider"}/>
+                  <label className="p-2" for="serviceProvider">Service Provider: role for those that provide a service to the node</label>
+                </div>
+
+              </form>
     }
   }
 })
