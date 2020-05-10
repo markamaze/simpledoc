@@ -75,16 +75,21 @@ function RoleManagerPage(props){
   return  <AgencyPageWrapper className="module-wrapper">
             <List className="container"
                 headerComponent={<div className="page-header">Agent Roles</div>}
-                tableData={Object.values(useSelector(state => state.agency.role))}
-                iconComponent={ item => <div>{item.label}</div> }
+                tableData={useSelector(state => Object.values(state.agency.role))}
+                iconComponent={ item => 
+                  <div className="d-flex flex-row">
+                    <div className="d-item-flex flex-grow-2 p-1">{item.tools.getDisplayName(item)}</div>
+                    <div className="d-item-flex flex-grow-1 p-1">{item.role_type}</div>
+                    <div className="d-item-flex flex-grow-1 p-1">{item.tools.getTags(item).map( tag => tag.display.card(tag))}</div>
+                  </div> }
                 listActions={[{label: "+", action: (close, alert) => {
                   let newRole = agencyObject("role", {id: "new_object", label: "new role", role_type: "supervisor"}, () => useSelector(state => state.agency), props.services, props.utilities, alert)
                   return newRole.display.builder(newRole, close, alert)
                 }}]}
                 drawerComponents={[
+                  {label: "document", component: (item, close, alert) => item.display.document(item, close, alert)},
                 ]}
                 overlayComponents={[
-                  {label: "document", component: item => item.display.document(item)},
                   {label: "modify", component: (item, close, alert) => item.display.builder(item, close, alert)}
                 ]} />
           </AgencyPageWrapper>
