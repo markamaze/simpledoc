@@ -214,8 +214,9 @@ const agencyComponents = ( getStore, getServices ) => ({
     let tags = getStore().getById(tag_set, "tag")
     return  <div>
               {
-                Array.isArray(tags) ? tags.map( tag => tag.display.card(tag) ) 
-                  : tags ? tags.display.card(tags) : null
+                Array.isArray(tags) && tags.length > 0 ? tags.map( tag => tag.display.card(tag) ) 
+                  : tags.length === 0 ? "no tags"
+                    : tags ? tags.display.card(tags) : null
               }
             </div>
   },
@@ -278,8 +279,8 @@ const agencyComponents = ( getStore, getServices ) => ({
               columns={[{selector:"property_editor"}]} />
   },
   setLabel: (agencyObj, updateHandler) => {
-    return  <div className="d-flex flex-row">
-              <label className="d-flex p-1 w-25">Set Label</label>
+    return  <div className="d-flex flex-wrap m-2 p-2">
+              <label className="d-flex mr-3 font-weight-bold" style={{fontSize: "larger"}}>Set Label</label>
               <input className="d-flex m-1 p-0 flex-fill" value={agencyObj.label} onChange={() => updateHandler({label: event.target.value})} />
             </div>
   },
@@ -288,24 +289,53 @@ const agencyComponents = ( getStore, getServices ) => ({
   
     const removeTag = tag_id => updateHandler({tag_ids: agencyObj.tag_ids.filter(id => id !== tag_id)})
 
-    return  <List className="container-row"
-                headerComponent={<div className="container-item item-label">Modify Tags</div>}
-                tableData={[
-                  {
-                    selectable: false, 
-                    label: "Add Tag" , 
-                    input: <select className="container-row" value="" onChange={() => addTag(event.target.value)}>
-                              <option value=""></option>
-                              {
-                                Object.values(getStore().tag).map( tag => <option value={tag.id}>{tag.label}</option>)
-                              }
-                            </select>},
-                  ...Object.values(agencyObj.tools.getTags(agencyObj)).map(tag => ({
-                    data: tag, 
-                    selectable: false, 
-                    input: <button onClick={()=> removeTag(tag.id)}>X</button>, 
-                    label: tag.display.card(tag) }))]}
-                columns={[{selector: "label"}, {selector: "input"}]} />
+    let unassignedTags = []
+    let assignedTags = []
+    let allTagsOfObjType = getStore().getTagsByType(agencyObj.type === "structural" ? "structural" : "agent")
+    allTagsOfObjType.forEach( tag => {
+      agencyObj.tag_ids.includes(tag.id) ? 
+        assignedTags = [...assignedTags, tag]
+        : unassignedTags = [...unassignedTags, tag]
+    })
+    return  <div className="d-flex flex-column m-2 p-2">
+              <label className="d-flex font-weight-bold" style={{fontSize: "larger"}}>Set Tags (click to toggle)</label>
+
+              <div className="d-flex flex-wrap">
+                <div className="d-flex flex-column flex-fill mw-50 m-3">
+                  <label className="d-flex font-italic align-self-center">assigned tags</label>
+                  <div className="d-flex border flex-wrap p-2">
+                  { assignedTags.map( tag => <div onClick={() => removeTag(tag.id)}>{tag.display.card(tag)}</div> )}  
+                  </div>
+                </div>
+
+                <div className="d-flex flex-column flex-fill mw-50 m-3">
+                  <label className="d-flex font-italic align-self-center">unassigned tags</label>
+                  <div className="d-flex border flex-wrap p-2">
+                  { unassignedTags.map( tag => <div onDblClick={() => console.log("dblclicked")} onClick={() => addTag(tag.id)}>{tag.display.card(tag)}</div> )}
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+    // return  <List className="container-row"
+    //             headerComponent={<div className="container-item item-label">Modify Tags</div>}
+    //             tableData={[
+    //               {
+    //                 selectable: false, 
+    //                 label: "Add Tag" , 
+    //                 input: <select className="container-row" value="" onChange={() => addTag(event.target.value)}>
+    //                           <option value=""></option>
+    //                           {
+    //                             Object.values(getStore().tag).map( tag => <option value={tag.id}>{tag.label}</option>)
+    //                           }
+    //                         </select>},
+    //               ...Object.values(agencyObj.tools.getTags(agencyObj)).map(tag => ({
+    //                 data: tag, 
+    //                 selectable: false, 
+    //                 input: <button onClick={()=> removeTag(tag.id)}>X</button>, 
+    //                 label: tag.display.card(tag) }))]}
+    //             columns={[{selector: "label"}, {selector: "input"}]} />
   },
   manageSubscriptions: (node, updateHandler) => {
     return  <div>manage subscriptions component</div>
