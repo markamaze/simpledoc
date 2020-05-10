@@ -57,7 +57,7 @@ const prototype = (getStore, services, utilities) => ({
         
         let valid_property_types = ["string", "date"]
 
-        properties.reduce((result, property) => {
+        return properties.reduce((result, property) => {
           let propertySet
 
           if(!result) return false
@@ -77,20 +77,20 @@ const prototype = (getStore, services, utilities) => ({
   },
   display: {
     card: tag => {
-      return  <div className="tag container-item">
+      return  <div className="d-inline-flex bg-secondary text-light p-1 m-1" style={{fontSize: "smaller", borderRadius: ".5rem"}}>
                 {tag.tools.getDisplayName(tag)}
               </div>
     },
     document: tag => {
 
       return  <List className="container"
-                  headerComponent={<div>{tag.display.card(tag)}</div>}
+                  headerComponent={<div>Tag Info: {tag.tools.getDisplayName(tag)}</div>}
                   tableData={[
-                    {label: "Tag Name", display: tag.tools.getDisplayName(tag)},
-                    {label: "Tag Type", display: tag.components.showTagType(tag)},
-                    {label: "Tag Properties", display: tag.agencyComponents.showPropertyKeys(tag.tag_properties)}
+                    {label: <div>Tag</div>, display: tag.display.card(tag)},
+                    {label: <div>Type</div>, display: tag.components.showTagType(tag)},
+                    {label: <div>Properties</div>, display: tag.agencyComponents.showPropertyKeys(tag.tag_properties)}
                   ]}
-                  columns={[{selector: "label", selectable: false}, {selector: "display", selectable: false}]} />
+                  columns={[{selector: "label"}, {selector: "display"}]} />
     },
     builder: (tag, close, alert) => {
       function Builder(props){
@@ -98,11 +98,11 @@ const prototype = (getStore, services, utilities) => ({
         const updateHandler = newState => updateTempTag(tempTag.update(newState))
 
         return  <List className="container"
-                    headerComponent={<header>{props.tag.display.card(props.tag)}</header>}
+                    headerComponent={<div>{props.tag.tools.getDisplayName(props.tag)}</div>}
                     tableData={[
                       tempTag.agencyComponents.setLabel(tempTag, updateHandler),
                       tempTag.components.setTagType(tempTag, updateHandler),
-                      tempTag.components.buildProperties(tempTag, updateHandler)
+                      tempTag.components.manageTagProperties(tempTag, updateHandler)
                     ]}
                     footerComponent={tempTag.storage.handlers.call(tempTag, close, alert)}
                     iconComponent={ item => item } />
@@ -116,24 +116,21 @@ const prototype = (getStore, services, utilities) => ({
     getProperties: tag => tag.tag_properties
   },
   components: {
-    showTagType: tag => <div>{tag.tag_type}</div>,
+    showTagType: tag => <div className="font-italic">{tag.tag_type}</div>,
     setTagType: (tag, updateHandler) => {
 
-      return  <div className="container-row border-bottom">
-                <div className="container-item item-label">Set Tag Type:</div>
-                <div className="container-fill">
-                  <div className="container-item">
-                    <select value={tag.tag_type}
-                        onChange={() => updateHandler({tag_type: event.target.value})} >
-                      <option value=""></option>
-                      <option value="agent">Agent</option>
-                      <option value="structural">Structural</option>
-                    </select>
-                  </div>
-                </div>
+      return  <div className="d-flex flex-row">
+                <label className="d-flex p-1 w-25">Set tag type</label>
+                <select className="d-flex p-0 m-1 flex-fill"
+                    value={tag.tag_type}
+                    onChange={() => updateHandler({tag_type: event.target.value})} >
+                  <option value=""></option>
+                  <option value="agent">Agent</option>
+                  <option value="structural">Structural</option>
+                </select>
               </div>
     },
-    buildProperties: (tag, updateHandler) => {
+    manageTagProperties: (tag, updateHandler) => {
       let tagProperties = tag.tag_properties ? tag.tag_properties : []
 
       const addNewProperty = event => {
@@ -145,26 +142,49 @@ const prototype = (getStore, services, utilities) => ({
 
         tagProperties.push(propertyString)
         updateHandler({tag_properties: tagProperties})
-
       }
 
-      return  <div className="container-row border-bottom">
-                <div className="container-item item-label">Build Properties:</div>
-                <div className="container">
+      const removeProperty = propertyString => {
+        updateHandler({tag_properties: tagProperties.filter(property => property !== propertyString)})
+      }
+
+      const updateProperty = (id, key, valueType) => {
+        updateHandler({tag_properties: [...tagProperties.filter(property => property.split("=")[0] !== id), `${id}=${key}=${valueType}`]})
+      }
 
 
-                <form onSubmit={() => addNewProperty(event)}>
-                  <label>add new property</label>
-                  <input type="text" id="propertyKey" name="propertyKey" placeholder="define key" />
-                  <select id="valueType" name="valueType" placeholder="set value type">
-                    <option value="text">text</option>
+      return  <div className="d-flex flex-column flex-fill">
+                <label className="d-flex pt-2 pb-0 align-self-center">Tag Properties</label>
+
+                <div className="d-flex p-1 flex-column">
+                { 
+                  tag.tools.getProperties(tag).map( propertyString => {
+                    let property = propertyString.split("=")
+                    let id = property[0]
+                    let key = property[1]
+                    let valueType = property[2]
+
+                    return  <div className="d-flex flex-row flex-fill mx-4 my-1 input-group input-group-sm">
+                              <input className="input-group-text p-1" type="text" value={key} onChange={() => updateProperty(id, event.target.value, valueType)} />
+                              <select className="input-group-select p-0" onChange={() => updateProperty(id, key, event.target.value)} value={valueType} >
+                                <option value="string">string</option>
+                                <option value="date">date</option>
+                              </select>
+                              <input className="mx-2 p-0" type="button" onClick={() => removeProperty(propertyString)} value="remove"/>
+                            </div> 
+                  })
+                }
+                </div>
+
+                <form className="d-flex mx-4 my-1 flex-row flex-fill input-group input-group-sm" onSubmit={() => addNewProperty(event)}>
+                  <input className="input-group-text" type="text" id="propertyKey" name="propertyKey" placeholder="set new key" />
+                  <select className="p-0" id="valueType" name="valueType" >
+                    <option value="">set new type</option>
+                    <option value="string">string</option>
                     <option value="date">date</option>
                   </select>
-                  <input type="submit" value="add property" />
+                  <input className="input-group-text mx-2 p-0" type="submit" value="add property" />
                 </form>
-
-                { tag.agencyComponents.showPropertyKeys(tag.tag_properties) }
-                </div>
               </div>
     }
   }
