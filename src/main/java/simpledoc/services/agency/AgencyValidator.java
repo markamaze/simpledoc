@@ -116,13 +116,12 @@ public class AgencyValidator extends ModuleValidation {
 	String id, key, value_type;
 
 
-	if(property_string instanceof String) return null;
-	else kvpair = ((String)property_string).split("=");
+	if(property_string instanceof String) kvpair = ((String)property_string).split("=");
+	else return null;
 	
 	if(kvpair.length != 3) return null;
 	
-	if(kvpair[0].equals("new_property")) id = UUID.randomUUID().toString();
-	else id = kvpair[0];
+	id = kvpair[0];
 	key = kvpair[1];
 	value_type = kvpair[2];
 
@@ -130,8 +129,8 @@ public class AgencyValidator extends ModuleValidation {
 	else if(!AgencyValidator.validateString(key, 1, 0, true, true)) return null;
 	else if(!typeSet.contains(value_type)) return null;
 					
-	
-	return String.join(id, "=", key, "=", value_type);
+	String propertyString = id + "=" + key + "=" + value_type;
+	return propertyString;
   }
 
   public static String tagType(Object type){
