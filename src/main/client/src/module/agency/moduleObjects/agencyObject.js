@@ -248,12 +248,12 @@ const agencyComponents = ( getStore, getServices ) => ({
   },
   showPropertyKeys: property_set => {
     if(!Array.isArray(property_set) || property_set.length === 0) 
-      return <div>no properties</div>
+      return <div>-</div>
 
-    return  <div>
+    return  <div className="d-flex flex-wrap">
               { property_set.map( propertyString => {
                   let property= propertyString.split("=")
-              return <span>{property[1]}</span> }) }
+              return <div className="p-2">{property[1]}</div> }) }
             </div>
   },
   showSubscriptions: subscription_set => {
@@ -278,12 +278,9 @@ const agencyComponents = ( getStore, getServices ) => ({
               columns={[{selector:"property_editor"}]} />
   },
   setLabel: (agencyObj, updateHandler) => {
-    return  <div className="container-row border-bottom">
-              <div className="container-item item-label">Set Label:</div>
-              <div className="container-fill">
-                <input value={agencyObj.label}
-                    onChange={() => updateHandler({label: event.target.value})} />
-              </div>
+    return  <div className="d-flex flex-row">
+              <label className="d-flex p-1 w-25">Set Label</label>
+              <input className="d-flex m-1 p-0 flex-fill" value={agencyObj.label} onChange={() => updateHandler({label: event.target.value})} />
             </div>
   },
   setTags: (agencyObj, updateHandler) => {
